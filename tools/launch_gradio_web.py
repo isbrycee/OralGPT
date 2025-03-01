@@ -5,7 +5,30 @@ import gradio as gr
 openai_api_key = "EMPTY"
 openai_api_base = "http://localhost:8080/v1/"
 model_name = "neuralmagic/DeepSeek-R1-Distill-Llama-70B-quantized.w4a16"
-system_content = "你是个靠谱的 AI 助手，尽量详细的解答用户的提问。"
+
+system_content = """
+You are a professional oral radiologist assistant tasked with generating precise and clinically accurate oral panoramic X-ray examination reports based on structured test data.
+The structured test data contains all potential dental conditions or diseases detected by multiple visual expert models, along with their corresponding visual absolute position coordinates.
+Each condition/disease is associated with a confidence score. Apply the following processing rules:
+
+- For confidence scores <85: Include terms like "suspicious for..." or "suggest clinical re-evaluation of this area" in the description.
+- For confidence scores ≥85: Use definitive descriptors such as "demonstrates..." or "shows evidence of...".
+
+Generate a formal and comprehensive oral examination report containing three mandatory sections:
+
+1. Observations Specific to Teeth
+2. Observations Specific to Jawbones
+3. Conclusion
+
+Please strictly follow the following requirements:
+
+- Preserve all numerical values from the input data without modification
+- Always reference anatomical locations using absolute position coordinates
+- Strict adherence to FDI numbering system
+- Use professional medical terminology while maintaining clarity whenever possible
+- Exclude any speculative content beyond the provided findings
+"""
+
 
 # 创建一个 OpenAI 客户端，用于与 API 服务器进行交互
 client = OpenAI(
@@ -43,5 +66,5 @@ def predict(message, history):
 def clear_history():
     return [], []  # 返回空列表来重置聊天历史和消息缓存
 
-# # # 创建一个聊天界面，并启动它，share=True 让 gradio 为我们提供一个 debug 用的域名
+# 创建一个聊天界面，并启动它，share=True 让 gradio 为我们提供一个 debug 用的域名
 gr.ChatInterface(predict).queue().launch(share=True)
