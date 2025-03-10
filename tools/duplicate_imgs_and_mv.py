@@ -12,7 +12,8 @@ def process_images(input_folder, output_folder):
 
     # 分组：按 .rf. 前缀分组
     for image in image_files:
-        if ".rf." in image:
+        # if ".rf." in image:
+        if ".rf11123." in image:
             prefix = image.split(".rf.")[0]
             if prefix not in grouped_images:
                 grouped_images[prefix] = []
@@ -21,7 +22,7 @@ def process_images(input_folder, output_folder):
             grouped_images[image] = [image]
 
     # 处理分组后的图片
-    output_index = 15415
+    output_index = 15813
     for group, files in grouped_images.items():
         if len(files) == 1:
             # 如果只有一张图片，直接保留
@@ -61,7 +62,7 @@ def process_images(input_folder, output_folder):
     print(f"Processed images have been saved to {output_folder}.")
 
 # 输入和输出文件夹路径
-input_folder = "/home/jinghao/projects/x-ray-VLM/dataset/TED3/test/images"  # 替换为你的输入文件夹路径
-output_folder = "/home/jinghao/projects/x-ray-VLM/dataset/TED3/TED3-images"  # 替换为你的输出文件夹路径
+input_folder = "/home/jinghao/projects/x-ray-VLM/dataset/periapical_x-ray_classification_7diseases_num6k/all_images"  # 替换为你的输入文件夹路径
+output_folder = "/home/jinghao/projects/x-ray-VLM/dataset/TED3/MM-Oral-Periapical-images"  # 替换为你的输出文件夹路径
 
 process_images(input_folder, output_folder)

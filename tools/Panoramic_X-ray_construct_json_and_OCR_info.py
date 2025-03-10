@@ -8,8 +8,8 @@ import re
 
 
 # 输入图片文件夹路径和输出 JSON 文件夹路径
-input_image_folder = "/home/jinghao/projects/x-ray-VLM/dataset/TED3/TED3-images"  # 替换为实际图片文件夹路径
-output_json_folder = "/home/jinghao/projects/x-ray-VLM/dataset/TED3/TED3-jsons"  # 替换为实际 JSON 文件夹路径
+input_image_folder = "/home/jinghao/projects/x-ray-VLM/dataset/TED3/MM-Oral-OPG-images-4k"  # 替换为实际图片文件夹路径
+output_json_folder = "/home/jinghao/projects/x-ray-VLM/dataset/TED3/MM-Oral-OPG-jsons-4k"  # 替换为实际 JSON 文件夹路径
 
 
 engine = OpenOCR()
@@ -57,7 +57,6 @@ for file_name in os.listdir(input_image_folder):
         # 打开图片以获取宽高
         with Image.open(image_path) as img:
             image_width, image_height = img.size
-
         # 调用 OCR 模型获取采集时间
         aquisition_time = get_aquisition_time(image_path)
         image_id = int(os.path.splitext(file_name)[0])
