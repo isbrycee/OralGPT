@@ -4,7 +4,7 @@ from typing import Dict, Any, List
 
 prefixed_template = '''
 This localization caption provides multi-dimensional spatial analysis of anatomical structures and pathological findings \
-for this panoramic dental X-ray image, including:\n\n
+for this panoramic dental X-ray image, including:\n
 '''
 
 def process_bboxes(bbox_data: Any) -> List[List[float]]:
