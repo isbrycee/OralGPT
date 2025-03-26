@@ -144,6 +144,7 @@ def determine_side(box, quadrants_info, object_type='tooth', image_width=None, i
                 else:
                     return "lower left"
     
+
 def process_json_file(file_path):
     """处理单个JSON文件"""
     with open(file_path, 'r') as f:
@@ -159,6 +160,14 @@ def process_json_file(file_path):
     # 1. 处理MissingTeeth和Missing teeth
     missing_teeth = data.get('properties', {}).get('Missing teeth', [])
     missing_teeth_alt = data.get('properties', {}).get('MissingTeeth', [])
+    
+    # 过滤Missing teeth中score低于0.4的
+    if missing_teeth:
+        missing_teeth = [mt for mt in missing_teeth if mt.get('score', 0) >= 0.4]
+    
+    # 过滤MissingTeeth中score低于0.4的
+    if missing_teeth_alt:
+        missing_teeth_alt = [mt for mt in missing_teeth_alt if mt.get('score', 0) >= 0.4]
     
     # 如果两个字段都存在
     if missing_teeth and missing_teeth_alt:
@@ -232,44 +241,79 @@ def process_json_file(file_path):
         
         data['properties']['Missing teeth'] = missing_teeth
     
-    # 3. 处理bone loss，只保留score > 0.6的
+    # 处理JawBones，过滤score低于0.4的所有条件
     if 'JawBones' in data.get('properties', {}):
         for jawbone in data['properties']['JawBones']:
-            if 'conditions' in jawbone and 'Bone loss' in jawbone['conditions']:
-                bone_loss = jawbone['conditions']['Bone loss']
+            if 'conditions' in jawbone:
+                conditions_to_remove = []
                 
-                # 过滤score > 0.6的bone loss
-                if isinstance(bone_loss.get('score', []), list):
-                    filtered_boxes = []
-                    filtered_segmentations = []
-                    filtered_scores = []
+                for condition_name, condition_data in jawbone['conditions'].items():
+                    # 处理bone loss，只保留score > 0.6的
+                    if condition_name == 'Bone loss':
+                        if isinstance(condition_data.get('score', []), list):
+                            filtered_boxes = []
+                            filtered_segmentations = []
+                            filtered_scores = []
+                            
+                            for i, score in enumerate(condition_data['score']):
+                                if score > 0.6:  # 对bone loss使用0.6的阈值
+                                    filtered_boxes.append(condition_data['bbox'][i])
+                                    filtered_segmentations.append(condition_data['segmentation'][i])
+                                    filtered_scores.append(score)
+                            
+                            if filtered_boxes:
+                                condition_data['bbox'] = filtered_boxes
+                                condition_data['segmentation'] = filtered_segmentations
+                                condition_data['score'] = filtered_scores
+                                
+                                # 添加side信息
+                                sides = []
+                                for box in filtered_boxes:
+                                    sides.append(determine_side(box, quadrants_info, 'bone_loss', image_width, image_height))
+                                condition_data['side'] = sides
+                            else:
+                                # 如果没有满足条件的bone loss，标记为删除
+                                conditions_to_remove.append(condition_name)
+                        else:
+                            # 对于单个score的情况
+                            if condition_data.get('score', 0) <= 0.6:  # 对bone loss使用0.6的阈值
+                                conditions_to_remove.append(condition_name)
+                            else:
+                                # 添加side信息
+                                condition_data['side'] = determine_side(condition_data['bbox'], quadrants_info, 'bone_loss', image_width, image_height)
                     
-                    for i, score in enumerate(bone_loss['score']):
-                        if score > 0.6:
-                            filtered_boxes.append(bone_loss['bbox'][i])
-                            filtered_segmentations.append(bone_loss['segmentation'][i])
-                            filtered_scores.append(score)
-                    
-                    if filtered_boxes:
-                        bone_loss['bbox'] = filtered_boxes
-                        bone_loss['segmentation'] = filtered_segmentations
-                        bone_loss['score'] = filtered_scores
-                        
-                        # 添加side信息
-                        sides = []
-                        for box in filtered_boxes:
-                            sides.append(determine_side(box, quadrants_info, 'bone_loss', image_width, image_height))
-                        bone_loss['side'] = sides
+                    # 处理其他条件，过滤score < 0.4的
                     else:
-                        # 如果没有满足条件的bone loss，删除整个bone loss条目
-                        del jawbone['conditions']['Bone loss']
-                else:
-                    # 对于单个score的情况
-                    if bone_loss.get('score', 0) <= 0.6:
-                        del jawbone['conditions']['Bone loss']
-                    else:
-                        # 添加side信息
-                        bone_loss['side'] = determine_side(bone_loss['bbox'], quadrants_info, 'bone_loss', image_width, image_height)
+                        if isinstance(condition_data.get('score', []), list):
+                            filtered_boxes = []
+                            filtered_segmentations = []
+                            filtered_scores = []
+                            
+                            for i, score in enumerate(condition_data['score']):
+                                if score >= 0.4:
+                                    if 'bbox' in condition_data:
+                                        filtered_boxes.append(condition_data['bbox'][i])
+                                    if 'segmentation' in condition_data:
+                                        filtered_segmentations.append(condition_data['segmentation'][i])
+                                    filtered_scores.append(score)
+                            
+                            if filtered_scores:
+                                if filtered_boxes:
+                                    condition_data['bbox'] = filtered_boxes
+                                if filtered_segmentations:
+                                    condition_data['segmentation'] = filtered_segmentations
+                                condition_data['score'] = filtered_scores
+                            else:
+                                # 如果没有满足条件的项，标记为删除
+                                conditions_to_remove.append(condition_name)
+                        else:
+                            # 对于单个score的情况
+                            if condition_data.get('score', 0) < 0.4:
+                                conditions_to_remove.append(condition_name)
+                
+                # 删除被标记的条件
+                for condition_name in conditions_to_remove:
+                    del jawbone['conditions'][condition_name]
     
     return data
 
