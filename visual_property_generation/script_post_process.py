@@ -143,12 +143,6 @@ def determine_side(box, quadrants_info, object_type='tooth', image_width=None, i
                     return "lower right"
                 else:
                     return "lower left"
-    
-    # 如果不能确定，默认返回
-    if object_type in ['bone_loss', 'missing_teeth']:
-        return "lower"  # 默认值
-    else:
-        return "lower left"  # 默认值
 
 def process_json_file(file_path):
     """处理单个JSON文件"""
@@ -218,6 +212,7 @@ def process_json_file(file_path):
         # 找出所有tooth_id为unknown且有conditions的牙齿
         unknown_teeth = []
         known_teeth = []
+        unknown_teeth_to_keep = []  # 用于存储未被分配的unknown牙齿
         
         for tooth in teeth:
             if tooth.get('tooth_id') == 'unknown' and 'conditions' in tooth and tooth['conditions']:
@@ -234,16 +229,24 @@ def process_json_file(file_path):
                     tooth_copy = tooth.copy()
                     tooth_copy['conditions'] = filtered_conditions
                     unknown_teeth.append(tooth_copy)
+                    # 初始时，所有unknown牙齿都需要保留
+                    unknown_teeth_to_keep.append(tooth_copy)
             else:
                 known_teeth.append(tooth)
         
         # 处理unknown牙齿的conditions，将它们分配给重叠的已知牙齿
         for unknown_tooth in unknown_teeth:
+            all_conditions_assigned = True  # 标记是否所有conditions都被分配
+            conditions_to_remove = []  # 记录已被分配的conditions
+            
             for cond_name, cond_data in unknown_tooth['conditions'].items():
                 # 检查condition是否有bbox
                 if 'bbox' in cond_data:
                     # 对于bbox列表的情况
                     if isinstance(cond_data['bbox'], list) and isinstance(cond_data['bbox'][0], list):
+                        all_bbox_assigned = True  # 标记是否所有bbox都被分配
+                        assigned_bbox_indices = []  # 记录已被分配的bbox索引
+                        
                         for i, bbox in enumerate(cond_data['bbox']):
                             # 查找与该condition bbox重叠最大的牙齿
                             max_iou = 0
@@ -304,6 +307,35 @@ def process_json_file(file_path):
                                             new_cond['segmentation'] = cond_data['segmentation'][i]
                                     
                                     best_tooth['conditions'][cond_name] = new_cond
+                                
+                                assigned_bbox_indices.append(i)
+                            else:
+                                all_bbox_assigned = False
+                        
+                        # 如果所有bbox都被分配，记录这个condition将被移除
+                        if all_bbox_assigned:
+                            conditions_to_remove.append(cond_name)
+                        else:
+                            # 如果有些bbox未被分配，更新condition，只保留未分配的bbox
+                            new_bbox = []
+                            new_score = []
+                            new_segmentation = []
+                            
+                            for i in range(len(cond_data['bbox'])):
+                                if i not in assigned_bbox_indices:
+                                    new_bbox.append(cond_data['bbox'][i])
+                                    if 'score' in cond_data and isinstance(cond_data['score'], list) and i < len(cond_data['score']):
+                                        new_score.append(cond_data['score'][i])
+                                    if 'segmentation' in cond_data and isinstance(cond_data['segmentation'], list) and i < len(cond_data['segmentation']):
+                                        new_segmentation.append(cond_data['segmentation'][i])
+                            
+                            cond_data['bbox'] = new_bbox
+                            if new_score:
+                                cond_data['score'] = new_score
+                            if new_segmentation:
+                                cond_data['segmentation'] = new_segmentation
+                            
+                            all_conditions_assigned = False
                     else:
                         # 对于单个bbox的情况
                         bbox = cond_data['bbox']
@@ -338,9 +370,22 @@ def process_json_file(file_path):
                             else:
                                 # 如果condition不存在，直接添加
                                 best_tooth['conditions'][cond_name] = cond_data.copy()
+                            
+                            conditions_to_remove.append(cond_name)
+                        else:
+                            all_conditions_assigned = False
+            
+            # 从unknown_tooth中移除已分配的conditions
+            for cond_name in conditions_to_remove:
+                if cond_name in unknown_tooth['conditions']:
+                    del unknown_tooth['conditions'][cond_name]
+            
+            # 如果所有conditions都被分配，则从未分配列表中移除该unknown牙齿
+            if all_conditions_assigned or not unknown_tooth['conditions']:
+                unknown_teeth_to_keep.remove(unknown_tooth)
         
-        # 更新Teeth字段，移除tooth_id为unknown的牙齿
-        data['properties']['Teeth'] = [tooth for tooth in teeth if tooth.get('tooth_id') != 'unknown']
+        # 更新Teeth字段，包括known_teeth和未分配的unknown_teeth
+        data['properties']['Teeth'] = known_teeth + unknown_teeth_to_keep
     
     # 3. 处理JawBones，过滤score低于0.4的所有条件
     if 'JawBones' in data.get('properties', {}):
