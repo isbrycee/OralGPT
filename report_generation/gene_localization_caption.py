@@ -2,10 +2,7 @@ import json
 import os
 from typing import Dict, Any, List
 
-prefixed_template = '''
-This localization caption provides multi-dimensional spatial analysis of anatomical structures and pathological findings \
-for this panoramic dental X-ray image, including:\n
-'''
+prefixed_template = "This localization caption provides multi-dimensional spatial analysis of anatomical structures and pathological findings for this panoramic dental X-ray image, including:\n "
 
 def process_bboxes(bbox_data: Any) -> List[List[float]]:
     """处理嵌套的bbox数据结构"""
@@ -91,6 +88,16 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
     sections.append(generate_section("Wisdom teeth detection", wisdom_teeth))
     
     # TODO: Missing teeth
+    if "Missing teeth" in data["properties"].keys():
+        missing_teeth = []
+        for tooth in data["properties"]["Missing teeth"]:
+            # 检查是否为缺失牙齿，并确保 tooth_id 有效
+            missing_teeth.append({
+                "box_2d": tooth.get("bbox", []),  # 兼容可能缺失的 bbox
+                "side": tooth.get("side", "unknown"),
+                "score": round(tooth.get("score", 0), 2)  # 可选：如果缺失牙齿有置信度评分
+            })
+        sections.append(generate_section("Missing teeth detection", missing_teeth))
 
     # 非智齿阻生齿检测（与智齿检测分开处理）
     non_wisdom_impacted = []
@@ -116,13 +123,22 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
         conditions = tooth.get("conditions", {})
         for cond in ["Caries", "Deep caries"]:
             if c := conditions.get(cond, {}):
-                if c.get("present", False):
+                if c.get("present", False) and (tooth.get("tooth_id") != 'unknown'):
                     caries.append({
                         "box_2d": [round(coord) for coord in c["bbox"]],
                         "tooth_id": tooth.get("tooth_id", "unknown"),
                         "label": cond.replace("_", " "),
                         "score": round(c.get("score", 0), 2)
                     })
+                if tooth.get("tooth_id") == 'unknown':
+                    for ids, bbox in enumerate(process_bboxes(c.get("bbox", []))):
+                        caries.append({
+                            "box_2d": [round(coord) for coord in bbox],
+                            "tooth_id": tooth.get("tooth_id", "unknown"),
+                            "side": c.get("side", 0)[ids] if isinstance(c.get("side", 0), list) else c.get("side", 0),
+                            "label": cond.replace("_", " "),
+                            "score": c.get("score", 0)[ids] if isinstance(c.get("score", 0), list) else c.get("score", 0),
+                        })
     sections.append(generate_section("Dental caries detection", caries))
     
     # 根尖病变检测
@@ -131,13 +147,24 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
         conditions = tooth.get("conditions", {})
         for cond in ["Periapical lesions"]:
             if p := conditions.get(cond, {}):
-                if p.get("present", False):
-                    Periapical_lesions.append({
-                        "box_2d": [round(coord) for coord in p["bbox"]],
-                        "tooth_id": tooth.get("tooth_id", "unknown"),
-                        "label": cond + f' ({p.get("type")})' if p.get("type", None) else cond,
-                        "score": round(p.get("score", 0), 2)
-                    })
+                if p.get("present", False) and (tooth.get("tooth_id") != 'unknown'):
+                    if p.get("score") > 0.7: # filter score lower than 0.7; add by bryce
+                        Periapical_lesions.append({
+                            "box_2d": [round(coord) for coord in p["bbox"]],
+                            "tooth_id": tooth.get("tooth_id", "unknown"),
+                            "label": cond + f' ({p.get("type")})' if p.get("type", None) else cond,
+                            "score": round(p.get("score", 0), 2)
+                        })
+                if tooth.get("tooth_id") == 'unknown':
+                    for ids, bbox in enumerate(process_bboxes(p.get("bbox", []))):
+                        Periapical_lesions.append({
+                            "box_2d": [round(coord) for coord in bbox],
+                            "tooth_id": tooth.get("tooth_id", "unknown"),
+                            "side": p.get("side", 0)[ids] if isinstance(p.get("side", 0), list) else p.get("side", 0),
+                            "label": cond.replace("_", " "),
+                            "score": p.get("score", 0)[ids] if isinstance(p.get("score", 0), list) else p.get("score", 0),
+                        })
+                
     sections.append(generate_section("Periapical lesions detection", Periapical_lesions))
     
     # 历史治疗
@@ -147,7 +174,7 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
         conditions = tooth.get("conditions", {})
         for tt in treatment_types:
             if t := conditions.get(tt, {}):
-                if t.get("present", False):
+                if t.get("present", False) and (tooth.get("tooth_id") != 'unknown'):
                     for ids, bbox in enumerate(process_bboxes(t.get("bbox", []))):
                         treatments.append({
                             "box_2d": [round(coord) for coord in bbox],
@@ -155,6 +182,16 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
                             "label": tt.replace("_", " "),
                             "score": round(t.get("score", 0)[ids], 2) if isinstance(t.get("score", 0), list) else round(t.get("score", 0), 2)
                         })
+                if tooth.get("tooth_id") == 'unknown':
+                    for ids, bbox in enumerate(process_bboxes(t.get("bbox", []))):
+                        treatments.append({
+                            "box_2d": [round(coord) for coord in bbox],
+                            "tooth_id": tooth.get("tooth_id", "unknown"),
+                            "side": t.get("side", 0)[ids] if isinstance(t.get("side", 0), list) else t.get("side", 0),
+                            "label": cond.replace("_", " "),
+                            "score": t.get("score", 0)[ids] if isinstance(t.get("score", 0), list) else t.get("score", 0),
+                        })
+
     sections.append(generate_section("Historical treatments", treatments))
     
     # 颌骨相关检测
@@ -168,6 +205,7 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
                 jawbone_sections.append({
                     "box_2d": [round(coord) for coord in bbox],
                     "label": "Bone loss",
+                    "side": bone_loss.get("side", 0)[ids] if isinstance(bone_loss.get("side", 0), list) else bone_loss.get("side", 0),
                     "score": round(bone_loss.get("score", 0)[ids], 2) if isinstance(bone_loss.get("score", 0), list) else round(bone_loss.get("score", 0), 2)
                 })
         
@@ -181,11 +219,11 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
                 })
         
         # 上颌窦
-        if sinuses := conditions.get("Maxillary sinuses", {}):
+        if sinuses := conditions.get("Maxillary sinus", {}):
             for ids, bbox in enumerate(process_bboxes(sinuses.get("bbox", []))):
                 jawbone_sections.append({
                     "box_2d": [round(coord) for coord in bbox],
-                    "label": "Maxillary sinuses",
+                    "label": "Maxillary sinus",
                     "score": round(sinuses.get("score", 0)[ids], 2) if isinstance(sinuses.get("score", 0), list) else round(sinuses.get("score", 0), 2)
                 })
     
@@ -194,7 +232,7 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
     sections.append(generate_section("Mandibular canal visibility", 
                    [x for x in jawbone_sections if x["label"] == "Mandibular canal"]))
     sections.append(generate_section("Maxillary sinuses visibility", 
-                   [x for x in jawbone_sections if x["label"] == "Maxillary sinuses"]))
+                   [x for x in jawbone_sections if x["label"] == "Maxillary sinus"]))
     
     return "\n\n".join([s for s in sections if s])
 
@@ -203,8 +241,8 @@ def process_json_file(file_path: str, saved_folder: str):
         data = json.load(f)
     
     data["loc_caption"] = prefixed_template + generate_loc_caption(data)
-
-    print(data["loc_caption"])
+    print(file_path)
+    print(data["med_report"])
     file_name = file_path.split('/')[-1]
     with open(os.path.join(saved_folder, file_name), "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -216,8 +254,8 @@ def main(input_folder: str, saved_folder: str):
                 process_json_file(os.path.join(root, file), saved_folder)
 
 if __name__ == "__main__":
-    input_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/temp"
-    saved_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/temp_output"
+    input_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv1_med_report/"
+    saved_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv1_loc/"
 
     os.makedirs(saved_folder, exist_ok=True)
 
