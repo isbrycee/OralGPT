@@ -188,7 +188,7 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
                             "box_2d": [round(coord) for coord in bbox],
                             "tooth_id": tooth.get("tooth_id", "unknown"),
                             "side": t.get("side", 0)[ids] if isinstance(t.get("side", 0), list) else t.get("side", 0),
-                            "label": cond.replace("_", " "),
+                            "label": tt.replace("_", " "),
                             "score": t.get("score", 0)[ids] if isinstance(t.get("score", 0), list) else t.get("score", 0),
                         })
 
