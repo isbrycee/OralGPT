@@ -112,7 +112,7 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
                 non_wisdom_impacted.append({
                     "box_2d": [round(coord) for coord in bbox],
                     "tooth_id": tooth.get("tooth_id"),
-                    "label": "Impacted teeth",
+                    "label": "Impacted tooth",
                     "score": round(imp.get("score", 0), 2)
                 })
     sections.append(generate_section("Non-wisdom impacted teeth detection", non_wisdom_impacted))
