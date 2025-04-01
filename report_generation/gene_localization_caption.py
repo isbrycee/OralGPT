@@ -82,7 +82,7 @@ def generate_loc_caption(data: Dict[str, Any]) -> str:
             wisdom_teeth.append({
                 "box_2d": [round(coord) for coord in tooth["bbox"]],
                 "tooth_id": tooth.get("tooth_id", "unknown"),
-                "is_impacted": tooth.get("conditions", {}).get("impacted_teeth", {}).get("present", False),
+                "is_impacted": tooth.get("conditions", {}).get("Impacted tooth", {}).get("present", False),
                 "score": round(tooth.get("score", 0), 2)
             })
     sections.append(generate_section("Wisdom teeth detection", wisdom_teeth))
@@ -241,8 +241,8 @@ def process_json_file(file_path: str, saved_folder: str):
         data = json.load(f)
     
     data["loc_caption"] = prefixed_template + generate_loc_caption(data)
-    print(file_path)
-    print(data["med_report"])
+    # print(file_path)
+    # print(data["med_report"])
     file_name = file_path.split('/')[-1]
     with open(os.path.join(saved_folder, file_name), "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -255,7 +255,7 @@ def main(input_folder: str, saved_folder: str):
 
 if __name__ == "__main__":
     input_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv1_med_report/"
-    saved_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv1_loc/"
+    saved_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv1_med_report_sft"
 
     os.makedirs(saved_folder, exist_ok=True)
 
