@@ -6,116 +6,185 @@ from ast import literal_eval
 import copy
 from typing import List, Dict, Any, Tuple
 
-# Question templates for different categories
-COUNTING_TEMPLATES = [
-    'How many teeth are visible in this panoramic dental X-ray image?',
-    'What is the total number of visible teeth in this panoramic image?',
-    'Count the number of teeth that can be seen in this dental X-ray.',
-    'How many teeth with caries are detected in this panoramic image?',
-    'What is the count of wisdom teeth visible in this X-ray?',
-    'How many teeth show evidence of root canal treatment in this panoramic image?',
-    'Count the number of missing teeth in this dental X-ray.',
-    'How many areas of bone loss can be identified in this panoramic image?',
-    'What is the total number of impacted teeth shown in this X-ray?',
-    'How many dental fillings can be detected in this panoramic image?'
+# Comprehensive template dictionaries for each category
+TEMPLATE_DICT = {
+    "Teeth visibility with center points": [
+        "How many teeth are visible in this panoramic dental X-ray image?",
+        "What is the total number of visible teeth in this panoramic image?",
+        "Count the number of teeth that can be seen in this dental X-ray.",
+        "Which tooth is located at coordinates [{}, {}] in the panoramic image?",
+        "Identify the position of tooth #{} in this X-ray image.",
+        "Output the coordinates of tooth #{} in the panoramic dental X-ray."
+    ],
+    "Wisdom teeth detection": [
+        "What is the count of wisdom teeth visible in this X-ray?",
+        "How many wisdom teeth can be identified in this panoramic image?",
+        "Where is the wisdom tooth #{} located in this panoramic X-ray?",
+        "Which wisdom teeth are impacted in this panoramic dental X-ray?",
+        "Are any wisdom teeth fully erupted in this X-ray image?"
+    ],
+    "Missing teeth detection": [
+        "How many teeth are missing in this panoramic dental X-ray?",
+        "Count the number of missing teeth in this dental X-ray.",
+        "In which part of the dental arch are teeth missing in this X-ray?",
+        "Which teeth are missing in this panoramic dental image?",
+        "Where are gaps from missing teeth located in this panoramic image?"
+    ],
+    "Non-wisdom impacted teeth detection": [
+        "How many non-wisdom impacted teeth are visible in this panoramic X-ray?",
+        "Where is the impacted non-wisdom tooth located in this panoramic X-ray?",
+        "Which teeth are impacted (excluding wisdom teeth) in this dental image?",
+        "Are there any impacted canines visible in this panoramic X-ray?"
+    ],
+    "Dental caries detection": [
+        "How many teeth with caries are detected in this panoramic image?",
+        "Which teeth are affected by caries in this panoramic dental image?",
+        "Where are the caries detected in this X-ray image?",
+        "Which teeth have deep caries in this panoramic dental X-ray?",
+        "What is the distribution of caries in this dental X-ray?"
+    ],
+    "Periapical lesions detection": [
+        "How many teeth show periapical lesions in this panoramic X-ray?",
+        "Where is a periapical lesion located in this panoramic X-ray?",
+        "Which teeth are affected by periapical lesions in this panoramic X-ray?",
+        "Are there any periapical lesions visible in this dental image?",
+        "What is the size of the periapical lesion detected in this X-ray?"
+    ],
+    "Historical treatments": [
+        "How many dental fillings can be detected in this panoramic image?",
+        "Which teeth have dental restorations in this panoramic dental image?",
+        "What types of dental treatments are visible in this panoramic X-ray?",
+        "Where are dental restorations detected in this panoramic image?",
+        "Which teeth show evidence of root canal treatment in this panoramic image?"
+    ],
+    "Bone loss detection": [
+        "How many areas of bone loss can be identified in this panoramic image?",
+        "Where is bone loss detected in this panoramic X-ray?",
+        "On which side(s) is bone loss detected in this panoramic X-ray?",
+        "What is the severity of bone loss visible in this dental X-ray?",
+        "Which teeth are affected by adjacent bone loss in this image?"
+    ],
+    "Mandibular canal visibility": [
+        "Is the mandibular canal visible in this panoramic X-ray?",
+        "On which sides is the mandibular canal visible in this panoramic X-ray?",
+        "Where is the mandibular canal located in this panoramic X-ray?",
+        "How clear is the visualization of the mandibular canal in this image?",
+        "What is the relationship between the mandibular canal and adjacent teeth roots?"
+    ],
+    "Maxillary sinuses visibility": [
+        "Are the maxillary sinuses visible in this panoramic X-ray?",
+        "Where are the maxillary sinuses located in this panoramic X-ray?",
+        "Is there any pathology visible in the maxillary sinuses in this X-ray?",
+        "How well can you visualize the maxillary sinuses in this panoramic image?",
+        "What is the relationship between the maxillary sinuses and the upper molar roots?"
+    ]
+}
+
+# Keep the existing specialized templates for backwards compatibility
+COUNTING_TEMPLATES = TEMPLATE_DICT["Teeth visibility with center points"][:3] + [
+    TEMPLATE_DICT["Dental caries detection"][0],
+    TEMPLATE_DICT["Wisdom teeth detection"][0],
+    TEMPLATE_DICT["Historical treatments"][4],
+    TEMPLATE_DICT["Missing teeth detection"][1],
+    TEMPLATE_DICT["Bone loss detection"][0],
+    "What is the total number of impacted teeth shown in this X-ray?",
+    TEMPLATE_DICT["Historical treatments"][0]
 ]
 
-TOOTH_LOCALIZATION_TEMPLATES = [
-    'Which tooth is located at coordinates [x, y] in the panoramic image?',
-    'Which tooth appears within the bounding box [x1, y1, x2, y2] in this X-ray?',
-    'Where is tooth #{} located in this panoramic dental image?',
-    'Identify the position of tooth #{} in this X-ray image.',
-    'Output the coordinates of tooth #{} in the panoramic dental X-ray.',
-    'Detect the location of the {} in this panoramic image.',
-    'Which tooth is positioned at the center point [{}, {}] in this dental X-ray?',
-    'Locate tooth #{} in this panoramic radiograph.',
-    'Where are the wisdom teeth positioned in this dental panoramic image?',
-    'Identify the location of tooth #{} in this X-ray image.'
+TOOTH_LOCALIZATION_TEMPLATES = TEMPLATE_DICT["Teeth visibility with center points"][3:6] + [
+    "Where is tooth #{} located in this panoramic dental image?",
+    "Identify the position of tooth #{} in this X-ray image.",
+    "Output the coordinates of tooth #{} in the panoramic dental X-ray.",
+    "Detect the location of the {} in this panoramic image.",
+    "Which tooth is positioned at the center point [{}, {}] in this dental X-ray?",
+    "Locate tooth #{} in this panoramic radiograph.",
+    "Where are the wisdom teeth positioned in this dental panoramic image?",
+    "Identify the location of tooth #{} in this X-ray image."
 ]
 
 PATHOLOGY_TEMPLATES = [
-    'Which teeth are affected by {} in this panoramic dental image?',
-    'Where are the {} detected in this X-ray image?',
-    'Output the positions of {} in the panoramic X-ray image.',
-    'Which teeth show evidence of {} in this panoramic image?',
-    'Identify the areas showing {} in the panoramic radiograph.',
-    'Detect the locations of {} in this X-ray image.',
-    'Which teeth have {} in this panoramic dental image?',
-    'Where are the {} located in this X-ray?',
-    'Identify which teeth exhibit {} in this panoramic image.',
-    'Output the locations of all pathological findings in this dental X-ray.'
+    "Which teeth are affected by {} in this panoramic dental image?",
+    "Where are the {} detected in this X-ray image?",
+    "Output the positions of {} in the panoramic X-ray image.",
+    "Which teeth show evidence of {} in this panoramic image?",
+    "Identify the areas showing {} in the panoramic radiograph.",
+    "Detect the locations of {} in this X-ray image.",
+    "Which teeth have {} in this panoramic dental image?",
+    "Where are the {} located in this X-ray?",
+    "Identify which teeth exhibit {} in this panoramic image.",
+    "Output the locations of all pathological findings in this dental X-ray."
 ]
 
 TREATMENT_TEMPLATES = [
-    'Which teeth have {} in this panoramic dental image?',
-    'Identify the teeth with {} in this X-ray.',
-    'Where are {} detected in this panoramic image?',
-    'Which teeth show evidence of {} in this X-ray?',
-    'Output the positions of all dental restorations in the panoramic image.',
-    'Detect the teeth with historical treatments in this dental X-ray.',
-    'Which dental treatments are visible in the area [x1, y1, x2, y2]?',
-    'Identify all teeth with {} in this panoramic radiograph.',
-    'What type of dental treatment is shown in the bounding box [x1, y1, x2, y2]?',
-    'Which teeth have undergone {} in this panoramic image?'
+    "Which teeth have {} in this panoramic dental image?",
+    "Identify the teeth with {} in this X-ray.",
+    "Where are {} detected in this panoramic image?",
+    "Which teeth show evidence of {} in this X-ray?",
+    "Output the positions of all dental restorations in the panoramic image.",
+    "Detect the teeth with historical treatments in this dental X-ray.",
+    "Which dental treatments are visible in the area [x1, y1, x2, y2]?",
+    "Identify all teeth with {} in this panoramic radiograph.",
+    "What type of dental treatment is shown in the bounding box [x1, y1, x2, y2]?",
+    "Which teeth have undergone {} in this panoramic image?"
 ]
 
 ANATOMY_TEMPLATES = [
-    'Which anatomical structures are visible in the panoramic dental image?',
-    'Where is the {} located in this X-ray image?',
-    'Identify the {} in this panoramic radiograph.',
-    'Detect the locations of bone structures in this dental X-ray.',
-    'Output the positions of the {} in the panoramic image.',
-    'Which anatomical landmarks have been accurately detected in the panoramic image?',
-    'Please detect the {} in this X-ray image.',
-    'Which areas show the {} in the panoramic image?',
-    'Identify areas showing the {} in the panoramic radiograph.',
-    'Output the boundaries of the {} in this dental X-ray.'
+    "Which anatomical structures are visible in the panoramic dental image?",
+    "Where is the {} located in this X-ray image?",
+    "Identify the {} in this panoramic radiograph.",
+    "Detect the locations of bone structures in this dental X-ray.",
+    "Output the positions of the {} in the panoramic image.",
+    "Which anatomical landmarks have been accurately detected in the panoramic image?",
+    "Please detect the {} in this X-ray image.",
+    "Which areas show the {} in the panoramic image?",
+    "Identify areas showing the {} in the panoramic radiograph.",
+    "Output the boundaries of the {} in this dental X-ray."
 ]
 
 MISSING_TEETH_TEMPLATES = [
-    'Which teeth are missing in this panoramic dental image?',
-    'Identify the missing teeth in this X-ray.',
-    'Where are gaps from missing teeth located in this panoramic image?',
-    'Which areas show evidence of missing teeth in this dental X-ray?',
-    'Output the positions of dental gaps in the panoramic image.',
-    'Detect the missing teeth in the upper arch of this X-ray.',
-    'Which teeth are absent in the lower jaw of this panoramic image?',
-    'Identify all missing teeth positions in this dental radiograph.',
-    'Which tooth numbers are missing in this panoramic X-ray?',
-    'In which regions of the dental arches are teeth missing in this image?'
+    "Which teeth are missing in this panoramic dental image?",
+    "Identify the missing teeth in this X-ray.",
+    "Where are gaps from missing teeth located in this panoramic image?",
+    "Which areas show evidence of missing teeth in this dental X-ray?",
+    "Output the positions of dental gaps in the panoramic image.",
+    "Detect the missing teeth in the upper arch of this X-ray.",
+    "Which teeth are absent in the lower jaw of this panoramic image?",
+    "Identify all missing teeth positions in this dental radiograph.",
+    "Which tooth numbers are missing in this panoramic X-ray?",
+    "In which regions of the dental arches are teeth missing in this image?"
 ]
 
 def parse_medical_string(input_str):
-    """解析医疗检测字符串为结构化字典"""
+    """Parse medical detection string to structured dictionary"""
     pattern = r"""
-        ([A-Za-z\s]+)\s+    # 匹配分类名称
-        (?:\(.*?\):\s*)     # 跳过括号内容
-        (\[.*?\])\s*        # 捕获检测条目
-        (?=\n\S|\Z)         # 前瞻判断结束位置
+        ([A-Za-z\s]+)\s+    # Match category name
+        (?:\(.*?\):\s*)     # Skip parenthesized content
+        (\[.*?\])\s*        # Capture detection items
+        (?=\n\S|\Z)         # Lookahead for end position
     """
     
     result_dict = {}
     
-    # 分割主分类
+    # Split main categories
     for match in re.finditer(pattern, input_str, re.VERBOSE | re.DOTALL):
         category, entries_str = match.groups()
         
-        # 清理分类名称
+        # Clean category name
         clean_category = re.sub(r'\s+', ' ', category).strip()
         
-        # 解析条目
+        # Parse entries
         entries = []
         entry_pattern = r"\{([^}]+)\}"
         for entry_match in re.finditer(entry_pattern, entries_str):
             entry_str = entry_match.group(1)
             
-            # 转换键值对
+            # Convert key-value pairs
             entry_dict = {}
             kv_pattern = r"'(\w+)':\s*(.+?)(?=,\s*'|$)"
             for kv in re.finditer(kv_pattern, entry_str):
                 key, value = kv.groups()
                 
-                # 值类型转换
+                # Value type conversion
                 try:
                     parsed_value = literal_eval(value.strip())
                 except:
@@ -217,6 +286,186 @@ def generate_multiple_choice_options(correct_answer, wrong_options, shuffle=True
     
     return options, correct_letter
 
+def generate_qa_for_category(category, templates, parsed_data, max_questions=3):
+    """Generate questions and answers for a specific category using templates"""
+    if category not in parsed_data or not parsed_data[category]:
+        return []
+    
+    qa_pairs = []
+    category_data = parsed_data[category]
+    
+    # Shuffle templates to get variety
+    shuffled_templates = random.sample(templates, min(len(templates), max_questions))
+    
+    for template in shuffled_templates:
+        # Skip if we've reached max questions
+        if len(qa_pairs) >= max_questions:
+            break
+            
+        # For counting questions
+        if any(keyword in template.lower() for keyword in ["how many", "count", "number", "total"]):
+            count = len(category_data)
+            wrong_counts = generate_wrong_count(count)
+            options, correct_letter = generate_multiple_choice_options(count, wrong_counts)
+            
+            qa_pairs.append({
+                "question": template,
+                "options": options,
+                "answer": correct_letter,
+                "explanation": f"There are {count} {category.lower().replace('detection', '').strip()} in the panoramic X-ray."
+            })
+            continue
+            
+        # For location/where questions
+        if any(keyword in template.lower() for keyword in ["where", "locat", "position", "coordinat"]):
+            if not category_data:
+                continue
+                
+            sample_item = random.choice(category_data)
+            
+            # Handle template formatting with tooth ID or coordinates
+            if "{}" in template:
+                if "tooth_id" in sample_item and template.count("{}") == 1:
+                    question = template.format(sample_item["tooth_id"])
+                elif "point_2d" in sample_item and template.count("{}") == 2:
+                    x, y = sample_item["point_2d"]
+                    question = template.format(x, y)
+                else:
+                    continue
+            else:
+                question = template
+            
+            # Generate answer based on available data
+            if "box_2d" in sample_item:
+                correct_bbox = sample_item["box_2d"]
+                correct_bbox_str = str(correct_bbox)
+                
+                # Generate wrong bounding boxes
+                wrong_bboxes = []
+                for _ in range(3):
+                    wrong_bboxes.append(str(generate_wrong_bbox(correct_bbox)))
+                
+                options, correct_letter = generate_multiple_choice_options(correct_bbox_str, wrong_bboxes)
+                
+                explanation = f"The {category.lower().replace('detection', '').strip()} is located at the bounding box {correct_bbox_str}."
+                if "tooth_id" in sample_item:
+                    explanation = f"Tooth #{sample_item['tooth_id']} is located at the bounding box {correct_bbox_str}."
+                
+                qa_pairs.append({
+                    "question": question,
+                    "options": options,
+                    "answer": correct_letter,
+                    "explanation": explanation
+                })
+                continue
+                
+        # For which teeth/affected questions
+        if any(keyword in template.lower() for keyword in ["which teeth", "affected", "exhibit"]):
+            affected_teeth = [item.get("tooth_id") for item in category_data 
+                             if "tooth_id" in item and item["tooth_id"] != "unknown"]
+            
+            if affected_teeth:
+                correct_answer = ", ".join([f"#{t}" for t in affected_teeth])
+                
+                # Generate wrong options
+                if "Teeth visibility with center points" in parsed_data:
+                    all_teeth = [t.get("tooth_id") for t in parsed_data["Teeth visibility with center points"]
+                                if "tooth_id" in t and t["tooth_id"] != "unknown"]
+                    non_affected_teeth = [t for t in all_teeth if t not in affected_teeth]
+                    
+                    wrong_options = []
+                    for _ in range(3):
+                        if non_affected_teeth:
+                            sample_size = min(len(affected_teeth), len(non_affected_teeth))
+                            if sample_size > 0:
+                                wrong_sample = random.sample(non_affected_teeth, sample_size)
+                                wrong_options.append(", ".join([f"#{t}" for t in wrong_sample]))
+                            else:
+                                wrong_options.append("No teeth affected")
+                        else:
+                            wrong_options.append("No teeth affected")
+                else:
+                    wrong_options = ["No teeth affected", "All teeth affected", "Cannot be determined"]
+                
+                options, correct_letter = generate_multiple_choice_options(correct_answer, wrong_options)
+                
+                explanation = f"The teeth with {category.lower().replace('detection', '').strip()} are: {correct_answer}."
+                
+                qa_pairs.append({
+                    "question": template,
+                    "options": options,
+                    "answer": correct_letter,
+                    "explanation": explanation
+                })
+                continue
+                
+        # For yes/no questions
+        if any(keyword in template.lower() for keyword in ["is ", "are ", "visible"]):
+            if category_data:
+                correct_answer = "Yes"
+                explanation = f"The {category.lower().replace('detection', '').replace('visibility', '').strip()} is visible in the panoramic X-ray."
+                wrong_options = ["No", "Partially visible", "Cannot be determined"]
+            else:
+                correct_answer = "No"
+                explanation = f"The {category.lower().replace('detection', '').replace('visibility', '').strip()} is not visible in the panoramic X-ray."
+                wrong_options = ["Yes", "Partially visible", "Cannot be determined"]
+            
+            options, correct_letter = generate_multiple_choice_options(correct_answer, wrong_options)
+            
+            qa_pairs.append({
+                "question": template,
+                "options": options,
+                "answer": correct_letter,
+                "explanation": explanation
+            })
+            continue
+            
+        # For side/region questions
+        if any(keyword in template.lower() for keyword in ["side", "region", "part"]):
+            sides = {item.get("side", "unknown") for item in category_data if "side" in item}
+            
+            if sides and "unknown" not in sides:
+                correct_answer = ", ".join(s.capitalize() for s in sides)
+                
+                # Generate wrong options
+                all_sides = ["upper", "lower", "left", "right"]
+                remaining_sides = [s for s in all_sides if s not in sides]
+                
+                wrong_options = []
+                if remaining_sides:
+                    wrong_options.append(random.choice(remaining_sides).capitalize())
+                if len(sides) < len(all_sides):
+                    wrong_options.append("All sides")
+                wrong_options.append(f"No {category.lower().replace('detection', '').strip()} detected")
+                
+                # Ensure we have 3 wrong options
+                while len(wrong_options) < 3:
+                    wrong_options.append("Cannot be determined")
+                
+                options, correct_letter = generate_multiple_choice_options(correct_answer, wrong_options)
+                
+                explanation = f"The {category.lower().replace('detection', '').strip()} is detected on the {correct_answer} side(s)."
+                
+                qa_pairs.append({
+                    "question": template,
+                    "options": options,
+                    "answer": correct_letter,
+                    "explanation": explanation
+                })
+                continue
+    
+    # Return unique questions
+    unique_qa_pairs = []
+    seen_questions = set()
+    
+    for qa in qa_pairs:
+        if qa["question"] not in seen_questions:
+            seen_questions.add(qa["question"])
+            unique_qa_pairs.append(qa)
+    
+    return unique_qa_pairs
+
+# Keep the original functions for backwards compatibility
 def generate_counting_qa(parsed_data):
     """Generate counting questions and answers based on dental data"""
     qa_pairs = []
@@ -333,21 +582,31 @@ def generate_tooth_localization_qa(parsed_data):
         tooth_id = tooth["tooth_id"]
         x, y = tooth["point_2d"]
         
-        # Generate a question about tooth location
-        template = random.choice([t for t in TOOTH_LOCALIZATION_TEMPLATES if '{}' in t])
+        # Filter templates based on their placeholder requirements
+        templates_for_coordinates = []
+        templates_for_tooth_id = []
         
-        if "center point" in template:
+        for template in TOOTH_LOCALIZATION_TEMPLATES:
+            placeholders = template.count("{}")
+            if placeholders == 2 and "center point" in template:
+                templates_for_coordinates.append(template)
+            elif placeholders == 1 and "#" not in template:  # Ensure no # character in template
+                templates_for_tooth_id.append(template)
+        
+        # Generate a coordinate-based question (which tooth is at position X,Y)
+        if templates_for_coordinates:
+            template = random.choice(templates_for_coordinates)
             question = template.format(x, y)
-            correct_answer = tooth_id
+            correct_answer = str(tooth_id)
             
             # Generate wrong options (other tooth IDs)
-            wrong_options = [t["tooth_id"] for t in teeth_data if t["tooth_id"] != tooth_id]
+            wrong_options = [str(t["tooth_id"]) for t in teeth_data if t["tooth_id"] != tooth_id]
             if len(wrong_options) < 3:
                 # Add some random tooth numbers if we don't have enough
                 potential_ids = [str(i) for i in range(11, 49) if str(i) not in wrong_options and str(i) != tooth_id]
                 wrong_options.extend(random.sample(potential_ids, min(3 - len(wrong_options), len(potential_ids))))
             
-            options, correct_letter = generate_multiple_choice_options(correct_answer, wrong_options)
+            options, correct_letter = generate_multiple_choice_options(correct_answer, wrong_options[:3])
             
             qa_pairs.append({
                 "question": question,
@@ -355,9 +614,11 @@ def generate_tooth_localization_qa(parsed_data):
                 "answer": correct_letter,
                 "explanation": f"The tooth at center point [{x}, {y}] is tooth #{tooth_id}."
             })
-        else:
-            # Question asking about the location of a specific tooth
-            question = template.format(tooth_id)
+        
+        # Generate a tooth-id based question (where is tooth #X located)
+        if templates_for_tooth_id:
+            template = random.choice(templates_for_tooth_id)
+            question = template.format(f"#{tooth_id}")  # Manually adding # symbol
             
             # For these questions, the answer would be the bounding box
             # Since we only have center points, create a small bounding box around it
@@ -638,73 +899,390 @@ def generate_missing_teeth_qa(parsed_data):
     
     return qa_pairs
 
-def generate_qa_for_json(data):
-    """Generate all types of QA pairs for a JSON file"""
-    all_qa_pairs = []
-    
-    # Parse the localization caption
-    if "loc_caption" in data:
-        try:
-            loc_caption = data["loc_caption"].split('including:\n')[1].strip()
-            parsed_data = parse_medical_string(loc_caption)
-            
-            # Generate different types of QA pairs
-            all_qa_pairs.extend(generate_counting_qa(parsed_data))
-            all_qa_pairs.extend(generate_tooth_localization_qa(parsed_data))
-            all_qa_pairs.extend(generate_pathology_qa(parsed_data))
-            all_qa_pairs.extend(generate_treatment_qa(parsed_data))
-            all_qa_pairs.extend(generate_anatomy_qa(parsed_data))
-            all_qa_pairs.extend(generate_missing_teeth_qa(parsed_data))
-            
-            # Shuffle and limit to a reasonable number (e.g., 10)
-            random.shuffle(all_qa_pairs)
-            all_qa_pairs = all_qa_pairs[:10]
-        except Exception as e:
-            print(f"Error generating QA pairs: {str(e)}")
-    
-    return all_qa_pairs
-
 def process_json_files(input_folder, output_folder):
     """Process all JSON files in the input folder and add QA data"""
     # Ensure output folder exists
     os.makedirs(output_folder, exist_ok=True)
     
-    # Process each JSON file
+    # 确保类别名称与生成数据时完全一致
+    all_possible_categories = [
+        "Teeth visibility with center points",
+        "Wisdom teeth detection",
+        "Missing teeth detection",
+        "Non-wisdom impacted teeth detection",  # 修正为完整名称
+        "Dental caries detection",
+        "Periapical lesions detection",
+        "Historical treatments",
+        "Bone loss detection",
+        "Mandibular canal visibility",
+        "Maxillary sinuses visibility"
+    ]
+    
+    # 每个类别的关键词，用于确保问题文本中包含相关关键词
+    category_keywords = {
+        "Teeth visibility with center points": ["teeth", "tooth", "visible"],
+        "Wisdom teeth detection": ["wisdom"],
+        "Missing teeth detection": ["missing"],
+        "Non-wisdom impacted teeth detection": ["impacted", "non-wisdom"],
+        "Dental caries detection": ["caries", "decay", "cavities"],
+        "Periapical lesions detection": ["periapical", "lesion"],
+        "Historical treatments": ["treatment", "filling", "restoration", "root canal"],
+        "Bone loss detection": ["bone loss"],
+        "Mandibular canal visibility": ["mandibular", "canal"],
+        "Maxillary sinuses visibility": ["maxillary", "sinus", "sinuses"]
+    }
+    
+    # 处理每个JSON文件
     for filename in os.listdir(input_folder):
         if filename.endswith('.json'):
             input_path = os.path.join(input_folder, filename)
             output_path = os.path.join(output_folder, filename)
             
             try:
-                # Read input JSON
+                # 读取输入JSON
                 with open(input_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 
-                # Generate QA pairs
-                qa_pairs = generate_qa_for_json(data)
+                # 检查loc_caption是否存在
+                if "loc_caption" not in data:
+                    print(f"Skipping {filename}: No localization caption found")
+                    continue
                 
-                # Add QA pairs to the data
-                if "sft_data" not in data:
-                    data["sft_data"] = {}
-                
-                data["sft_data"]["loc_closed_ended"] = qa_pairs
-                
-                # Write updated JSON to output folder
-                with open(output_path, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, indent=2, ensure_ascii=False)
-                
-                print(f"Processed {filename}: Added {len(qa_pairs)} QA pairs")
-                
+                try:
+                    # 提取并解析定位说明
+                    if "including:\n" in data["loc_caption"]:
+                        loc_caption = data["loc_caption"].split('including:\n')[1].strip()
+                        parsed_data = parse_medical_string(loc_caption)
+                        
+                        # 初始化问答对列表
+                        qa_pairs = []
+                        
+                        # 确定此图像中可用的类别
+                        # 重要：确保类别名称完全匹配
+                        available_categories = []
+                        for category in all_possible_categories:
+                            if category in parsed_data and parsed_data[category]:
+                                available_categories.append(category)
+                        
+                        print(f"File {filename} has {len(available_categories)} categories: {available_categories}")
+                        
+                        # 跟踪每个类别已生成的问题
+                        category_questions = {category: [] for category in available_categories}
+                        
+                        # 阶段1：为每个可用类别生成至少1个问题
+                        for category in available_categories:
+                            if category in TEMPLATE_DICT:
+                                # 使用特定类别的模板
+                                templates = TEMPLATE_DICT[category]
+                                
+                                # 尝试3次为此类别生成有效问题
+                                for attempt in range(3):
+                                    # 为此类别生成1个问答对
+                                    category_qa = generate_qa_for_category(category, templates, parsed_data, max_questions=1)
+                                    
+                                    if category_qa:
+                                        # 为每个问题添加类别标签以便跟踪
+                                        for qa in category_qa:
+                                            qa["category"] = category
+                                            
+                                            # 确保问题文本中包含类别关键词
+                                            keywords = category_keywords.get(category, [category.split()[0].lower()])
+                                            question_text = qa["question"].lower()
+                                            
+                                            # 如果问题中不包含任何关键词，则修改问题
+                                            if not any(keyword.lower() in question_text for keyword in keywords):
+                                                # 添加类别前缀以确保可识别
+                                                qa["question"] = f"Regarding {category.lower()}: {qa['question']}"
+                                                print(f"  - Modified question to include category: {qa['question']}")
+                                        
+                                        qa_pairs.extend(category_qa)
+                                        category_questions[category].extend(category_qa)
+                                        print(f"  - Added initial question for {category}")
+                                        break
+                        
+                        # 阶段2：填充问题数量至10个，优先考虑问题较少的类别
+                        while len(qa_pairs) < 10:
+                            # 按问题数量排序类别（优先使用问题最少的类别）
+                            sorted_categories = sorted(
+                                available_categories, 
+                                key=lambda cat: len(category_questions.get(cat, []))
+                            )
+                            
+                            # 如果所有类别至少有2个问题，则停止
+                            if all(len(questions) >= 2 for questions in category_questions.values()):
+                                break
+                                
+                            # 获取问题最少的类别
+                            if not sorted_categories:
+                                break
+                                
+                            current_category = sorted_categories[0]
+                            
+                            if current_category in TEMPLATE_DICT:
+                                templates = TEMPLATE_DICT[current_category]
+                                
+                                # 为此类别再生成1个问题
+                                additional_qa = generate_qa_for_category(
+                                    current_category, templates, parsed_data, max_questions=1
+                                )
+                                
+                                if additional_qa:
+                                    # 确保不添加重复问题
+                                    existing_questions = {qa["question"] for qa in qa_pairs}
+                                    new_qa = [qa for qa in additional_qa 
+                                             if qa["question"] not in existing_questions]
+                                    
+                                    # 添加类别标签并确保问题中包含关键词
+                                    for qa in new_qa:
+                                        qa["category"] = current_category
+                                        
+                                        # 确保问题文本中包含类别关键词
+                                        keywords = category_keywords.get(current_category, [current_category.split()[0].lower()])
+                                        question_text = qa["question"].lower()
+                                        
+                                        # 如果问题中不包含任何关键词，则修改问题
+                                        if not any(keyword.lower() in question_text for keyword in keywords):
+                                            # 添加类别前缀以确保可识别
+                                            qa["question"] = f"Regarding {current_category.lower()}: {qa['question']}"
+                                            print(f"  - Modified question to include category: {qa['question']}")
+                                    
+                                    if new_qa:
+                                        qa_pairs.extend(new_qa)
+                                        category_questions[current_category].extend(new_qa)
+                                        print(f"  - Added additional question for {current_category}")
+                                    else:
+                                        # 如果无法为此类别添加更多唯一问题，则下次跳过它
+                                        print(f"  - No more unique questions for {current_category}")
+                                        # 添加一个占位符问题，以避免再次尝试此类别
+                                        category_questions[current_category].append(None)
+                                else:
+                                    # 如果无法为此类别生成更多问题，则下次跳过它
+                                    print(f"  - Failed to generate more questions for {current_category}")
+                                    # 添加一个占位符问题，以避免再次尝试此类别
+                                    category_questions[current_category].append(None)
+                            else:
+                                # 没有合适的模板，跳过此类别
+                                category_questions[current_category].append(None)
+                        
+                        # 阶段3：如果仍然没有10个问题，尝试使用专门的函数
+                        if len(qa_pairs) < 10:
+                            # 移除category_questions中的None条目
+                            for category in category_questions:
+                                category_questions[category] = [q for q in category_questions[category] if q is not None]
+                            
+                            # 尝试使用专门的函数生成更多问题
+                            additional_qa = []
+                            
+                            # 专注于问题最少的前3个类别
+                            categories_to_boost = sorted(
+                                available_categories, 
+                                key=lambda cat: len(category_questions.get(cat, []))
+                            )[:3]
+                            
+                            for category in categories_to_boost:
+                                # 为每种类别使用专门的函数
+                                try:
+                                    if category == "Teeth visibility with center points":
+                                        counting_qa = generate_counting_qa(parsed_data)
+                                        # 标记这些问题
+                                        for qa in counting_qa:
+                                            qa["category"] = category
+                                            # 确保问题文本中包含类别关键词
+                                            keywords = category_keywords.get(category, [])
+                                            if not any(keyword.lower() in qa["question"].lower() for keyword in keywords):
+                                                qa["question"] = f"Regarding {category.lower()}: {qa['question']}"
+                                        additional_qa.extend(counting_qa)
+                                        
+                                        try:
+                                            loc_qa = generate_tooth_localization_qa(parsed_data)
+                                            # 标记这些问题
+                                            for qa in loc_qa:
+                                                qa["category"] = category
+                                                # 确保问题文本中包含类别关键词
+                                                keywords = category_keywords.get(category, [])
+                                                if not any(keyword.lower() in qa["question"].lower() for keyword in keywords):
+                                                    qa["question"] = f"Regarding {category.lower()}: {qa['question']}"
+                                            additional_qa.extend(loc_qa)
+                                        except Exception as e:
+                                            print(f"  - Error in tooth localization: {str(e)}")
+                                            
+                                    elif category == "Dental caries detection":
+                                        pathology_qa = generate_pathology_qa(parsed_data)
+                                        # 标记并过滤此类别的问题
+                                        for qa in pathology_qa:
+                                            if "caries" in qa["question"].lower():
+                                                qa["category"] = category
+                                                additional_qa.append(qa)
+                                    
+                                    elif category == "Periapical lesions detection":
+                                        pathology_qa = generate_pathology_qa(parsed_data)
+                                        # 标记并过滤此类别的问题
+                                        for qa in pathology_qa:
+                                            if "periapical" in qa["question"].lower():
+                                                qa["category"] = category
+                                                additional_qa.append(qa)
+                                    
+                                    elif category == "Historical treatments":
+                                        treatment_qa = generate_treatment_qa(parsed_data)
+                                        # 标记这些问题
+                                        for qa in treatment_qa:
+                                            qa["category"] = category
+                                            # 确保问题文本中包含类别关键词
+                                            keywords = category_keywords.get(category, [])
+                                            if not any(keyword.lower() in qa["question"].lower() for keyword in keywords):
+                                                qa["question"] = f"Regarding {category.lower()}: {qa['question']}"
+                                        additional_qa.extend(treatment_qa)
+                                    
+                                    elif category == "Missing teeth detection":
+                                        missing_qa = generate_missing_teeth_qa(parsed_data)
+                                        # 标记这些问题
+                                        for qa in missing_qa:
+                                            qa["category"] = category
+                                            # 确保问题文本中包含类别关键词
+                                            keywords = category_keywords.get(category, [])
+                                            if not any(keyword.lower() in qa["question"].lower() for keyword in keywords):
+                                                qa["question"] = f"Regarding {category.lower()}: {qa['question']}"
+                                        additional_qa.extend(missing_qa)
+                                    
+                                    elif category == "Mandibular canal visibility":
+                                        anatomy_qa = generate_anatomy_qa(parsed_data)
+                                        # 标记并过滤此类别的问题
+                                        for qa in anatomy_qa:
+                                            if "mandibular" in qa["question"].lower():
+                                                qa["category"] = category
+                                                additional_qa.append(qa)
+                                    
+                                    elif category == "Maxillary sinuses visibility":
+                                        anatomy_qa = generate_anatomy_qa(parsed_data)
+                                        # 标记并过滤此类别的问题
+                                        for qa in anatomy_qa:
+                                            if "maxillary" in qa["question"].lower() or "sinus" in qa["question"].lower():
+                                                qa["category"] = category
+                                                additional_qa.append(qa)
+                                                
+                                    elif category == "Non-wisdom impacted teeth detection":
+                                        # 为非智齿阻生齿生成专门的问题
+                                        impacted_qa = []
+                                        for template in TEMPLATE_DICT.get(category, []):
+                                            qa = generate_qa_for_category(category, [template], parsed_data, max_questions=1)
+                                            if qa:
+                                                for q in qa:
+                                                    q["category"] = category
+                                                    # 确保问题文本包含关键词
+                                                    if "impacted" not in q["question"].lower():
+                                                        q["question"] = f"Regarding non-wisdom impacted teeth: {q['question']}"
+                                                impacted_qa.extend(qa)
+                                        additional_qa.extend(impacted_qa)
+                                    
+                                    elif category == "Bone loss detection":
+                                        # 为骨质流失生成专门的问题
+                                        bone_qa = []
+                                        for template in TEMPLATE_DICT.get(category, []):
+                                            qa = generate_qa_for_category(category, [template], parsed_data, max_questions=1)
+                                            if qa:
+                                                for q in qa:
+                                                    q["category"] = category
+                                                    # 确保问题文本包含关键词
+                                                    if "bone loss" not in q["question"].lower():
+                                                        q["question"] = f"Regarding bone loss: {q['question']}"
+                                                bone_qa.extend(qa)
+                                        additional_qa.extend(bone_qa)
+                                        
+                                    # 如果已添加足够的问题，则停止
+                                    if len(qa_pairs) + len(additional_qa) >= 10:
+                                        break
+                                except Exception as e:
+                                    print(f"  - Error generating questions for {category}: {str(e)}")
+                                    import traceback
+                                    traceback.print_exc()
+                            
+                            # 确保问题文本中包含类别关键词
+                            for qa in additional_qa:
+                                if "category" in qa:
+                                    category = qa["category"]
+                                    keywords = category_keywords.get(category, [category.split()[0].lower()])
+                                    question_text = qa["question"].lower()
+                                    
+                                    if not any(keyword.lower() in question_text for keyword in keywords):
+                                        qa["question"] = f"Regarding {category.lower()}: {qa['question']}"
+                            
+                            # 过滤掉已有的问题
+                            existing_questions = {qa["question"] for qa in qa_pairs}
+                            new_qa = [qa for qa in additional_qa if qa["question"] not in existing_questions]
+                            
+                            # 添加直到达到10个
+                            if new_qa:
+                                # 优先添加来自问题较少类别的问题
+                                new_qa.sort(key=lambda qa: len(category_questions.get(qa.get("category", ""), [])))
+                                to_add = new_qa[:min(10 - len(qa_pairs), len(new_qa))]
+                                
+                                for qa in to_add:
+                                    qa_pairs.append(qa)
+                                    if "category" in qa:
+                                        category_questions[qa["category"]].append(qa)
+                        
+                        # 过滤掉空类别和None值
+                        for category in list(category_questions.keys()):
+                            category_questions[category] = [q for q in category_questions[category] if q is not None]
+                            if not category_questions[category]:
+                                del category_questions[category]
+                        
+                        # 创建新的JSON对象，仅包含所需字段
+                        new_data = {
+                            "image_id": data.get("image_id", ""),
+                            "file_name": data.get("file_name", ""),
+                            "image_width": data.get("image_width", 0),
+                            "image_height": data.get("image_height", 0)
+                        }
+                        
+                        # 从最终输出中删除类别标签
+                        for qa in qa_pairs:
+                            if "category" in qa:
+                                del qa["category"]
+                        
+                        # 添加SFT数据
+                        new_data["sft_data"] = {}
+                        new_data["sft_data"]["loc_closed_ended"] = qa_pairs
+                        
+                        # 将更新后的JSON写入输出文件夹
+                        with open(output_path, 'w', encoding='utf-8') as f:
+                            json.dump(new_data, f, indent=2, ensure_ascii=False)
+                        
+                        # 统计每个类别的问题数量
+                        category_counts = {cat: len(qs) for cat, qs in category_questions.items()}
+                        
+                        # 检查是否所有类别都被使用
+                        unused_categories = [cat for cat in available_categories if cat not in category_counts]
+                        
+                        print(f"Processed {filename}:")
+                        print(f"  - Added {len(qa_pairs)} QA pairs")
+                        print(f"  - Used {len(category_counts)}/{len(available_categories)} feature categories")
+                        
+                        if unused_categories:
+                            print(f"  - WARNING: {len(unused_categories)} categories were not used: {unused_categories}")
+                        
+                        for cat, count in category_counts.items():
+                            print(f"  - {cat}: {count} questions")
+                    else:
+                        print(f"Skipping {filename}: Invalid localization caption format")
+                        
+                except Exception as e:
+                    print(f"Error parsing localization caption in {filename}: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
+                    
             except Exception as e:
                 print(f"Error processing file {filename}: {str(e)}")
+                import traceback
+                traceback.print_exc()
 
 if __name__ == "__main__":
     # Set random seed for reproducibility
     random.seed(42)
     
     # Define input and output folders
-    input_folder = "input_jsons/"
-    output_folder = "output_jsons/"
+    input_folder = "/hpc2hdd/home/yfan546/workplace/xray_teeth/unlabeled_data/MM-Oral-OPG-jsons_latestv3_wloc/"
+    output_folder = "/hpc2hdd/home/yfan546/workplace/xray_teeth/unlabeled_data/MM-Oral-OPG-jsons_latestv3_wloc_close_sft_loc/"
     
     # Process all JSON files
     process_json_files(input_folder, output_folder)
