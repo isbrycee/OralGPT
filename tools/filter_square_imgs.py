@@ -9,7 +9,7 @@ def move_square_images(source_folder, target_folder):
     # 确保目标文件夹存在
     if not os.path.exists(target_folder):
         os.makedirs(target_folder)
-
+    num = 0
     # 遍历源文件夹中的所有文件
     for filename in os.listdir(source_folder):
         file_path = os.path.join(source_folder, filename)
@@ -20,14 +20,15 @@ def move_square_images(source_folder, target_folder):
                 width, height = img.size
                 # 如果宽高比为 1，移动文件
                 if width == height:
-                    shutil.move(file_path, os.path.join(target_folder, filename))
+                    # shutil.move(file_path, os.path.join(target_folder, filename))
+                    num += 1
                     print(f"Moved: {filename}")
         except Exception as e:
             # 如果文件无法打开为图片，跳过
             print(f"Skipping {filename}: {e}")
-
+    print(num)
 # 使用示例
-source_folder = "path/to/source/folder"  # 替换为你的源文件夹路径
-target_folder = "path/to/target/folder"  # 替换为你的目标文件夹路径
+source_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-images"  # 替换为你的源文件夹路径
+target_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-images"  # 替换为你的目标文件夹路径
 
 move_square_images(source_folder, target_folder)
