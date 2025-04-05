@@ -91,7 +91,7 @@ This is a panoramic dental X-ray image, which provides a broad view of the entir
     - #35: Imaging features sign of periapical granuloma
 3. Historical Interventions:
     - #15,16,23,24,25,38: sign of fillings
-    - #35: Imaging features sign of dental implant with crown restoration
+    - #36: Imaging features sign of dental implant with crown restoration
     - #25: signs of root canal treatment with post-core restoration
 
 ### Jaw-Specific Observations
