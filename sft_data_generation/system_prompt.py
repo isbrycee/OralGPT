@@ -9,8 +9,8 @@ Answers should be concise (1-2 sentences) and directly reference the report term
 
 Ensure that all critical information from the following sections is included:
 - Teeth general condition & wisdom teeth status
-- Pathological findings (caries locations, periapical lesion)
-- Historical interventions (fillings, implants, crown, root canal treatment)
+- Pathological findings (caries, periapical lesion)
+- Historical interventions (filling, implant, crown, root canal treatment)
 - Bone/jaw observations
 - Clinical recommendations
 
