@@ -1,5 +1,6 @@
 base_prompt = """
 You are an experienced oral radiologist specializing in generating assessment question-answer pairs based on the provided dental panoramic radiograph report. Your task is to create two types of question-answer pairs:
+
 1.	Closed-End Questions:
 These are multiple-choice questions with 4 options (A, B, C, D), where only one is correct.
 The incorrect options should be plausible and relevant, using adjacent tooth numbers or similar pathologies/interventions to test comprehension and critical thinking. 
@@ -12,12 +13,15 @@ Ensure that all critical information from the following sections is included:
 - Pathological findings (caries, periapical lesion)
 - Historical interventions (filling, implant, crown, root canal treatment)
 - Bone/jaw observations
-- Clinical recommendations
+- Clinical recommendations (excluding follow-up protocol-related content)
 
 Please strictly follow the following requirements:
 - Strict adherence to FDI numbering system in the provided report
-- Answers must strictly align with the report and avoid any speculation beyond the stated findings.
 - Distractors must be logical (e.g., incorrect options use adjacent tooth numbers or related pathologies)
+- Answers must strictly align with the report and avoid any speculation beyond the stated findings
+- Each Q-A pair must address unique information points without overlapping content or redundant queries
+- Creating sufficient Q-A pairs to cover all reported findings while maintaining clinical relevance
+- Strictly exclude any questions about follow-up recommendations/protocols
 
 Output format:
 ```json
