@@ -7,19 +7,19 @@ from collections import defaultdict
 
 
 Questions_Template = [
-    'Which {} are visible in the panoramic dental image?',
-    'Which {} can be detected in the panoramic image?,',
+    'Which {} is/are visible in the panoramic dental image?',
+    'Which {} can be detected in the panoramic image?',
     'Identify the {} in the X-ray image.',
     'Detect {} in the panoramic image.',
     'Output the positions of {} in the panoramic X-ray image.',
-    'Which {} have been accurately detected in the panoramic image?',
+    'Which {} could be detected in the panoramic image?',
     'Please detect the {} in the panoramic image.',
     'Which areas show the {} in the panoramic image?',
     'Identify areas showing the {} in the panoramic radiograph.',
     'Please accurately identify the {} in the X-ray image.'
 ]
 
-key_map = {'Teeth visibility with center points': 'tooth',
+key_map = {'Teeth visibility with center points': 'teeth',
            'Wisdom teeth detection': 'wisdom tooth', 
            'wisdom impacted teeth detection': 'non-wisdom tooth but impacted tooth',
            'Missing teeth detection': 'missing teeth',
@@ -28,7 +28,7 @@ key_map = {'Teeth visibility with center points': 'tooth',
            'Historical treatments': 'historical treatments',
            'Bone loss detection': 'bone loss',
            'Mandibular canal visibility': 'mandibular canal',
-           'Maxillary sinuses visibility': 'maxillary sinuses',
+           'Maxillary sinuses visibility': 'maxillary sinus',
            }
 
 one_tooth_all_properties_Template = [
@@ -55,7 +55,7 @@ all_Pathological_Findings_Template = [
     'Which teeth exhibit signs of pathology on the panoramic radiograph? Summarize the key findings.', 
     'What are the most significant radiographic anomalies present in this panoramic radiograph?',  
     'Identify and categorize all detectable pathological conditions in this panoramic radiograph.', 
-    'Are there any incidental findings of concern on the panoramic radiograph? List them systematically.',  
+    'Are there any pathological findings on the panoramic radiograph? List them systematically.',  
 ]
 
 all_impacted_teeth_Template = [
@@ -72,7 +72,7 @@ all_jawbone_Template = [
     'Identify and describe all visible jawbone structures on this panoramic radiograph.',
     'What radiographic features of the maxilla and mandible are evident in this panoramic X-ray?',
     'Describe any signs of alveolar bone loss or resorption observed in the maxilla or mandible.',
-    'Does the panoramic radiograph reveal evidence of jawbone fractures or osseous lesions? Specify their locations.',
+    'Does the panoramic radiograph reveal the maxilla and mandible structure? Specify their locations.',
     'Assess the integrity of the jawbone-related structures as seen on this panoramic X-ray.',
     'Does the panoramic X-ray demonstrate any jawbone-related structures?',
 ]
@@ -220,18 +220,22 @@ def extract_all_Pathological_Findings(dict_data):
             if 'is_impacted' in element and element['is_impacted'] == 'true':
                 disease_to_elements['impacted teeth'].append(element)
 
+    formated_answer = "[\n"
+    flag_saved = False
     for k, v in disease_to_elements.items():
         if len(v) > 0:
-            question = choice(all_Pathological_Findings_Template).format(k.lower())
-            formated_answer = "[\n" + ",\n".join(
-                                    [str(json.dumps(item, ensure_ascii=False)) for item in v]
-                                ) + "\n]"
-            return_q_a_list.append(
-                {
-                    "Question": question,
-                    "Answer": formated_answer
-                }
-            )
+            flag_saved = True
+            formated_answer += ",\n".join(
+                                    [str(json.dumps(item, ensure_ascii=False)) for item in v])
+    if flag_saved:
+        formated_answer += "\n]"
+        question = choice(all_Pathological_Findings_Template)
+        return_q_a_list.append(
+            {
+                "Question": question,
+                "Answer": formated_answer
+            }
+        )
     return disease_to_elements, return_q_a_list
 
 
@@ -306,7 +310,7 @@ def extract_field_from_jsons(input_folder, output_folder):
                 
                 loc_caption = data['loc_caption'].split('including:\n')[1].strip()
                 result = parse_medical_string(loc_caption)
-                
+                print(result)
                 q_a_pairs = []
                 for category, value in result.items():
                     question = choice(Questions_Template).format(key_map[category])
@@ -352,7 +356,7 @@ def extract_field_from_jsons(input_folder, output_folder):
 
 # 使用示例
 if __name__ == "__main__":
-    input_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv3_wloc_wreport'
+    input_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/test_sft_open_json'
     output_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv3_sft_loc_open_test'
     
     extract_field_from_jsons(input_folder, output_folder)
