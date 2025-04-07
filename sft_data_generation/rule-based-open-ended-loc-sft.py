@@ -2,6 +2,7 @@ import json
 import os
 import re
 from ast import literal_eval
+import random
 from random import choice
 from collections import defaultdict
 
@@ -30,6 +31,26 @@ key_map = {'Teeth visibility with center points': 'teeth',
            'Mandibular canal visibility': 'mandibular canal',
            'Maxillary sinuses visibility': 'maxillary sinus',
            }
+
+Questions_Time_Aquisition_Template = [
+    'When was this dental panoramic X-ray taken?',
+    'What is the date and time recorded on the dental X-ray?',
+    'Can you provide the timestamp for this panoramic dental image?',
+    'What is the imaging date and time shown on this X-ray?'
+    'What does the timestamp on the X-ray indicate?'
+    'Could you tell me the exact date and time this dental X-ray was captured?'
+    'When does the panoramic X-ray show it was taken?'
+    'What is the specific timestamp visible on the X-ray image?'
+]
+
+Questions_Time_Aquisition_Reject_Template = [
+    'No, there is no timestamp on the image.',
+    "No, it's not shown on the image.",
+    'No, those details are not included.',
+    'Sorry, the date and time are not provided.',
+    'Sorry, the image does not show this information.',
+    "No, it's not visible."
+]
 
 one_tooth_all_properties_Template = [
     'What findings can be observed in the panoramic radiograph regarding tooth #{}?',
@@ -309,9 +330,32 @@ def extract_field_from_jsons(input_folder, output_folder):
                     data = json.load(f)
                 
                 loc_caption = data['loc_caption'].split('including:\n')[1].strip()
+
+                # for image aquisition_time 
+                time_str = None
+                if 'Panoramic Dental X-ray Imaging Time:' in loc_caption:
+                    time_str = loc_caption.split('Panoramic Dental X-ray Imaging Time:')[1].split('\n')[0].strip()
                 result = parse_medical_string(loc_caption)
-                print(result)
+                # print(result)
                 q_a_pairs = []
+
+                if time_str:
+                    question = choice(Questions_Time_Aquisition_Template)
+                    q_a_pairs.append(
+                        {
+                            "Question": question,
+                            "Answer": time_str
+                        }
+                    )
+                else:
+                    if random.random() < 0.1:
+                        q_a_pairs.append(
+                            {
+                                "Question": choice(Questions_Time_Aquisition_Template),
+                                "Answer": choice(Questions_Time_Aquisition_Reject_Template),
+                            }
+                        )
+
                 for category, value in result.items():
                     question = choice(Questions_Template).format(key_map[category])
                     formated_answer = "[\n" + ",\n".join(
@@ -356,7 +400,7 @@ def extract_field_from_jsons(input_folder, output_folder):
 
 # 使用示例
 if __name__ == "__main__":
-    input_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/test_sft_open_json'
-    output_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv3_sft_loc_open_test'
+    input_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv1_med_report'
+    output_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/test_sft_open_json'
     
     extract_field_from_jsons(input_folder, output_folder)
