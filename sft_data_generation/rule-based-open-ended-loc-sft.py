@@ -32,7 +32,7 @@ key_map = {'Teeth visibility with center points': 'teeth',
            'Maxillary sinuses visibility': 'maxillary sinus',
            }
 
-Questions_Time_Aquisition_Template = [
+Questions_Time_Acquisition_Template = [
     'When was this dental panoramic X-ray taken?',
     'What is the date and time recorded on the dental X-ray?',
     'Can you provide the timestamp for this panoramic dental image?',
@@ -43,7 +43,7 @@ Questions_Time_Aquisition_Template = [
     'What is the specific timestamp visible on the X-ray image?'
 ]
 
-Questions_Time_Aquisition_Reject_Template = [
+Questions_Time_Acquisition_Reject_Template = [
     'No, there is no timestamp on the image.',
     "No, it's not shown on the image.",
     'No, those details are not included.',
@@ -340,7 +340,7 @@ def extract_field_from_jsons(input_folder, output_folder):
                 q_a_pairs = []
 
                 if time_str:
-                    question = choice(Questions_Time_Aquisition_Template)
+                    question = choice(Questions_Time_Acquisition_Template)
                     q_a_pairs.append(
                         {
                             "Question": question,
@@ -351,8 +351,8 @@ def extract_field_from_jsons(input_folder, output_folder):
                     if random.random() < 0.1:
                         q_a_pairs.append(
                             {
-                                "Question": choice(Questions_Time_Aquisition_Template),
-                                "Answer": choice(Questions_Time_Aquisition_Reject_Template),
+                                "Question": choice(Questions_Time_Acquisition_Template),
+                                "Answer": choice(Questions_Time_Acquisition_Reject_Template),
                             }
                         )
 
