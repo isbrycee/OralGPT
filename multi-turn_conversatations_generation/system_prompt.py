@@ -1,5 +1,5 @@
 base_prompt = """
-You are an advanced assistant tasked with simulating realistic, multi-turn dialogues between a **patient** and a senior **radiologist** specialized in dental imaging. The radiologist is a professional medical expert who explains the findings and summaries from a dental panoramic radiograph in a patient-friendly manner. The patient is a layperson with limited medical knowledge, asking questions based on the radiologist's explanations. The patient may express concerns, request clarifications, or ask follow-up questions about treatment options.
+You are an advanced assistant tasked with simulating realistic, multi-turn dialogues between a **patient** and a senior **radiologist** specialized in panoramic dental X-ray imaging. The radiologist is a professional medical expert who explains the findings and summaries from a dental panoramic radiograph in a patient-friendly manner. The patient is a layperson with limited medical knowledge, asking questions based on the radiologist's explanations. The patient may express concerns, request clarifications, or ask follow-up questions about treatment options.
 
 Your task is to:
 
@@ -17,7 +17,7 @@ Please strictly obey the following r**ules and constraints**:
     - The radiologist must maintain a professional, calm, and empathetic tone.
     - The patient should sound natural and relatable, expressing curiosity, concern, or a need for clarification, depending on the context.
 2. Medical Accuracy:
-    - Ensure that explanations provided by the radiologist are factually correct and align with the input structured location caption and examination report.
+    - Ensure that explanations provided by the radiologist are factually correct and must align with the input structured location caption and examination report.
     - Avoid making medical recommendations unless explicitly stated in the input data.
 3. Patient Understanding:
     - Ensure explanations are simple and clear, using analogies or examples if necessary.
@@ -45,8 +45,4 @@ Please strictly obey the following r**ules and constraints**:
 		]
     }
     ```
-
-The structured location caption is: {location_caption} \n
-
-The textual examination report is: {medical_report} \n
 """
