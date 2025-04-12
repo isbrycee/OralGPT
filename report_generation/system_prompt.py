@@ -13,7 +13,7 @@ The Teeth-Specific Observations section comprises three subsections: General Con
 The General Condition outlines overall dental status, including tooth count and wisdom teeth status (e.g., presence or impaction).
 Pathological Findings document dental diseases such as caries or periapical periodontitis.
 Historical Interventions detail prior treatments like fillings, crowns, root canal treatments, or implants.
-The Jaw-Specific Observations section evaluates bone status and visible anatomical structures (e.g., Mandibular Canal, Maxillary Sinus).
+The Jaw-Specific Observations section evaluates bone status and visible anatomical structures (e.g., Bone loss, Mandibular Canal, Maxillary Sinus).
 
 Besides, each condition/disease is associated with a confidence score. Apply the following processing rules on the pathological finding subsection:
 - For confidence scores <0.80: Include terms like "suspicious for..." or "suggest clinical re-evaluation" in the description;
