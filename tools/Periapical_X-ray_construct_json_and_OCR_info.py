@@ -7,8 +7,6 @@ from datetime import datetime
 input_image_folder = "/home/jinghao/projects/x-ray-VLM/dataset/TED3/MM-Oral-Periapical-images"  # 替换为实际图片文件夹路径
 output_json_folder = "/home/jinghao/projects/x-ray-VLM/dataset/TED3/MM-Oral-Periapical-jsons"  # 替换为实际 JSON 文件夹路径
 
-
-
 # 确保输出文件夹存在
 if not os.path.exists(output_json_folder):
     os.makedirs(output_json_folder)

@@ -33,18 +33,18 @@ def add_field_to_jsons(input_folder, output_folder):
                         new_data["image_quality"] = image_quality
                     data = new_data
                 
-                elif isinstance(data, list):  # JSON 数组
-                    for item in data:
-                        if isinstance(item, dict):
-                            new_item = OrderedDict()
-                            for key, value in item.items():
-                                new_item[key] = value
-                                if key == "file_name":
-                                    new_item["image_modality"] = "aaa"
-                            if "image_modality" not in new_item:
-                                new_item["image_modality"] = "aaa"
-                            item.clear()
-                            item.update(new_item)
+                # elif isinstance(data, list):  # JSON 数组
+                #     for item in data:
+                #         if isinstance(item, dict):
+                #             new_item = OrderedDict()
+                #             for key, value in item.items():
+                #                 new_item[key] = value
+                #                 if key == "file_name":
+                #                     new_item["image_modality"] = "aaa"
+                #             if "image_modality" not in new_item:
+                #                 new_item["image_modality"] = "aaa"
+                #             item.clear()
+                #             item.update(new_item)
                 
                 with open(output_path, 'w', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=4)
