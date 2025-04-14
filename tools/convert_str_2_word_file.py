@@ -25,7 +25,14 @@ for filename in os.listdir(input_folder):
             data = json.load(f)
         
         # 提取字段内容
-        content = data.get(target_field, '')
+        if data['revised_med_report']['need revision'] == True \
+            and \
+          len(data['revised_med_report']['Revised med report']['Revised Report']) > 0:
+            content = data['revised_med_report']['Revised med report']['Revised Report']
+        else:
+            print(f"{filename} Revision version cannot be found!")
+            content = data.get(target_field, '')
+
         if not content:
             print(f'跳过 {filename}: 未找到字段 "{target_field}"')
             continue

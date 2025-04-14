@@ -53,11 +53,11 @@ def copy_random_files(json_folder, image_folder, new_json_folder, new_image_fold
 
 # 使用示例
 if __name__ == "__main__":
-    json_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/FINAL/MM-Oral-OPG-jsons_latestv3_wloc_wreport"  # 替换为 JSON 文件夹路径
+    json_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/FINAL/MM-Oral-OPG-jsons-loc-med-report"  # 替换为 JSON 文件夹路径
     image_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/FINAL/MM-Oral-OPG-images"  # 替换为图像文件夹路径
     new_json_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/FINAL/for_human_evaluation/jsons"  # 替换为新的 JSON 目标文件夹路径
     new_image_folder = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/FINAL/for_human_evaluation/images"  # 替换为新的图像目标文件夹路径
     
     # 设置随机种子
-    seed = 42  # 固定随机种子，确保结果可复现
+    seed = 2025  # 固定随机种子，确保结果可复现
     copy_random_files(json_folder, image_folder, new_json_folder, new_image_folder, sample_size=100, seed=seed)
