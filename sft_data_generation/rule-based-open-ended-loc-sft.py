@@ -179,10 +179,22 @@ def extract_one_tooth_all_properties(dict_data):
         formated_answer = "[\n" + ",\n".join( 
                                 [str(json.dumps(item, ensure_ascii=False)) for item in v]
                             ) + "\n]"
+        
+        category_list = ['teeth',]
+        if 'filling' in formated_answer.lower() or \
+            'crown' in formated_answer.lower() or \
+            'implant' in formated_answer.lower() or \
+            'root canal treatment' in formated_answer.lower():
+            category_list.append('his')
+        if 'caries' in formated_answer.lower() or \
+            'lesion' in formated_answer.lower():
+            category_list.append('patho')
+        Category = ','.join(category_list)
         return_q_a_list.append(
             {
                 "Question": question,
-                "Answer": formated_answer
+                "Answer": formated_answer,
+                "Category": Category
             }
         )
 
@@ -212,7 +224,8 @@ def extract_one_disease_all_teeth(historical_treatments_list):
         return_q_a_list.append(
             {
                 "Question": question,
-                "Answer": formated_answer
+                "Answer": formated_answer,
+                "Category": 'his'
             }
         )
     return return_q_a_list
@@ -248,15 +261,19 @@ def extract_all_Pathological_Findings(dict_data):
             flag_saved = True
             formated_answer += ",\n".join(
                                     [str(json.dumps(item, ensure_ascii=False)) for item in v])
-    if flag_saved:
-        formated_answer += "\n]"
-        question = choice(all_Pathological_Findings_Template)
-        return_q_a_list.append(
-            {
-                "Question": question,
-                "Answer": formated_answer
-            }
-        )
+        else:
+            flag_saved = False
+
+        if flag_saved:
+            formated_answer += "\n]"
+            question = choice(all_Pathological_Findings_Template)
+            return_q_a_list.append(
+                {
+                    "Question": question,
+                    "Answer": formated_answer,
+                    "Category": 'patho'
+                }
+            )
     return disease_to_elements, return_q_a_list
 
 
@@ -272,7 +289,8 @@ def extract_all_impacted_teeth(dict_data):
         return_q_a_list.append(
             {
                 "Question": question,
-                "Answer": formated_answer
+                "Answer": formated_answer,
+                "Category": 'teeth'
             }
         )
     return return_q_a_list
@@ -301,7 +319,8 @@ def extract_all_jawbone_info(dict_data):
         return_q_a_list.append(
             {
                 "Question": question,
-                "Answer": formated_answer
+                "Answer": formated_answer,
+                "Category": 'jaw'
             }
         )
 
@@ -318,6 +337,16 @@ def extract_field_from_jsons(input_folder, output_folder):
     
     # 确保输出文件夹存在
     os.makedirs(output_folder, exist_ok=True)
+
+    category_map = {'Teeth visibility with center points': 'teeth', 
+                    'Wisdom teeth detection': 'teeth',
+                    'Mandibular canal visibility': 'jaw',
+                    'Maxillary sinuses visibility': 'jaw',
+                    'Missing teeth detection': 'teeth',
+                    'Dental caries detection': 'patho', 
+                    'Historical treatments': 'his',
+                    'Bone loss detection': 'jaw',
+                    }
 
     # 遍历输入文件夹中的所有文件
     for filename in os.listdir(input_folder):
@@ -344,7 +373,8 @@ def extract_field_from_jsons(input_folder, output_folder):
                     q_a_pairs.append(
                         {
                             "Question": question,
-                            "Answer": time_str
+                            "Answer": time_str,
+                            "Category": 'OCR'
                         }
                     )
                 else:
@@ -353,6 +383,7 @@ def extract_field_from_jsons(input_folder, output_folder):
                             {
                                 "Question": choice(Questions_Time_Acquisition_Template),
                                 "Answer": choice(Questions_Time_Acquisition_Reject_Template),
+                                "Category": 'OCR'
                             }
                         )
 
@@ -364,7 +395,8 @@ def extract_field_from_jsons(input_folder, output_folder):
                     q_a_pairs.append(
                         {
                             "Question": question,
-                            "Answer": formated_answer
+                            "Answer": formated_answer,
+                            "Category": category_map[category]
                         }
                     )
 
