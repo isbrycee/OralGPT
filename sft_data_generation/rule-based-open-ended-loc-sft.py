@@ -339,13 +339,15 @@ def extract_field_from_jsons(input_folder, output_folder):
     os.makedirs(output_folder, exist_ok=True)
 
     category_map = {'Teeth visibility with center points': 'teeth', 
+                    'wisdom impacted teeth detection': 'teeth',
                     'Wisdom teeth detection': 'teeth',
                     'Mandibular canal visibility': 'jaw',
                     'Maxillary sinuses visibility': 'jaw',
+                    'Bone loss detection': 'jaw',
                     'Missing teeth detection': 'teeth',
                     'Dental caries detection': 'patho', 
                     'Historical treatments': 'his',
-                    'Bone loss detection': 'jaw',
+                    'Periapical lesions detection': 'patho',
                     }
 
     # 遍历输入文件夹中的所有文件
@@ -413,17 +415,20 @@ def extract_field_from_jsons(input_folder, output_folder):
                 q_a_pairs += extract_all_jawbone_info(result)
 
                 # print(q_a_pairs)
-
-                data.pop('properties')
-
-                if 'sft_data' in data.keys():
-                    data['sft_data']['loc_open_ended'] = q_a_pairs
-                else:
-                    data['sft_data'] = {}
-                    data['sft_data']['loc_open_ended'] = q_a_pairs
+                # data.pop('properties')
 
                 # 保存提取的数据到新JSON文件
                 output_path = os.path.join(output_folder, filename)
+                
+                with open(output_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                if 'vqa_data' in data.keys():
+                    data['vqa_data']['loc_open_ended'] = q_a_pairs
+                else:
+                    data['vqa_data'] = {}
+                    data['vqa_data']['loc_open_ended'] = q_a_pairs
+
                 with open(output_path, 'w', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=4)
                 
@@ -432,7 +437,7 @@ def extract_field_from_jsons(input_folder, output_folder):
 
 # 使用示例
 if __name__ == "__main__":
-    input_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/MM-Oral-OPG-jsons_latestv1_med_report'
-    output_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/test_sft_open_json'
+    input_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/data_0415/MM-Oral-OPG-loc-med-reports'
+    output_folder = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/data_0415/MM-Oral-OPG-vqa-sft-data-bak/'
     
     extract_field_from_jsons(input_folder, output_folder)
