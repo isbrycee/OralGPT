@@ -1,116 +1,116 @@
-import os
 import json
-import numpy as np
-from glob import glob
+import os
+import glob
+import argparse
+import copy
+from typing import Dict, List, Any, Union, Tuple
 
-def calculate_iou(box1, box2):
-    """计算两个边界框的IOU"""
-    # box格式为[x1, y1, x2, y2]
-    x1_min, y1_min, x1_max, y1_max = box1
-    x2_min, y2_min, x2_max, y2_max = box2
+def calculate_iou(box1: List[Union[int, float]], box2: List[Union[int, float]]) -> float:
+    """计算两个边界框的交并比(IoU)"""
+    # 处理空边界框
+    if not box1 or not box2 or len(box1) < 4 or len(box2) < 4:
+        return 0.0
     
-    # 计算相交矩形的坐标
-    x_left = max(x1_min, x2_min)
-    y_top = max(y1_min, y2_min)
-    x_right = min(x1_max, x2_max)
-    y_bottom = min(y1_max, y2_max)
+    # 确保使用[x1, y1, x2, y2]格式
+    x1_1, y1_1, x2_1, y2_1 = box1
+    x1_2, y1_2, x2_2, y2_2 = box2
     
-    # 没有相交区域
+    # 检查是否需要转换格式
+    if x2_1 < x1_1 and y2_1 < y1_1:  # 可能是[x2, y2, x1, y1]格式
+        x1_1, y1_1, x2_1, y2_1 = x2_1, y2_1, x1_1, y1_1
+    elif x2_1 > 0 and y2_1 > 0 and not (x2_1 < x1_1 and y2_1 < y1_1):  # 如果是[x, y, w, h]格式
+        x2_1, y2_1 = x1_1 + x2_1, y1_1 + y2_1
+    
+    if x2_2 < x1_2 and y2_2 < y1_2:  # 可能是[x2, y2, x1, y1]格式
+        x1_2, y1_2, x2_2, y2_2 = x2_2, y2_2, x1_2, y1_2
+    elif x2_2 > 0 and y2_2 > 0 and not (x2_2 < x1_2 and y2_2 < y1_2):  # 如果是[x, y, w, h]格式
+        x2_2, y2_2 = x1_2 + x2_2, y1_2 + y2_2
+    
+    # 计算交集区域
+    x_left = max(x1_1, x1_2)
+    y_top = max(y1_1, y1_2)
+    x_right = min(x2_1, x2_2)
+    y_bottom = min(y2_1, y2_2)
+    
     if x_right < x_left or y_bottom < y_top:
         return 0.0
     
-    # 计算相交区域面积
     intersection_area = (x_right - x_left) * (y_bottom - y_top)
     
-    # 计算两个边界框的面积
-    box1_area = (x1_max - x1_min) * (y1_max - y1_min)
-    box2_area = (x2_max - x2_min) * (y2_max - y2_min)
-    
-    # 计算并集面积
+    # 计算并集区域
+    box1_area = (x2_1 - x1_1) * (y2_1 - y1_1)
+    box2_area = (x2_2 - x1_2) * (y2_2 - y1_2)
     union_area = box1_area + box2_area - intersection_area
     
-    # 计算IOU
-    iou = intersection_area / union_area
-    
-    return iou
+    return intersection_area / union_area if union_area > 0 else 0.0
 
-def calculate_box_area(box):
-    """计算边界框的面积"""
-    x1, y1, x2, y2 = box
-    return (x2 - x1) * (y2 - y1)
+def get_highest_score(score_value):
+    """从分数值中获取最高分数，处理列表和单一值"""
+    if isinstance(score_value, list):
+        if not score_value:  # 如果是空列表
+            return 0.0
+        return max(filter(lambda x: isinstance(x, (int, float)), score_value), default=0.0)
+    elif isinstance(score_value, (int, float)):
+        return score_value
+    return 0.0
 
-def calculate_overlap_area(box1, box2):
-    """计算两个边界框的重叠面积"""
-    x1_min, y1_min, x1_max, y1_max = box1
-    x2_min, y2_min, x2_max, y2_max = box2
-    
-    # 计算相交矩形的坐标
-    x_left = max(x1_min, x2_min)
-    y_top = max(y1_min, y2_min)
-    x_right = min(x1_max, x2_max)
-    y_bottom = min(y1_max, y2_max)
-    
-    # 没有相交区域
-    if x_right < x_left or y_bottom < y_top:
-        return 0.0
-    
-    # 计算相交区域面积
-    intersection_area = (x_right - x_left) * (y_bottom - y_top)
-    return intersection_area
-
-def determine_side(box, quadrants_info, object_type='tooth', image_width=None, image_height=None):
+def determine_side_from_bbox(bbox: List[Union[int, float]], 
+                             quadrants: Dict[str, List[Union[int, float]]], 
+                             object_type: str = 'tooth',
+                             image_width: int = None, 
+                             image_height: int = None) -> Union[str, List[str]]:
     """
-    根据box和象限位置确定side
+    根据边界框确定其所在的象限和侧面
     
     参数:
-    - box: 边界框坐标 [x1, y1, x2, y2]
-    - quadrants_info: 象限信息列表
-    - object_type: 对象类型，'tooth'、'bone_loss' 或 'missing_teeth'
+    - bbox: 单个边界框或边界框列表
+    - quadrants: 象限信息字典
+    - object_type: 对象类型，'tooth'、'bone_loss'或'missing_teeth'
     - image_width: 图像宽度
     - image_height: 图像高度
     
     返回:
-    - side: 确定的side值
+    - 确定的side值(字符串)或side值列表
     """
-    x_center = (box[0] + box[2]) / 2
-    y_center = (box[1] + box[3]) / 2
+    # 处理bbox为列表的列表的情况
+    if isinstance(bbox, list) and bbox and isinstance(bbox[0], list):
+        sides = []
+        for single_bbox in bbox:
+            side = determine_side_from_bbox(single_bbox, quadrants, object_type, image_width, image_height)
+            sides.append(side)
+        return sides
     
-    # 计算box与每个象限的重叠面积
-    overlaps = []
-    for q in quadrants_info:
-        q_box = q['bbox']
-        overlap_area = calculate_overlap_area(box, q_box)
-        if overlap_area > 0:
-            overlaps.append((q['quadrant'], overlap_area))
+    # 处理单个bbox的情况
+    if not bbox:  # 如果边界框为空
+        return "unknown"
     
-    # 按重叠面积排序
-    overlaps.sort(key=lambda x: x[1], reverse=True)
-    
-    # 如果有重叠，选择重叠面积最大的象限
-    if overlaps:
-        best_quadrant = overlaps[0][0]
+    # 计算边界框中心点
+    x_center = (bbox[0] + bbox[2]) / 2
+    y_center = (bbox[1] + bbox[3]) / 2
         
-        # 对于bone_loss和missing_teeth可以使用upper或lower
-        if object_type in ['bone_loss', 'missing_teeth']:
-            upper_area = sum(area for q, area in overlaps if "1" in q or "2" in q)
-            lower_area = sum(area for q, area in overlaps if "3" in q or "4" in q)
-            
-            if upper_area > 0 and lower_area == 0:
+    best_overlap = 0
+    best_quadrant = None
+    
+    for quadrant_name, quadrant_bbox in quadrants.items():
+        overlap = calculate_iou(bbox, quadrant_bbox)
+        if overlap > best_overlap:
+            best_overlap = overlap
+            best_quadrant = quadrant_name
+    
+    # 对于bone_loss和missing_teeth可以使用upper或lower
+    if object_type in ['bone_loss', 'missing_teeth']:
+        if best_quadrant:
+            if "1" in best_quadrant or "2" in best_quadrant:
                 return "upper"
-            elif lower_area > 0 and upper_area == 0:
+            elif "3" in best_quadrant or "4" in best_quadrant:
                 return "lower"
-            elif upper_area > lower_area:
-                return "upper"
-            elif lower_area > upper_area:
-                return "lower"
-            else:
-                # 如果上下象限重叠面积相等，使用中心点判断
-                if image_height is not None and y_center < image_height / 2:
-                    return "upper"
-                else:
-                    return "lower"
         
-        # 根据最佳象限确定side
+        # 如果没有找到最佳象限，使用中心点的y坐标
+        if image_height:
+            return "upper" if y_center < image_height / 2 else "lower"
+    
+    # 对于牙齿，返回具体的象限
+    if best_quadrant:
         if "1" in best_quadrant:
             return "upper right"
         elif "2" in best_quadrant:
@@ -120,385 +120,449 @@ def determine_side(box, quadrants_info, object_type='tooth', image_width=None, i
         elif "4" in best_quadrant:
             return "lower right"
     
-    # 如果没有和任何象限重叠，使用中心点判断
-    if image_height is not None and image_width is not None:
-        midpoint_y = image_height / 2
-        midpoint_x = image_width / 2
-        
-        if y_center < midpoint_y:
-            if object_type in ['bone_loss', 'missing_teeth']:
-                return "upper"
-            else:
-                # 根据水平位置确定左右
-                if x_center < midpoint_x:
-                    return "upper right"
-                else:
-                    return "upper left"
-        else:
-            if object_type in ['bone_loss', 'missing_teeth']:
-                return "lower"
-            else:
-                # 根据水平位置确定左右
-                if x_center < midpoint_x:
-                    return "lower right"
-                else:
-                    return "lower left"
-
-def process_json_file(file_path):
-    """处理单个JSON文件"""
-    with open(file_path, 'r') as f:
-        data = json.load(f)
+    # 如果无法通过象限确定，使用中心点坐标
+    if image_height and image_width:
+        if y_center < image_height / 2:  # 上半部分
+            return "upper right" if x_center < image_width / 2 else "upper left"
+        else:  # 下半部分
+            return "lower left" if x_center > image_width / 2 else "lower right"
     
-    # 获取图像宽度和高度
-    image_width = data.get('image_width', None)
-    image_height = data.get('image_height', None)
+    return "unknown"
+
+def ensure_bbox_list(bbox_data) -> List[List[Union[int, float]]]:
+    """
+    确保bbox_data是格式为[[x1, y1, x2, y2], ...]的列表。
+    如果是单个bbox [x1, y1, x2, y2]，转换为[[x1, y1, x2, y2]]。
+    """
+    if isinstance(bbox_data, list):
+        if bbox_data and isinstance(bbox_data[0], list):
+            return [box for box in bbox_data if len(box) == 4 and all(isinstance(x, (int, float)) for x in box)]
+        elif len(bbox_data) == 4 and all(isinstance(x, (int, float)) for x in bbox_data):
+            return [bbox_data]
+    return []
+
+def is_valid_bbox(bbox: Any) -> bool:
+    """检查边界框是否有效"""
+    if not isinstance(bbox, list):
+        return False
+    
+    if not bbox:  # 空列表
+        return False
+    
+    # 处理嵌套列表的情况 [[x1, y1, x2, y2]]
+    if isinstance(bbox[0], list):
+        return False
+    
+    # 检查是否有4个值
+    if len(bbox) != 4:
+        return False
+    
+    return True
+
+def process_dental_json(data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    根据指定要求处理牙科JSON数据
+    
+    处理内容包括:
+    1. 删除空的"Missing teeth"字段
+    2. 合并和处理各种Missing teeth相关字段
+    3. 处理牙齿数据，包括处理重复牙齿
+    4. 过滤低分条件
+    5. 处理unknown牙齿的条件
+    6. 处理根尖和残根条件
+    7. 为特定牙齿添加推荐提取
+    8. 处理Crown和Filling的重叠
+    """
+    result = copy.deepcopy(data)
+    
+    # 获取图像尺寸
+    image_width = result.get('image_width', None)
+    image_height = result.get('image_height', None)
     
     # 获取象限信息
-    quadrants_info = data.get('properties', {}).get('Quadrants', [])
+    quadrants = {}
+    if "properties" in result and "Quadrants" in result["properties"]:
+        for quadrant_info in result["properties"]["Quadrants"]:
+            quadrant_name = quadrant_info["quadrant"]
+            quadrant_bbox = quadrant_info["bbox"]
+            quadrants[quadrant_name] = quadrant_bbox
     
-    # 1. 处理Missing teeth、MissingTeeth和Missing tooth
-    missing_teeth = data.get('properties', {}).get('Missing teeth', [])
-    missing_teeth_alt = data.get('properties', {}).get('MissingTeeth', [])
-    missing_tooth = data.get('properties', {}).get('Missing tooth', [])
+    # 1. 如果"Missing teeth"字段为空，则删除
+    if "properties" in result and "Missing teeth" in result["properties"] and not result["properties"]["Missing teeth"]:
+        del result["properties"]["Missing teeth"]
     
-    # 合并Missing tooth和MissingTeeth到Missing teeth
-    all_missing_teeth = []
-    
-    # 过滤并添加Missing teeth中score >= 0.4的
-    if missing_teeth:
-        all_missing_teeth.extend([mt for mt in missing_teeth if mt.get('score', 0) >= 0.4])
-    
-    # 过滤并添加MissingTeeth中score >= 0.4的
-    if missing_teeth_alt:
-        all_missing_teeth.extend([mt for mt in missing_teeth_alt if mt.get('score', 0) >= 0.4])
-    
-    # 过滤并添加Missing tooth中score >= 0.4的
-    if missing_tooth:
-        all_missing_teeth.extend([mt for mt in missing_tooth if mt.get('score', 0) >= 0.4])
-    
-    # 按score排序，处理重叠的缺失牙齿
-    all_missing_teeth.sort(key=lambda x: x.get('score', 0), reverse=True)
-    
-    # 处理重叠，保留score最高的
-    merged_missing_teeth = []
-    for mt in all_missing_teeth:
-        box1 = mt.get('bbox', [])
-        # 检查是否与已合并的有重叠
-        overlap = False
-        for merged_mt in merged_missing_teeth:
-            box2 = merged_mt.get('bbox', [])
-            if calculate_iou(box1, box2) > 0.5:
-                overlap = True
-                break
+    # 2. 合并和处理各种Missing teeth相关字段
+    if "properties" in result:
+        missing_teeth = result["properties"].get("Missing teeth", [])
+        missing_teeth_alt = result["properties"].get("MissingTeeth", [])
+        missing_tooth = result["properties"].get("Missing tooth", [])
         
-        if not overlap:
-            # 添加side信息
-            mt['side'] = determine_side(box1, quadrants_info, 'missing_teeth', image_width, image_height)
-            merged_missing_teeth.append(mt)
-    
-    # 更新data
-    data['properties']['Missing teeth'] = merged_missing_teeth
-    
-    # 删除原始字段
-    if 'MissingTeeth' in data.get('properties', {}):
-        del data['properties']['MissingTeeth']
-    if 'Missing tooth' in data.get('properties', {}):
-        del data['properties']['Missing tooth']
-    
-    # 2. 处理tooth_id为unknown的牙齿的condition
-    if 'Teeth' in data.get('properties', {}):
-        teeth = data.get('properties', {}).get('Teeth', [])
+        # 合并Missing tooth和MissingTeeth到Missing teeth
+        all_missing_teeth = []
         
-        # 找出所有tooth_id为unknown且有conditions的牙齿
-        unknown_teeth = []
-        known_teeth = []
-        unknown_teeth_to_keep = []  # 用于存储未被分配的unknown牙齿
+        # 过滤并添加Missing teeth中score >= 0.4的
+        if missing_teeth:
+            all_missing_teeth.extend([mt for mt in missing_teeth if get_highest_score(mt.get('score', 0)) >= 0.4])
         
-        for tooth in teeth:
-            if tooth.get('tooth_id') == 'unknown' and 'conditions' in tooth and tooth['conditions']:
-                # 过滤掉score < 0.4的conditions
-                filtered_conditions = {}
-                for cond_name, cond_data in tooth['conditions'].items():
-                    if isinstance(cond_data.get('score', 0), list):
-                        if any(score >= 0.4 for score in cond_data['score']):
-                            filtered_conditions[cond_name] = cond_data
-                    elif cond_data.get('score', 0) >= 0.4:
-                        filtered_conditions[cond_name] = cond_data
-                
-                if filtered_conditions:
-                    tooth_copy = tooth.copy()
-                    tooth_copy['conditions'] = filtered_conditions
-                    unknown_teeth.append(tooth_copy)
-                    # 初始时，所有unknown牙齿都需要保留
-                    unknown_teeth_to_keep.append(tooth_copy)
-            else:
-                known_teeth.append(tooth)
+        # 过滤并添加MissingTeeth中score >= 0.4的
+        if missing_teeth_alt:
+            all_missing_teeth.extend([mt for mt in missing_teeth_alt if get_highest_score(mt.get('score', 0)) >= 0.4])
         
-        # 处理unknown牙齿的conditions，将它们分配给重叠的已知牙齿
-        for unknown_tooth in unknown_teeth:
-            all_conditions_assigned = True  # 标记是否所有conditions都被分配
-            conditions_to_remove = []  # 记录已被分配的conditions
+        # 过滤并添加Missing tooth中score >= 0.4的
+        if missing_tooth:
+            all_missing_teeth.extend([mt for mt in missing_tooth if get_highest_score(mt.get('score', 0)) >= 0.4])
+        
+        # 按score排序，处理重叠的缺失牙齿
+        all_missing_teeth.sort(key=lambda x: get_highest_score(x.get('score', 0)), reverse=True)
+        
+        # 处理重叠，保留score最高的
+        merged_missing_teeth = []
+        for mt in all_missing_teeth:
+            box1 = mt.get('bbox', [])
+            # 检查是否与已合并的有重叠
+            overlap = False
+            for merged_mt in merged_missing_teeth:
+                box2 = merged_mt.get('bbox', [])
+                if calculate_iou(box1, box2) > 0.5:
+                    overlap = True
+                    break
             
-            for cond_name, cond_data in unknown_tooth['conditions'].items():
-                # 检查condition是否有bbox
-                if 'bbox' in cond_data:
-                    # 对于bbox列表的情况
-                    if isinstance(cond_data['bbox'], list) and isinstance(cond_data['bbox'][0], list):
-                        all_bbox_assigned = True  # 标记是否所有bbox都被分配
-                        assigned_bbox_indices = []  # 记录已被分配的bbox索引
+            if not overlap:
+                # 添加side信息
+                mt['side'] = determine_side_from_bbox(box1, quadrants, 'missing_teeth', image_width, image_height)
+                merged_missing_teeth.append(mt)
+        
+        # 更新data
+        if merged_missing_teeth:
+            result["properties"]["Missing teeth"] = merged_missing_teeth
+        elif "Missing teeth" in result["properties"]:
+            del result["properties"]["Missing teeth"]
+        
+        # 删除原始字段
+        if 'MissingTeeth' in result["properties"]:
+            del result["properties"]["MissingTeeth"]
+        if 'Missing tooth' in result["properties"]:
+            del result["properties"]["Missing tooth"]
+    
+    # 3. 处理牙齿数据，包括处理重复牙齿
+    if "properties" in result and "Teeth" in result["properties"]:
+        teeth = result["properties"]["Teeth"]
+        teeth_dict = {}
+        unknown_teeth = []
+        
+        # 3.1 分离known和unknown牙齿，处理重复牙号
+        for tooth in teeth:
+            tooth_id = tooth.get("tooth_id", "unknown")
+            score = tooth.get("score", 0.0)
+            
+            # 获取分数，处理可能是列表的情况
+            tooth_score = get_highest_score(score)
+            
+            # 将unknown牙齿单独处理
+            if tooth_id == "unknown":
+                unknown_teeth.append(tooth)
+                continue
+            
+            if tooth_id in teeth_dict:
+                existing_score = get_highest_score(teeth_dict[tooth_id].get("score", 0.0))
+                if tooth_score > existing_score:
+                    teeth_dict[tooth_id] = tooth
+            else:
+                teeth_dict[tooth_id] = tooth
+        
+        # 3.2 过滤掉所有score<0.4的所有condition/disease
+        for tooth in list(teeth_dict.values()) + unknown_teeth:
+            if "conditions" in tooth:
+                conditions_to_keep = {}
+                for condition_name, condition_data in tooth["conditions"].items():
+                    # 特殊处理Periapical lesions和Impacted tooth
+                    if condition_name == "Periapical lesions":
+                        threshold = 0.7
+                    elif condition_name == "Impacted tooth":
+                        threshold = 0.55
+                    else:
+                        threshold = 0.4
+                    
+                    # 获取分数
+                    condition_score = get_highest_score(condition_data.get("score", 0))
+                    
+                    # 保留高于阈值的条件
+                    if condition_score >= threshold:
+                        # 添加side信息给unknown牙齿的条件
+                        if tooth.get("tooth_id") == "unknown" and "bbox" in condition_data:
+                            side = determine_side_from_bbox(
+                                condition_data["bbox"], 
+                                quadrants, 
+                                'tooth', 
+                                image_width, 
+                                image_height
+                            )
+                            condition_data["side"] = side
                         
-                        for i, bbox in enumerate(cond_data['bbox']):
-                            # 查找与该condition bbox重叠最大的牙齿
+                        conditions_to_keep[condition_name] = condition_data
+                
+                tooth["conditions"] = conditions_to_keep
+        
+        # 3.3 处理根尖和残根条件
+        for tooth in list(teeth_dict.values()) + unknown_teeth:
+            if "conditions" in tooth:
+                has_root_piece = "Root piece" in tooth["conditions"]
+                has_retained_root = "Retained root" in tooth["conditions"]
+                
+                if has_root_piece and not has_retained_root:
+                    # 将Root piece转换为Retained root
+                    tooth["conditions"]["Retained root"] = tooth["conditions"]["Root piece"]
+                    del tooth["conditions"]["Root piece"]
+                elif has_root_piece and has_retained_root:
+                    # 只保留Retained root
+                    del tooth["conditions"]["Root piece"]
+        
+        # 3.4 为特定条件的智齿添加"Recommended extraction"
+        has_18 = "18" in teeth_dict
+        has_28 = "28" in teeth_dict
+        has_38 = "38" in teeth_dict
+        has_48 = "48" in teeth_dict
+        
+        if has_18 and not has_48:
+            if "conditions" not in teeth_dict["18"]:
+                teeth_dict["18"]["conditions"] = {}
+            teeth_dict["18"]["conditions"]["Recommended extraction"] = {"present": True}
+        
+        if has_28 and not has_38:
+            if "conditions" not in teeth_dict["28"]:
+                teeth_dict["28"]["conditions"] = {}
+            teeth_dict["28"]["conditions"]["Recommended extraction"] = {"present": True}
+        
+        # 3.5 处理unknown牙齿条件的分配
+        unknown_teeth_to_keep = []
+        for unknown_tooth in unknown_teeth:
+            if "conditions" not in unknown_tooth or not unknown_tooth["conditions"]:
+                continue
+                
+            all_conditions_assigned = True
+            conditions_to_remove = []
+            
+            for cond_name, cond_data in unknown_tooth["conditions"].items():
+                if "bbox" in cond_data:
+                    # 确保bbox为列表格式
+                    bbox_list = ensure_bbox_list(cond_data["bbox"])
+                    
+                    if bbox_list:
+                        # 遍历每个bbox，尝试找到重叠的known牙齿
+                        for bbox in bbox_list:
                             max_iou = 0
                             best_tooth = None
                             
-                            for known_tooth in known_teeth:
-                                if 'bbox' in known_tooth:
-                                    known_bbox = known_tooth['bbox']
-                                    iou = calculate_iou(bbox, known_bbox)
-                                    
+                            for tooth_id, known_tooth in teeth_dict.items():
+                                if "bbox" in known_tooth and is_valid_bbox(known_tooth["bbox"]):
+                                    iou = calculate_iou(bbox, known_tooth["bbox"])
                                     if iou > max_iou:
                                         max_iou = iou
                                         best_tooth = known_tooth
                             
-                            # 如果找到重叠的牙齿，将condition添加到该牙齿中
-                            if best_tooth and max_iou > 0:  # 只要有任何重叠即可分配
-                                if 'conditions' not in best_tooth:
-                                    best_tooth['conditions'] = {}
+                            # 如果找到重叠的牙齿，添加条件
+                            if best_tooth and max_iou > 0.5:
+                                if "conditions" not in best_tooth:
+                                    best_tooth["conditions"] = {}
                                 
-                                # 如果condition已存在于目标牙齿中，比较score
-                                if cond_name in best_tooth['conditions']:
-                                    existing_cond = best_tooth['conditions'][cond_name]
-                                    existing_score = existing_cond.get('score', 0)
-                                    
-                                    # 获取当前condition的score
-                                    if isinstance(cond_data.get('score', 0), list):
-                                        new_score = cond_data['score'][i] if i < len(cond_data['score']) else 0
-                                    else:
-                                        new_score = cond_data.get('score', 0)
-                                    
-                                    # 如果新的score更高，替换condition
-                                    if new_score > existing_score:
-                                        # 创建新的condition数据
-                                        new_cond = {
-                                            'present': cond_data.get('present', True),
-                                            'bbox': bbox,
-                                            'score': new_score
-                                        }
-                                        
-                                        # 如果有segmentation，也复制
-                                        if 'segmentation' in cond_data and isinstance(cond_data['segmentation'], list):
-                                            if i < len(cond_data['segmentation']):
-                                                new_cond['segmentation'] = cond_data['segmentation'][i]
-                                        
-                                        best_tooth['conditions'][cond_name] = new_cond
-                                else:
-                                    # 如果condition不存在，直接添加
-                                    # 创建新的condition数据
-                                    new_cond = {
-                                        'present': cond_data.get('present', True),
-                                        'bbox': bbox,
-                                        'score': cond_data['score'][i] if isinstance(cond_data.get('score', 0), list) and i < len(cond_data['score']) else cond_data.get('score', 0)
-                                    }
-                                    
-                                    # 如果有segmentation，也复制
-                                    if 'segmentation' in cond_data and isinstance(cond_data['segmentation'], list):
-                                        if i < len(cond_data['segmentation']):
-                                            new_cond['segmentation'] = cond_data['segmentation'][i]
-                                    
-                                    best_tooth['conditions'][cond_name] = new_cond
+                                if cond_name not in best_tooth["conditions"]:
+                                    best_tooth["conditions"][cond_name] = cond_data.copy()
+                                elif get_highest_score(cond_data.get("score", 0)) > get_highest_score(best_tooth["conditions"][cond_name].get("score", 0)):
+                                    best_tooth["conditions"][cond_name] = cond_data.copy()
                                 
-                                assigned_bbox_indices.append(i)
+                                conditions_to_remove.append(cond_name)
                             else:
-                                all_bbox_assigned = False
-                        
-                        # 如果所有bbox都被分配，记录这个condition将被移除
-                        if all_bbox_assigned:
-                            conditions_to_remove.append(cond_name)
-                        else:
-                            # 如果有些bbox未被分配，更新condition，只保留未分配的bbox
-                            new_bbox = []
-                            new_score = []
-                            new_segmentation = []
-                            
-                            for i in range(len(cond_data['bbox'])):
-                                if i not in assigned_bbox_indices:
-                                    new_bbox.append(cond_data['bbox'][i])
-                                    if 'score' in cond_data and isinstance(cond_data['score'], list) and i < len(cond_data['score']):
-                                        new_score.append(cond_data['score'][i])
-                                    if 'segmentation' in cond_data and isinstance(cond_data['segmentation'], list) and i < len(cond_data['segmentation']):
-                                        new_segmentation.append(cond_data['segmentation'][i])
-                            
-                            cond_data['bbox'] = new_bbox
-                            if new_score:
-                                cond_data['score'] = new_score
-                            if new_segmentation:
-                                cond_data['segmentation'] = new_segmentation
-                            
-                            all_conditions_assigned = False
-                    else:
-                        # 对于单个bbox的情况
-                        bbox = cond_data['bbox']
-                        
-                        # 查找与该condition bbox重叠最大的牙齿
-                        max_iou = 0
-                        best_tooth = None
-                        
-                        for known_tooth in known_teeth:
-                            if 'bbox' in known_tooth:
-                                known_bbox = known_tooth['bbox']
-                                iou = calculate_iou(bbox, known_bbox)
-                                
-                                if iou > max_iou:
-                                    max_iou = iou
-                                    best_tooth = known_tooth
-                        
-                        # 如果找到重叠的牙齿，将condition添加到该牙齿中
-                        if best_tooth and max_iou > 0:  # 只要有任何重叠即可分配
-                            if 'conditions' not in best_tooth:
-                                best_tooth['conditions'] = {}
-                            
-                            # 如果condition已存在于目标牙齿中，比较score
-                            if cond_name in best_tooth['conditions']:
-                                existing_cond = best_tooth['conditions'][cond_name]
-                                existing_score = existing_cond.get('score', 0)
-                                new_score = cond_data.get('score', 0)
-                                
-                                # 如果新的score更高，替换condition
-                                if new_score > existing_score:
-                                    best_tooth['conditions'][cond_name] = cond_data.copy()
-                            else:
-                                # 如果condition不存在，直接添加
-                                best_tooth['conditions'][cond_name] = cond_data.copy()
-                            
-                            conditions_to_remove.append(cond_name)
-                        else:
-                            all_conditions_assigned = False
+                                all_conditions_assigned = False
             
-            # 从unknown_tooth中移除已分配的conditions
+            # 从unknown_tooth移除已分配的条件
             for cond_name in conditions_to_remove:
-                if cond_name in unknown_tooth['conditions']:
-                    del unknown_tooth['conditions'][cond_name]
+                if cond_name in unknown_tooth["conditions"]:
+                    del unknown_tooth["conditions"][cond_name]
             
-            # 如果所有conditions都被分配，则从未分配列表中移除该unknown牙齿
-            if all_conditions_assigned or not unknown_tooth['conditions']:
-                unknown_teeth_to_keep.remove(unknown_tooth)
+            # 如果还有未分配的条件，保留这个unknown牙齿
+            if not all_conditions_assigned and unknown_tooth["conditions"]:
+                unknown_teeth_to_keep.append(unknown_tooth)
         
-        # 更新Teeth字段，包括known_teeth和未分配的unknown_teeth
-        data['properties']['Teeth'] = known_teeth + unknown_teeth_to_keep
+        # 3.6 处理Crown和Filling的重叠
+        for tooth in list(teeth_dict.values()) + unknown_teeth_to_keep:
+            if "conditions" in tooth and "Crown" in tooth["conditions"] and "Filling" in tooth["conditions"]:
+                crown = tooth["conditions"]["Crown"]
+                filling = tooth["conditions"]["Filling"]
+                
+                if "bbox" in crown and "bbox" in filling:
+                    crown_bboxes = ensure_bbox_list(crown["bbox"])
+                    filling_bboxes = ensure_bbox_list(filling["bbox"])
+                    
+                    if crown_bboxes and filling_bboxes:
+                        crown_scores = crown.get("score", 0)
+                        if not isinstance(crown_scores, list):
+                            crown_scores = [crown_scores] * len(crown_bboxes)
+                        
+                        filling_scores = filling.get("score", 0)
+                        if not isinstance(filling_scores, list):
+                            filling_scores = [filling_scores] * len(filling_bboxes)
+                        
+                        # 检查每对Crown和Filling的重叠
+                        for i, (crown_bbox, crown_score) in enumerate(zip(crown_bboxes, crown_scores)):
+                            for j, (filling_bbox, filling_score) in enumerate(zip(filling_bboxes, filling_scores)):
+                                iou = calculate_iou(crown_bbox, filling_bbox)
+                                
+                                # 如果IoU很高，保留得分更高的
+                                if iou > 0.9:
+                                    if crown_score < filling_score:
+                                        # 移除这个crown
+                                        if isinstance(crown["bbox"], list) and isinstance(crown["bbox"][0], list):
+                                            crown["bbox"].pop(i)
+                                            if isinstance(crown["score"], list):
+                                                crown["score"].pop(i)
+                                        else:
+                                            del tooth["conditions"]["Crown"]
+                                            break
+                                    else:
+                                        # 移除这个filling
+                                        if isinstance(filling["bbox"], list) and isinstance(filling["bbox"][0], list):
+                                            filling["bbox"].pop(j)
+                                            if isinstance(filling["score"], list):
+                                                filling["score"].pop(j)
+                                        else:
+                                            del tooth["conditions"]["Filling"]
+                                            break
+        
+        # 更新teeth列表
+        result["properties"]["Teeth"] = list(teeth_dict.values()) + unknown_teeth_to_keep
     
-    # 3. 处理JawBones，过滤score低于0.4的所有条件
-    if 'JawBones' in data.get('properties', {}):
-        for jawbone in data['properties']['JawBones']:
-            if 'conditions' in jawbone:
+    # 4. 处理JawBones，过滤score低于阈值的所有条件
+    if "properties" in result and "JawBones" in result["properties"]:
+        for jawbone in result["properties"]["JawBones"]:
+            if "conditions" in jawbone:
                 conditions_to_remove = []
                 
-                for condition_name, condition_data in jawbone['conditions'].items():
-                    # 处理bone loss，只保留score > 0.6的
-                    if condition_name == 'Bone loss':
-                        if isinstance(condition_data.get('score', []), list):
-                            filtered_boxes = []
-                            filtered_segmentations = []
-                            filtered_scores = []
-                            
-                            for i, score in enumerate(condition_data['score']):
-                                if score > 0.6:  # 对bone loss使用0.6的阈值
-                                    filtered_boxes.append(condition_data['bbox'][i])
-                                    filtered_segmentations.append(condition_data['segmentation'][i])
-                                    filtered_scores.append(score)
-                            
-                            if filtered_boxes:
-                                condition_data['bbox'] = filtered_boxes
-                                condition_data['segmentation'] = filtered_segmentations
-                                condition_data['score'] = filtered_scores
-                                
-                                # 添加side信息
-                                sides = []
-                                for box in filtered_boxes:
-                                    sides.append(determine_side(box, quadrants_info, 'bone_loss', image_width, image_height))
-                                condition_data['side'] = sides
-                            else:
-                                # 如果没有满足条件的bone loss，标记为删除
-                                conditions_to_remove.append(condition_name)
-                        else:
-                            # 对于单个score的情况
-                            if condition_data.get('score', 0) <= 0.6:  # 对bone loss使用0.6的阈值
-                                conditions_to_remove.append(condition_name)
-                            else:
-                                # 添加side信息
-                                condition_data['side'] = determine_side(condition_data['bbox'], quadrants_info, 'bone_loss', image_width, image_height)
-                    
-                    # 处理其他条件，过滤score < 0.4的
+                for condition_name, condition_data in jawbone["conditions"].items():
+                    # 处理bone loss，使用更高的阈值
+                    if condition_name == "Bone loss":
+                        threshold = 0.6
                     else:
-                        if isinstance(condition_data.get('score', []), list):
-                            filtered_boxes = []
-                            filtered_segmentations = []
-                            filtered_scores = []
+                        threshold = 0.4
+                    
+                    # 处理bbox和score可能是列表的情况
+                    if isinstance(condition_data.get("score", []), list):
+                        filtered_boxes = []
+                        filtered_segmentations = []
+                        filtered_scores = []
+                        
+                        for i, score in enumerate(condition_data["score"]):
+                            if score > threshold:
+                                if "bbox" in condition_data and i < len(condition_data["bbox"]):
+                                    filtered_boxes.append(condition_data["bbox"][i])
+                                if "segmentation" in condition_data and i < len(condition_data["segmentation"]):
+                                    filtered_segmentations.append(condition_data["segmentation"][i])
+                                filtered_scores.append(score)
+                        
+                        if filtered_boxes:
+                            condition_data["bbox"] = filtered_boxes
+                            condition_data["score"] = filtered_scores
+                            if filtered_segmentations:
+                                condition_data["segmentation"] = filtered_segmentations
                             
-                            for i, score in enumerate(condition_data['score']):
-                                if score >= 0.4:
-                                    if 'bbox' in condition_data:
-                                        filtered_boxes.append(condition_data['bbox'][i])
-                                    if 'segmentation' in condition_data:
-                                        filtered_segmentations.append(condition_data['segmentation'][i])
-                                    filtered_scores.append(score)
-                            
-                            if filtered_scores:
-                                if filtered_boxes:
-                                    condition_data['bbox'] = filtered_boxes
-                                if filtered_segmentations:
-                                    condition_data['segmentation'] = filtered_segmentations
-                                condition_data['score'] = filtered_scores
-                            else:
-                                # 如果没有满足条件的项，标记为删除
-                                conditions_to_remove.append(condition_name)
+                            # 添加side信息
+                            sides = []
+                            for box in filtered_boxes:
+                                sides.append(determine_side_from_bbox(box, quadrants, 'bone_loss', image_width, image_height))
+                            condition_data["side"] = sides
                         else:
-                            # 对于单个score的情况
-                            if condition_data.get('score', 0) < 0.4:
-                                conditions_to_remove.append(condition_name)
+                            conditions_to_remove.append(condition_name)
+                    else:
+                        # 单个score的情况
+                        if condition_data.get("score", 0) < threshold:
+                            conditions_to_remove.append(condition_name)
+                        elif "bbox" in condition_data:
+                            # 添加side信息
+                            condition_data["side"] = determine_side_from_bbox(
+                                condition_data["bbox"], 
+                                quadrants, 
+                                'bone_loss', 
+                                image_width, 
+                                image_height
+                            )
                 
                 # 删除被标记的条件
                 for condition_name in conditions_to_remove:
-                    del jawbone['conditions'][condition_name]
+                    del jawbone["conditions"][condition_name]
     
-    return data
+    return result
 
-def process_folder(folder_path, output_folder=None):
-    """处理文件夹中的所有JSON文件"""
-    if output_folder is None:
-        output_folder = os.path.join(folder_path, 'processed')
+def process_directory(input_dir: str, output_dir: str) -> None:
+    """处理目录中的所有JSON文件"""
+    # 确保输出目录存在
+    os.makedirs(output_dir, exist_ok=True)
     
-    os.makedirs(output_folder, exist_ok=True)
+    # 获取所有json文件
+    json_files = glob.glob(os.path.join(input_dir, "*.json"))
     
-    # 获取所有JSON文件
-    json_files = glob(os.path.join(folder_path, '*.json'))
+    print(f"找到 {len(json_files)} 个JSON文件待处理")
     
-    for file_path in json_files:
+    successful = 0
+    failed = 0
+    
+    for input_file in json_files:
+        filename = os.path.basename(input_file)
+        output_file = os.path.join(output_dir, filename)
+        
         try:
-            # 处理文件
-            processed_data = process_json_file(file_path)
+            # 读取JSON文件
+            with open(input_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
             
-            # 保存处理后的文件
-            file_name = os.path.basename(file_path)
-            output_path = os.path.join(output_folder, file_name)
+            # 处理数据
+            processed_data = process_dental_json(data)
             
-            with open(output_path, 'w') as f:
-                json.dump(processed_data, f, indent=2)
+            # 保存处理后的数据
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(processed_data, f, indent=2, ensure_ascii=False)
             
-            print(f"Processed: {file_name}")
+            successful += 1
+            print(f"已处理: {filename}")
+            
         except Exception as e:
-            print(f"Error processing {file_path}: {e}")
-
-
-if __name__ == "__main__":
-    import argparse
+            failed += 1
+            print(f"处理 {filename} 时出错: {str(e)}")
     
-    parser = argparse.ArgumentParser(description='caption json post process')
-    parser.add_argument('--input', required=True, help='输入json目录')
-    parser.add_argument('--output', required=True, help='输出json目录')
+    print(f"处理完成! 成功: {successful}, 失败: {failed}")
+
+def main():
+    """主函数，解析命令行参数并执行处理"""
+    parser = argparse.ArgumentParser(description='后处理牙科JSON数据')
+    parser.add_argument('-i', '--input', required=True, help='输入JSON文件或目录')
+    parser.add_argument('-o', '--output', required=True, help='输出JSON文件或目录')
     
     args = parser.parse_args()
-    folder_path = args.input
-    output_path = args.output
     
-    process_folder(folder_path, output_path)
+    # 判断输入是文件还是目录
+    if os.path.isfile(args.input):
+        # 处理单个文件
+        try:
+            # 读取JSON文件
+            with open(args.input, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # 处理数据
+            processed_data = process_dental_json(data)
+            
+            # 保存处理后的数据
+            with open(args.output, 'w', encoding='utf-8') as f:
+                json.dump(processed_data, f, indent=2, ensure_ascii=False)
+                
+            print(f"已成功处理文件: {args.input} -> {args.output}")
+        
+        except Exception as e:
+            print(f"处理文件时出错: {str(e)}")
+    
+    elif os.path.isdir(args.input):
+        # 处理目录
+        process_directory(args.input, args.output)
+    
+    else:
+        print(f"错误: 输入路径 '{args.input}' 不存在")
+
+if __name__ == "__main__":
+    main()
