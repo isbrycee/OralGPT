@@ -1,7 +1,6 @@
 import requests
 import json
 API_URL = "https://huggingface.co/api/datasets/Bryceee/MM-Oral/croissant"
-API_TOKEN = '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'
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 def query():
     response = requests.get(API_URL, headers=headers)
