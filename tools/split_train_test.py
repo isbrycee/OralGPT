@@ -32,8 +32,8 @@ def split_files(folder_a, folder_b, output_dir):
     print(f"文件已成功拆分到 {train_dir} 和 {test_dir}")
 
 # 示例用法
-folder_a = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/data_0415/output/test_4k_bak/MM-Oral-OPG-images"  # 末尾不能有 / 
-folder_b = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/data_0415/output/test_100/MM-Oral-OPG-images"  # 替换为文件夹 B 的路径
+folder_a = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/data_0415/output/MM-Oral-OPG-multi-turn-conv"  # 末尾不能有 '/'
+folder_b = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/data_0415/output/test/MM-Oral-OPG-images"  # 替换为文件夹 B 的路径
 output_dir = "/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/data_0415/output/1111111"  # 替换为输出文件夹的路径
 
 split_files(folder_a, folder_b, output_dir)

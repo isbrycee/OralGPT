@@ -34,5 +34,5 @@ def count_categories(file_path):
 
 
 # 替换为你的 TSV 文件路径
-file_path = '/home/jinghao/projects/x-ray-VLM/dataset/mmoral-json-v1/data_0415/output/test/MM-Oral-VQA-Open-Ended.tsv'
+file_path = '/home/jinghao/LMUData/MM-Oral-VQA-Open-Ended.tsv'
 count_categories(file_path)
