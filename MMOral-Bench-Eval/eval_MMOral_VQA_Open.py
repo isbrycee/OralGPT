@@ -36,6 +36,31 @@ def prepare_image_dir(output_dir, dataset_name):
     os.makedirs(img_dir, exist_ok=True)
     return img_dir
 
+def build_prompt(line):
+    question = line['question']
+    gt = str(line['answer'])
+    prediction = str(line['prediction'])
+    prompt = """
+Given the question, compare the ground truth and prediction from AI models, to generate a correctness score for the prediction.
+The correctness score is 0.0 (totally wrong), 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, or 1.0 (totally right).
+Just complete the last space of the correctness score.
+
+Question | Ground truth | Prediction | Correctness
+--- | --- | --- | ---
+How many teeth are visualized in the radiograph? | 30 teeth are visualized with clear anatomical definition. | 30 | 1.0
+How many teeth are visualized in the radiograph? | 30 teeth are visualized with clear anatomical definition. | 29 teeth are visualized with clear anatomical definition. | 0.0
+What is the status of the wisdom teeth in the radiograph? | Three wisdom teeth are detected, all of which are impacted: #18, #28, and #48. | #18: impacted, #28: impacted, #48: erupted | 0.7
+What is the condition of the teeth #26 and #14? | Teeth #26 and #14 show signs of periapical abscesses. | Teeth #26 and #23 show signs of periapical abscesses. | 0.5
+What is the condition of the bone architecture and visible structures in the jaw? | No apparent bone loss is observed. Bilateral mandibular canals and maxillary sinuses are clearly visible. | Bilateral mandibular canals and maxillary sinuses are clearly visible. | 0.5
+What is the clinical priority concern regarding the periapical lesions? | Periapical cysts at #11 and #12, and granuloma at #46 require endodontic evaluation. | Periapical lesions at #11, #12, and #46 require endodontic evaluation. | 0.8
+What radiographic features are visible in tooth #31 on the panoramic X-ray? | [\n{\"Teeth position\": {\"point_2d\": [1242, 726]}},\n{\"Crown\": {\"box_2d\": [1220, 637, 1266, 741]}}\n] | Crown | 0.8
+What radiographic features are visible in tooth #31 on the panoramic X-ray? | [\n{\"Teeth position\": {\"point_2d\": [1242, 726]}},\n{\"Crown\": {\"box_2d\": [1220, 637, 1266, 741]}}\n] | Crown at position: [1230, 627, 1276, 750] | 0.9
+What radiographic features are visible in tooth #31 on the panoramic X-ray? | [\n{\"Teeth position\": {\"point_2d\": [1242, 726]}},\n{\"Crown\": {\"box_2d\": [1220, 637, 1266, 741]}}\n] | Teeth at position: {\"point_2d\": [1242, 726]}},\n{Crown at position: {\"box_2d\": [1230, 627, 1276, 750]}} | 1.0
+"""
+    gpt4_prompt = prompt + '\n' + ' | '.join(
+        [question, gt.replace('<AND>', ' <AND> ').replace('<OR>', ' <OR> '), prediction, ''])
+    return gpt4_prompt
+
 def run_inference(dataset, img_dir, gpt_api_key, gpt_api_base, model_name="gpt-4o"):
     print("Running inference with GPT-4o...")
     results = defaultdict(list)
@@ -119,14 +144,7 @@ def evaluate_with_gpt(results_df, img_dir, gpt_api_key, gpt_api_base):
     system_prompt = """
     You are a medical expert specialized in oral radiology. Your task is to evaluate the quality of answers to questions about oral radiographic images (like X-rays of teeth, jaws, etc.).
     
-    Please rate the given answer on a scale from 0 to 1, where:
-    - 0: Completely incorrect or irrelevant
-    - 0.5: Partially correct but missing key information or containing inaccuracies
-    - 1: Fully correct and comprehensive
-    
-    Return only a JSON object with two fields:
-    1. "score": A decimal number between 0 and 1 (can be 0, 0.5, or 1)
-    2. "log": A brief explanation of your rating
+    Please provide a precise evaluation following the scoring system shown in the examples.
     """
     
     for idx, row in tqdm(results_df.iterrows(), total=len(results_df)):
@@ -141,15 +159,8 @@ def evaluate_with_gpt(results_df, img_dir, gpt_api_key, gpt_api_base):
             img = Image.open(image_path).convert('RGB')
             b64_img = encode_image_to_base64(img)
             
-            user_prompt = f"""
-            Question: {row['question']}
-            
-            Ground Truth Answer: {row['answer']}
-            
-            Model's Answer: {row['prediction']}
-            
-            Based on the radiographic image and the question, evaluate the model's answer accuracy compared to the ground truth.
-            """
+            # Use the MMVET prompt format
+            user_prompt = build_prompt(row)
             
             payload = {
                 "model": "gpt-4",
@@ -174,23 +185,55 @@ def evaluate_with_gpt(results_df, img_dir, gpt_api_key, gpt_api_base):
                 result = response.json()
                 gpt_response = result['choices'][0]['message']['content'].strip()
                 
+                # Try to parse the score from the MMVET format response
+                # The response should be a simple number like "0.8"
                 try:
-                    evaluation = json.loads(gpt_response)
-                    results_df.at[idx, 'score'] = float(evaluation.get('score', 0))
-                    results_df.at[idx, 'log'] = evaluation.get('log', "No explanation provided")
-                except json.JSONDecodeError:
-                    if "score" in gpt_response.lower():
-                        score_text = gpt_response.lower().split("score")[1].split("\n")[0]
-                        score = 0
-                        if "1" in score_text or "one" in score_text:
-                            score = 1.0
-                        elif "0.5" in score_text or "half" in score_text:
-                            score = 0.5
-                        results_df.at[idx, 'score'] = score
-                        results_df.at[idx, 'log'] = gpt_response
+                    # First try direct number extraction
+                    for score in ["0.0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1.0"]:
+                        if score in gpt_response:
+                            results_df.at[idx, 'score'] = float(score)
+                            results_df.at[idx, 'log'] = f"MMVET score: {score}"
+                            break
                     else:
-                        results_df.at[idx, 'score'] = 0
-                        results_df.at[idx, 'log'] = f"Failed to parse GPT response: {gpt_response}"
+                        # If no direct match, try to parse from more complex responses
+                        try:
+                            # Try to parse as JSON if it looks like JSON
+                            if '{' in gpt_response and '}' in gpt_response:
+                                evaluation = json.loads(gpt_response)
+                                results_df.at[idx, 'score'] = float(evaluation.get('score', 0))
+                                results_df.at[idx, 'log'] = evaluation.get('log', "No explanation provided")
+                            # Otherwise, look for score mentions
+                            elif "score" in gpt_response.lower():
+                                score_text = gpt_response.lower().split("score")[1].split("\n")[0]
+                                score = 0
+                                if "1" in score_text or "one" in score_text:
+                                    score = 1.0
+                                elif "0.5" in score_text or "half" in score_text:
+                                    score = 0.5
+                                results_df.at[idx, 'score'] = score
+                                results_df.at[idx, 'log'] = gpt_response
+                            else:
+                                # If all else fails, try to extract a float value
+                                import re
+                                numbers = re.findall(r"[0-9]+\.[0-9]+|[0-9]+", gpt_response)
+                                if numbers:
+                                    score_value = float(numbers[0])
+                                    if 0 <= score_value <= 1:
+                                        results_df.at[idx, 'score'] = score_value
+                                        results_df.at[idx, 'log'] = f"Extracted score: {score_value}"
+                                    else:
+                                        results_df.at[idx, 'score'] = 0
+                                        results_df.at[idx, 'log'] = f"Invalid score value: {score_value}, Response: {gpt_response}"
+                                else:
+                                    results_df.at[idx, 'score'] = 0
+                                    results_df.at[idx, 'log'] = f"Failed to parse GPT response: {gpt_response}"
+                        except json.JSONDecodeError:
+                            results_df.at[idx, 'score'] = 0
+                            results_df.at[idx, 'log'] = f"Failed to parse GPT response: {gpt_response}"
+                except Exception as e:
+                    print(f"Error parsing response for sample {idx}: {e}")
+                    results_df.at[idx, 'score'] = 0
+                    results_df.at[idx, 'log'] = f"Parsing error: {str(e)}, Response: {gpt_response}"
             else:
                 print(f"API Error: {response.status_code}, {response.text}")
                 results_df.at[idx, 'score'] = 0
