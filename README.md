@@ -6,12 +6,12 @@ Our benchmark consists of both Open-Ended and Closed-Ended evaluation formats, w
 
 For benchmark evaluation, we provide two approaches:
 
-1. Using **VLMEvalkit** (supporting multiple pre-configured VLMs)
+1. Using [**VLMEvalkit**](https://github.com/open-compass/VLMEvalKit) (supporting multiple pre-configured VLMs)
 2. For VLMs not available in VLMEvalkit or new VLMs, we provide generic evaluation scripts: `eval_MMOral_VQA_Closed.py` and `eval_MMOral_VQA_Open.py`
 
 ### Using VLMEvalkit
 
-We have included an `mmoral.py` file in the `vlmeval/dataset` directory. To evaluate any model supported by VLMEvalkit:
+We offer a zip file which includes the version we use to evaluate the VLMs on the MMOral-Bench. We have included an `mmoral.py` file in the `vlmeval/dataset` directory. To evaluate any model supported by VLMEvalkit:
 
 1. Modify the `mmoral_config.json` file with your desired settings
 2. Run `bash run_eval.sh` to start the evaluation
