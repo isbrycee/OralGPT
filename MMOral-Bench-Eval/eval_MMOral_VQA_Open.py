@@ -171,7 +171,7 @@ def evaluate_with_gpt(results_df, img_dir, gpt_api_key, gpt_api_base):
                         {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64_img}"}}
                     ]}
                 ],
-                "temperature": 0.2
+                "temperature": 0.0
             }
             
             response = requests.post(
@@ -265,11 +265,9 @@ def calculate_scores(results_df):
                 tot[main_cat] += 1
                 score[main_cat] += float(row['score'])
         
-        tot[category] += 1
         tot[subcategory] += 1
         tot['Overall'] += 1
         
-        score[category] += float(row['score'])
         score[subcategory] += float(row['score'])
         score['Overall'] += float(row['score'])
     
