@@ -1,5 +1,7 @@
 # OralGPT
 
+<img src="https://github.com/isbrycee/OralGPT/tree/main/assets/mmoral-logo.png" width="700px">
+
 ## Evaluation of MMOral-Bench
 
 Our benchmark consists of both Open-Ended and Closed-Ended evaluation formats, with corresponding TSV files available at [https://huggingface.co/datasets/EasonFan/MMOral-Bench](https://huggingface.co/datasets/EasonFan/MMOral-Bench).
