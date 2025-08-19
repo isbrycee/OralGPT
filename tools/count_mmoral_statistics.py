@@ -1,6 +1,4 @@
 import json
-
-import json
 import os
 
 def count_bbox_values(bbox_data):

@@ -50,11 +50,11 @@ def visualize_boxes(json_path, image_base_dir, output_dir):
             continue
 
         # 绘制Contextual Grounding Position (绿色)
-        for box in item["Contextual Grounding Position"]:
-            if len(box) != 4:
-                continue
-            x1, y1, x2, y2 = validate_coords(box)
-            cv2.rectangle(img_with_boxes, (x1, y1), (x2, y2), (0, 255, 0), 2)  # 绿色矩形
+        # for box in item["Contextual Grounding Position"]:
+        #     if len(box) != 4:
+        #         continue
+        #     x1, y1, x2, y2 = validate_coords(box)
+        #     cv2.rectangle(img_with_boxes, (x1, y1), (x2, y2), (0, 255, 0), 2)  # 绿色矩形
         
         # 绘制Precise Grounding Position (红色)
         for box in item["Precise Grounding Position"]:
@@ -76,8 +76,8 @@ def visualize_boxes(json_path, image_base_dir, output_dir):
 if __name__ == "__main__":
     # 配置参数
     json_path = "processed_annotations.json"  # 替换为你的JSON文件路径
-    image_base_dir = "/home/jinghao/projects/x-ray-VLM/R1"  # 图像基础目录
-    output_dir = "/home/jinghao/projects/x-ray-VLM/OralGPT/R1/tools/temp"  # 输出目录
+    image_base_dir = "/home/jinghao/projects/x-ray-VLM/R1/"  # 图像基础目录
+    output_dir = "/home/jinghao/projects/x-ray-VLM/OralGPT/R1/tools/temp_for_Dental_Conditions_Detection_2025_Romania/"  # 输出目录
     
     # 执行可视化
     visualize_boxes(json_path, image_base_dir, output_dir)
