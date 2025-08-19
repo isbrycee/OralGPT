@@ -1,7 +1,7 @@
 # OralGPT
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/mmoral-logo.png" width="200px">
+  <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/mmoral-logo.png" width="150px">
 </div>
 
 ## Evaluation of MMOral-Bench
