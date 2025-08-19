@@ -156,7 +156,7 @@ def visualize_predictions(image_path, predictions, id2name, output_path, confide
 def main():
     # 设置命令行参数
     parser = argparse.ArgumentParser(description='DINO模型单图像推理与可视化')
-    parser.add_argument('--image', type=str, default="/hpc2hdd/home/yfan546/workplace/xray_teeth/unlabeled_data/MM-Oral-OPG-images_3channels/009477.jpg", help='输入图像路径')
+    parser.add_argument('--image', type=str, default="Dental_Conditions_Detection_2025_Romania/test/images/v9.jpg", help='输入图像路径')
     #parser.add_argument('--config', type=str, default="config/DINO/1_disease_5scale_swin.py", help='模型配置文件路径')
     #parser.add_argument('--checkpoint', type=str, default="model_weights/Teeth_Visual_Experts_dino_Swinl_x-ray_4diseases.pth", help='模型检查点路径')
     #parser.add_argument('--coco_names', type=str, default="teeth_data/teeth_x-ray_4diseases_numImages705_ins_coco/annotations/instances_train2017.json", help='COCO类别文件路径')
@@ -164,8 +164,8 @@ def main():
     # parser.add_argument('--checkpoint', type=str, default="model_weights/Teeth_Visual_Experts_dino_Swinl_x-ray_12diseases.pth", help='模型检查点路径')
     # parser.add_argument('--coco_names', type=str, default="teeth_data/teeth_x-ray_12diseases_numImages9206_ins_coco/annotations/instances_train2017.json", help='COCO类别文件路径')
     parser.add_argument('--config', type=str, default="config/DINO/DINO_5scale_swinL_panoramic_x-ray_32ToothID.py", help='模型配置文件路径')
-    parser.add_argument('--checkpoint', type=str, default="model_weights/Teeth_Visual_Experts_DINO_SwinL_5scale_panoramic_x-ray_32ToothID.pth", help='模型检查点路径')
-    parser.add_argument('--coco_names', type=str, default="/hpc2hdd/home/yfan546/workplace/xray_teeth/DINO/teeth_data/teeth_x-ray_teeth_id_numImages1598_ins_coco/annotations/updated_train.json", help='COCO类别文件路径')
+    parser.add_argument('--checkpoint', type=str, default="Teeth_Visual_Experts_DINO_SwinL_5scale_panoramic_x-ray_32ToothID.pth", help='模型检查点路径')
+    parser.add_argument('--coco_names', type=str, default="32ToothID_DINO_category.json", help='COCO类别文件路径')
     parser.add_argument('--confidence', type=float, default=0.1, help='检测置信度阈值')
     parser.add_argument('--output', type=str, default="./outputs/final/", help='输出目录')
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='推理设备')
