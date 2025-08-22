@@ -4,6 +4,9 @@
   <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/mmoral-logo.png" width="150px">
 </div>
 
+## 🔔 News 
+🏃‍♀️ More datasets, models, and evaluations are under development. For collaboration, please contact: 📮 isjinghao@gmail.com
+
 ## Evaluation of MMOral-Bench
 
 Our benchmark consists of both Open-Ended and Closed-Ended evaluation formats, with corresponding TSV files available at [https://huggingface.co/datasets/EasonFan/MMOral-Bench](https://huggingface.co/datasets/EasonFan/MMOral-Bench).
