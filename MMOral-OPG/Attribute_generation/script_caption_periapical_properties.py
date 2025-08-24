@@ -6,13 +6,13 @@ import numpy as np
 from datetime import datetime
 from pathlib import Path
 from PIL import Image
-import datasets.transforms as T
 from torchvision import transforms
 import traceback
 from tqdm import tqdm
-
 import sys
-import json
+sys.path.append("/home/jinghao/projects/dental_plague_detection/DINO-main")
+import datasets.transforms as T
+
 
 # 定义类别常量
 TEETH_CATEGORIES = [
@@ -25,7 +25,7 @@ TEETH_CATEGORIES = [
 ]
 
 DISEASE_CATEGORIES = [
-    "Pulpitis",          # 牙髓炎
+    "Pulpitis",          # 牙髓炎 
     "Impacted tooth",    # 阻生齿
     "Apical periodontitis", # 根尖周炎
     "Bone loss",         # 骨质流失
@@ -35,10 +35,15 @@ DISEASE_CATEGORIES = [
 ]
 
 # 置信度阈值
-SCORE_THRESHOLD = 0.3
-SCORE_THRESHOLD_Alternation = 0.8
-SCORE_THRESHOLD_Impacted = 0.45
+SCORE_THRESHOLD = 0.55
 
+SCORE_THRESHOLD_Alternation = 0.8
+SCORE_THRESHOLD_Impacted = 0.95
+SCORE_THRESHOLD_Pulpitis = 0.8
+SCORE_THRESHOLD_Periodontitis = 0.8
+SCORE_THRESHOLD_Apical_Periodontitis = 0.78
+SCORE_THRESHOLD_Bone_loss = 0.75
+SCORE_THRESHOLD_Caries = 0.7
 
 def convert_numpy_types(obj):
     """
@@ -81,17 +86,16 @@ def load_vit_model(model_type):
         predictor: 预测器
         id2name: 类别ID到名称的映射
     """
-    sys.path.append("/hpc2hdd/home/yfan546/workplace/xray_teeth/ViT-pytorch-cls")  # vit
-    from vit_models.modeling import VisionTransformer, CONFIGS
+    sys.path.append("/home/jinghao/projects/x-ray-VLM/ViT-pytorch")  # vit
+    from models_ViT.modeling import VisionTransformer, CONFIGS
     
     # 根据模型类型选择配置
     if model_type == "7diseases":
         config = CONFIGS["ViT-L_16"]
-        model_weights = "/hpc2hdd/home/yfan546/workplace/xray_teeth/DINO/model_weights/Teeth_Visual_Experts_ViT_L_periapical_images_cls_7diseases.bin"
+        model_weights = "/home/jinghao/projects/x-ray-VLM/ViT-pytorch/output/Teeth_Visual_Experts_ViT_L_periapical_images_cls_7diseases.bin"
         num_classes = 100
     
     img_size = 512
-    
     
     # 初始化模型
     model = VisionTransformer(config, img_size=img_size, zero_head=False, num_classes=num_classes)
@@ -123,18 +127,18 @@ def load_maskdino_model(model_type):
         id2name: 类别ID到名称的映射
     """
     import sys
-    sys.path.append("/hpc2hdd/home/yfan546/workplace/xray_teeth/MaskDINO")
+    sys.path.append("/home/jinghao/projects/dental_plague_detection/MaskDINO")
     
     from detectron2.config import get_cfg
     from detectron2.projects.deeplab import add_deeplab_config
     from maskdino import add_maskdino_config
     from demo.predictor import VisualizationDemo
-    
 
+    
     if model_type == "6diseases":
-        config_file = "/hpc2hdd/home/yfan546/workplace/xray_teeth/DINO/config/DINO/maskdino_R50_bs16_50ep_4s_dowsample1_2048_periapical_x-ray_6diseases.yaml"
-        model_weights = "/hpc2hdd/home/yfan546/workplace/xray_teeth/DINO/model_weights/Teeth_Visual_Experts_Maskdino_Swinl_periapical_images_6diseases.pth"
-        category_map_path = "/hpc2hdd/home/yfan546/workplace/xray_teeth/DINO/teeth_data/teeth_periapical_images_6diseases_numImages1899_ins_seg_coco/output_coco.json"
+        config_file = "/home/jinghao/projects/dental_plague_detection/MaskDINO/configs/coco/instance-segmentation/swin/maskdino_R50_bs16_50ep_4s_dowsample1_2048_periapical_x-ray_6diseases.yaml"
+        model_weights = "/home/jinghao/projects/dental_plague_detection/MaskDINO/Teeth_Visual_Experts_Maskdino_Swinl_periapical_images_6diseases.pth"
+        category_map_path = "/home/jinghao/projects/x-ray-VLM/dataset/periapical_x-ray_ins_seg_num1899/output_coco.json"
     else:
         raise ValueError(f"Unknown MaskDINO model type: {model_type}")
     
@@ -187,8 +191,7 @@ class DentalVisualExpert:
                 self.id2name = id2name
                 print(f"Loaded {model_type} MaskDINO model successfully")
                 
-                
-                        # 图像预处理转换
+                # 图像预处理转换
                 self.transform = T.Compose([
                     T.RandomResize([800], max_size=1333),
                     T.ToTensor(),
@@ -283,7 +286,8 @@ class DentalVisualExpert:
                         category_name = self.id2name.get(class_id + 1)  # +1 因为COCO格式从1开始
                         if not category_name:
                             continue
-                        
+                        if category_name == "Normal": # filter normal teeth
+                            continue
                         # 将xyxy格式的边界框转换为cx,cy,w,h格式
                         x1, y1, x2, y2 = box
                         w = x2 - x1
@@ -357,6 +361,16 @@ class DentalVisualExpert:
                         threshold = SCORE_THRESHOLD_Alternation
                     elif disease == "Impacted tooth":
                         threshold = SCORE_THRESHOLD_Impacted
+                    elif disease == "Pulpitis":
+                        threshold = SCORE_THRESHOLD_Pulpitis
+                    elif disease == "Apical periodontitis":
+                        threshold = SCORE_THRESHOLD_Apical_Periodontitis
+                    elif disease == "Bone loss":
+                        threshold = SCORE_THRESHOLD_Bone_loss
+                    elif disease == "Caries":
+                        threshold = SCORE_THRESHOLD_Caries
+                    elif disease == "Periodontitis":
+                        threshold = SCORE_THRESHOLD_Periodontitis
                     
                     # 如果是龋齿类别，并且分割模型没有检测到龋齿，则跳过
                     if disease == "Caries" and not has_caries_detected:
@@ -427,7 +441,6 @@ def process_image(image_path, expert_6diseases, expert_7diseases, output_dir):
             # 更新或添加Classification字段
             json_data["properties"]["Classification"] = disease_annotations["Classification"]
     
-
     # 将NumPy类型转换为标准Python类型，以便正确序列化到JSON
     json_data = convert_numpy_types(json_data)
     
@@ -439,8 +452,8 @@ def process_image(image_path, expert_6diseases, expert_7diseases, output_dir):
 
 def main():
     # 设置路径
-    image_dir = Path("/hpc2hdd/home/yfan546/workplace/xray_teeth/unlabeled_data/MM-Oral-Periapical-images")
-    output_dir = Path("/hpc2hdd/home/yfan546/workplace/xray_teeth/unlabeled_data/MM-Oral-Periapical-jsons")
+    image_dir = Path("/home/jinghao/projects/x-ray-VLM/dataset/TED3/MM-Oral-Periapical-images")
+    output_dir = Path("/home/jinghao/projects/x-ray-VLM/dataset/TED3/MM-Oral-Periapical-jsons-0822")
     output_dir.mkdir(exist_ok=True)
 
     # 获取所有图像文件
@@ -450,7 +463,7 @@ def main():
     sorted_files = sorted(image_files, key=lambda x: int(x.stem) if x.stem.isdigit() else x.stem)
 
     # 只取前500个
-    # selected_files = sorted_files[:1000]
+    # selected_files = sorted_files[:100]
     selected_files = sorted_files
     total_files = len(selected_files)
     
