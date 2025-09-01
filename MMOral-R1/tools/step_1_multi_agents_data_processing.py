@@ -15,7 +15,7 @@ from PIL import Image
 url = "https://gpt-api.hkust-gz.edu.cn/v1/chat/completions"
 headers = { 
     "Content-Type": "application/json", 
-    "Authorization": "Bearer 558bec6cd6294150913c7ba8d56e68cd3ba1d5bffdc54c6497fe85ba8c7f7a1b" 
+    "Authorization": "Bearer YOUR_API_KEY" 
 }
 
 # Disease mapping
