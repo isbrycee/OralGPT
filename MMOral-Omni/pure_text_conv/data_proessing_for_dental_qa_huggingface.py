@@ -10,7 +10,7 @@ import time
 executor = ThreadPoolExecutor(max_workers=15)  # 增加线程池的线程数
 
 client = OpenAI(
-    api_key="sk-",  # 替换成你的 DMXapi 令牌key
+    api_key="sk-N1hsISExwkdoyisZg9gTd8CxzNAwK8r2ESRSbFsp2M2859Q6",  # 替换成你的 DMXapi 令牌key
     base_url="https://www.dmxapi.cn/v1",  # 需要改成DMXAPI的中转 https://www.dmxapi.cn/v1 ，这是已经改好的。
 )
 
@@ -184,7 +184,6 @@ async def call_api(title, dialogue, max_try=5, sleep_sec=1):
     else:
         print(f"Failed to process title: {title} after {max_try} attempts")
 
-    print(result_text)
     return parsed_result if parsed_result and len(parsed_result[0].get("conversations", [])) >= 2 else None
 
 
