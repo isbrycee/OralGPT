@@ -1,5 +1,5 @@
 # OralGPT 👄🦷  
-*An Omni Multimodal Large Language Model for Digital Dentistry*
+***OralGPT**: An Omni Multimodal Large Language Model for Digital Dentistry*
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![MLLM](https://img.shields.io/badge/MLLM-OralGPT-green.svg)]()
