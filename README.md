@@ -42,32 +42,28 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 ## 🔔 News 
 
 - **[2025-09-11]** 🎉 Our paper of **OralGPT** has been released on [arXiv](https://arxiv.org/abs/2509.09254).  
-- 🏃‍♀️ More datasets, models, and evaluation tools are under active development.  
-- 🤝 For collaboration inquiries, please contact us at: 📮 isjinghao@gmail.com  
+- 🔜 We are actively developing **MMOral-Bench v2**, which will include:  
+  - ✅ More dental imaging modalities  
+  - ✅ Professional dentistry exam questions  
+  - ✅ Comprehensive evaluation of MLLM performance in **digital dentistry**  
+- 🤝 For collaboration inquiries, please contact us at: 📮 isjinghao@gmail.com
+- 
 ---
 
 ## 🔮 Upcoming Updates  
 
 - 📦 Release of **MMOral-Bench v2**  
 - 📑 Expanded **instruction dataset** with more diverse dental imaging modalities
-- 🧪 Release of **OralGPT-O3**  
-
+- 🧪 Release of **OralGPT-O3**
+- 
 ---
 
 ## 📏 MMOral-Bench  
 
 You can evaluate your MLLM’s performance on **panoramic X-ray analysis** using **MMOral-Bench**.  
-
-🔜 We are actively developing **MMOral-Bench v2**, which will include:  
-- ✅ More dental imaging modalities  
-- ✅ Professional dentistry exam questions  
-- ✅ Comprehensive evaluation of MLLM performance in **digital dentistry**  
-
 All benchmark data are **reviewed and validated by senior clinical dentists**, ensuring **accuracy and clinical reliability**.  
 
----
-
-## Evaluation of MMOral-Bench
+### Evaluation of MMOral-Bench
 
 Our benchmark consists of both Open-Ended and Closed-Ended evaluation formats, with corresponding TSV files available at [https://huggingface.co/datasets/EasonFan/MMOral-Bench](https://huggingface.co/datasets/EasonFan/MMOral-Bench).
 
@@ -76,14 +72,14 @@ For benchmark evaluation, we provide two approaches:
 1. Using [**VLMEvalkit**](https://github.com/open-compass/VLMEvalKit) (supporting multiple pre-configured VLMs)
 2. For VLMs not available in VLMEvalkit or new VLMs, we provide generic evaluation scripts: `eval_MMOral_VQA_Closed.py` and `eval_MMOral_VQA_Open.py`
 
-### Using VLMEvalkit
+#### Using VLMEvalkit
 
 We offer a zip file which includes the version we use to evaluate the VLMs on the MMOral-Bench. We have included an `mmoral.py` file in the `vlmeval/dataset` directory. To evaluate any model supported by VLMEvalkit:
 
 1. Modify the `mmoral_config.json` file with your desired settings
 2. Run `bash run_eval.sh` to start the evaluation
 
-### Using Generic Evaluation Scripts
+#### Using Generic Evaluation Scripts
 
 For models not supported by VLMEvalkit, you can use our generic evaluation templates. Simply add your model's inference method to either `eval_MMOral_VQA_Closed.py` or `eval_MMOral_VQA_Open.py` to conduct the evaluation. These scripts provide a flexible framework that can accommodate any VLM implementation.
 
