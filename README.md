@@ -21,9 +21,7 @@
 
 ---
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/1_overview.png.png" width="400px">
-</div>
+![图片描述](assets/1_overview.png.png)
 
 ## ✨ Introduction
 
