@@ -1,14 +1,14 @@
 # OralGPT 👄🦷  
-*A Multimodal Large Language Model for Digital Dentistry*
+*An Omni Multimodal Large Language Model for Digital Dentistry*
+
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![MLLM](https://img.shields.io/badge/OralGPT-green.svg)]()
+[![Dataset](https://img.shields.io/badge/Dataset-MMOral-red.svg)]()
+[![Benchmark](https://img.shields.io/badge/Benchmark-MMOral--Bench-orange.svg)]()
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/mmoral-logo.png" width="150px">
 </div>
-
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![Python](https://img.shields.io/badge/python-3.9%2B-green.svg)]()
-[![Dataset](https://img.shields.io/badge/Dataset-MMOral-red.svg)]()
-[![Benchmark](https://img.shields.io/badge/Benchmark-MMOral--Bench-orange.svg)]()
 
 ---
 
