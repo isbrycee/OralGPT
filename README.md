@@ -21,7 +21,7 @@
 
 ---
 
-![图片描述](assets/1_overview.png.png)
+![图片描述](assets/1_overview.png)
 
 ## ✨ Introduction
 
