@@ -59,7 +59,7 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 ## 📏 MMOral-Bench  
 
 Currently, you can evaluate your MLLM’s performance on **panoramic X-ray analysis** using **MMOral-Bench**.  
-All benchmark data are **reviewed and validated by senior clinical dentists**, ensuring **accuracy and clinical reliability**.  
+All benchmark data are **reviewed and validated by professional clinical dentists**, ensuring **accuracy and clinical reliability**.  
 
 ### Evaluation of MMOral-Bench
 
