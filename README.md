@@ -63,7 +63,7 @@ All benchmark data are **reviewed and validated by professional clinical dentist
 
 ### Performance
 <div align="center">
-  <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/MMOral-Bench-V1-Performance.jpg" width="150px">
+  <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/MMOral-Bench-V1-Performance.jpg">
 </div>
 
 ### Evaluation of MMOral-Bench
