@@ -14,12 +14,10 @@
 
 ## 📖 Table of Contents  
 - [Introduction](#-introduction)  
-- [News](#-News)  
-- [MMOral Dataset](#-mmoral-dataset)  
-- [MMOral-Bench](#-mmoral-bench)  
+- [News](#-News)
 - [Upcoming Updates](#-upcoming-updates)  
+- [MMOral-Bench](#-mmoral-bench)  
 - [Citation](#-citation)  
-- [Contact](#-contact)  
 
 ---
 
@@ -45,9 +43,9 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 - 🔜 We are actively developing **MMOral-Bench v2**, which will include:  
   - ✅ More dental imaging modalities  
   - ✅ Professional dentistry exam questions  
-  - ✅ Comprehensive evaluation of MLLM performance in **digital dentistry**  
+  - ✅ Comprehensive evaluation of multiple MLLM performance in digital dentistry
 - 🤝 For collaboration inquiries, please contact us at: 📮 isjinghao@gmail.com
-- 
+
 ---
 
 ## 🔮 Upcoming Updates  
@@ -55,12 +53,12 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 - 📦 Release of **MMOral-Bench v2**  
 - 📑 Expanded **instruction dataset** with more diverse dental imaging modalities
 - 🧪 Release of **OralGPT-O3**
-- 
+
 ---
 
 ## 📏 MMOral-Bench  
 
-You can evaluate your MLLM’s performance on **panoramic X-ray analysis** using **MMOral-Bench**.  
+Currently, you can evaluate your MLLM’s performance on **panoramic X-ray analysis** using **MMOral-Bench**.  
 All benchmark data are **reviewed and validated by senior clinical dentists**, ensuring **accuracy and clinical reliability**.  
 
 ### Evaluation of MMOral-Bench
