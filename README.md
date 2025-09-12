@@ -21,6 +21,10 @@
 
 ---
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/1_overview.png.png" width="400px">
+</div>
+
 ## ✨ Introduction
 
 **OralGPT** is a **series multimodal large language model (MLLM) specialized in digital dentistry**. It supports diverse dental imaging modalities, including:  
