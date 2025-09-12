@@ -14,7 +14,7 @@
 
 ## 📖 Table of Contents  
 - [Introduction](#-introduction)  
-- [Features](#-features)  
+- [News](#-News)  
 - [MMOral Dataset](#-mmoral-dataset)  
 - [MMOral-Bench](#-mmoral-bench)  
 - [Upcoming Updates](#-upcoming-updates)  
@@ -25,31 +25,32 @@
 
 ## ✨ Introduction
 
-**OralGPT** is a **series multimodal large language model (MLLM) specialized in digital dentistry**.  
-It supports diverse dental imaging modalities, including:  
+**OralGPT** is a **series multimodal large language model (MLLM) specialized in digital dentistry**. It supports diverse dental imaging modalities, including:  
 
 - Intraoral images & videos  
-- Clinical photographs  
+- Photographs  
 - Panoramic X-rays 
 - Periapical radiographs  
 - Cephalometric radiographs  
 - Histopathological slides  
 - Textual Question & Conversation  
 
-With **Chain-of-Thought (CoT) reasoning**, OralGPT simulates the diagnostic process of radiologists, ensuring outputs that are **interpretable, trustworthy, and clinically reliable**.  
+OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridging multimodal reasoning with clinical expertise. With **Chain-of-Thought (CoT) reasoning**, OralGPT simulates the diagnostic process of radiologists, ensuring outputs that are **interpretable, trustworthy, and clinically reliable**.  
 
 ---
 
 ## 🔔 News 
-🏃‍♀️ More datasets, models, and evaluations are under development. For collaboration, please contact: 📮 isjinghao@gmail.com
 
+- **[2025-09-11]** 🎉 Our paper of **OralGPT** has been released on [arXiv](https://arxiv.org/abs/2509.09254).  
+- 🏃‍♀️ More datasets, models, and evaluation tools are under active development.  
+- 🤝 For collaboration inquiries, please contact us at: 📮 isjinghao@gmail.com  
 ---
 
 ## 🔮 Upcoming Updates  
 
 - 📦 Release of **MMOral-Bench v2**  
-- 📑 Expanded **instruction dataset**  
-- 🧪 Evaluation toolkit for reproducible benchmarking
+- 📑 Expanded **instruction dataset** with more diverse dental imaging modalities
+- 🧪 Release of **OralGPT-O3**  
 
 ---
 
