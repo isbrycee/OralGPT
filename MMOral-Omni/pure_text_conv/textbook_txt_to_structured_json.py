@@ -110,6 +110,48 @@ def split_into_two_by_newline(text: str) -> List[str]:
 
     return [s for s in [left, right] if s]
 
+def filter_text(text: str) -> str: 
+    """ 过滤规则： 
+    1) 删除包含 Figure 和 : 的行（大小写不敏感，Figure 需为完整单词） 
+    2) 删除包含常见图片扩展名或图片描述（.jpg/.png/...、<img>、Markdown 图片、data:image/...）的行 返回保留的行，使用原始的换行符拼接。 
+    """ 
+
+    import re
+    # 匹配常见图片扩展名（末尾可跟非字母数字字符或行尾），大小写不敏感
+    img_ext_re = re.compile(
+        r'\.(?:jpg|jpeg|png|gif|bmp|webp|tiff?|svg|heic|heif)(?=[^\w]|$)',
+        re.IGNORECASE
+    )
+    # Figure 与 : 同行（Figure 为完整单词）
+    figure_word_re = re.compile(r'\bfigure\b', re.IGNORECASE)
+
+    # 常见图片相关描述：HTML img 标签、Markdown 图片、data:image/...
+    html_img_re = re.compile(r'<img\b', re.IGNORECASE)
+    md_img_re = re.compile(r'!$[^$]*$$[^)]+?$', re.IGNORECASE)
+    data_img_re = re.compile(r'data:image/(?:png|jpeg|gif|webp|svg|bmp|tiff?)', re.IGNORECASE)
+
+    lines = text.split('\n')
+    kept = []
+
+    for line in lines:
+        check = line.strip()
+
+        # 规则 1：Figure 与冒号同一行
+        if ':' in check and figure_word_re.search(check):
+            continue
+
+        # 规则 2：包含图片扩展名
+        if img_ext_re.search(check):
+            continue
+
+        # 规则 2 扩展：常见图片标记
+        if html_img_re.search(check) or md_img_re.search(check) or data_img_re.search(check):
+            continue
+
+        kept.append(line)
+
+    return '\n'.join(kept)
+
 def process_directory(
     input_dir: Path,
     output_jsonl: Path,
@@ -143,6 +185,7 @@ def process_directory(
                 continue
 
             for seg in segments:
+                seg = filter_text(seg)
                 n_tok = count_tokens(tokenizer, seg)
 
                 # 如果超过阈值，按换行符拆成两个近似等长的段
