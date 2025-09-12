@@ -62,7 +62,9 @@ Currently, you can evaluate your MLLM’s performance on **panoramic X-ray analy
 All benchmark data are **reviewed and validated by professional clinical dentists**, ensuring **accuracy and clinical reliability**.  
 
 ### Performance
-
+<div align="center">
+  <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/MMOral-Bench-V1-Performance.jpg" width="150px">
+</div>
 
 ### Evaluation of MMOral-Bench
 
