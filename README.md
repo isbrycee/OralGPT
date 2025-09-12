@@ -65,7 +65,6 @@ All benchmark data are **reviewed and validated by professional clinical dentist
 
 | Model | Close-ended VQA (Teeth) | Patho | His | Jaw | Summ | Overall | Open-ended VQA (Teeth) | Patho | His | Jaw | Summ | Report | Overall | Avg. |
 |-------|-------------------------:|------:|----:|----:|-----:|--------:|------------------------:|------:|----:|----:|-----:|-------:|--------:|-----:|
-
 | **Proprietary LVLMs** |||||||||||||||
 | GPT-4o-2024-11-20 [21]           | 29.65 | 40.99 | 46.71 | 55.81 | 56.25 | 45.40 | 31.48 | 26.05 | 37.56 | 57.42 | 30.37 | 42.50 | 37.50 | 41.45 |
 | GPT-4V [21]                      | 37.88 | 39.13 | 48.50 | 51.69 | 55.83 | 46.00 | 27.16 | 13.47 | 33.50 | 58.95 | 30.84 | 45.00 | 34.83 | 39.12 |
