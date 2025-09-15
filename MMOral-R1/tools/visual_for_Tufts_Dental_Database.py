@@ -49,19 +49,30 @@ def visualize_boxes(json_path, image_base_dir, output_dir):
         if item["Contextual Grounding Position"] is None or item["Precise Grounding Position"] is None:
             continue
 
+        category_list = item.get("Category", [])
         # 绘制Contextual Grounding Position (绿色)
-        # for box in item["Contextual Grounding Position"]:
+        # for idx, box in enumerate(item["Contextual Grounding Position"]):
         #     if len(box) != 4:
         #         continue
         #     x1, y1, x2, y2 = validate_coords(box)
         #     cv2.rectangle(img_with_boxes, (x1, y1), (x2, y2), (0, 255, 0), 2)  # 绿色矩形
-        
+        #     category = category_list[idx] if idx < len(category_list) else "Unknown"
+        #     cv2.putText(img_with_boxes, category, (x1, y1 - 10), 
+        #                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+            
+        if_draw_flag = False
         # 绘制Precise Grounding Position (红色)
-        for box in item["Precise Grounding Position"]:
+        for idx, box in enumerate(item["Precise Grounding Position"]):
             if len(box) != 4:
                 continue
+            if category_list[idx] == 'Obturation':
+                continue
+            if_draw_flag = True
             x1, y1, x2, y2 = validate_coords(box)
             cv2.rectangle(img_with_boxes, (x1, y1), (x2, y2), (0, 0, 255), 2)  # 红色矩形
+            category = category_list[idx] if idx < len(category_list) else "Unknown"
+            cv2.putText(img_with_boxes, category, (x1, y1 - 10), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         
         # 添加图例
         legend_text = "Green: Contextual, Red: Precise"
@@ -69,15 +80,16 @@ def visualize_boxes(json_path, image_base_dir, output_dir):
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
         
         # 保存结果
-        output_path = os.path.join(output_dir, os.path.basename(item["image_name"]))
-        cv2.imwrite(output_path, img_with_boxes)
-        print(f"已保存可视化图像: {output_path}")
+        if if_draw_flag:
+            output_path = os.path.join(output_dir, os.path.basename(item["image_name"]))
+            cv2.imwrite(output_path, img_with_boxes)
+            print(f"已保存可视化图像: {output_path}")
 
 if __name__ == "__main__":
     # 配置参数
     json_path = "processed_annotations.json"  # 替换为你的JSON文件路径
     image_base_dir = "/home/jinghao/projects/x-ray-VLM/R1/"  # 图像基础目录
-    output_dir = "/home/jinghao/projects/x-ray-VLM/OralGPT/R1/tools/temp_for_Dental_Conditions_Detection_2025_Romania/"  # 输出目录
+    output_dir = "/home/jinghao/projects/x-ray-VLM/R1/temp_for_Dental_Conditions_Detection_2025_Romania/"  # 输出目录
     
     # 执行可视化
     visualize_boxes(json_path, image_base_dir, output_dir)

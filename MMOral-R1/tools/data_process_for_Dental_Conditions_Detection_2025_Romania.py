@@ -3,6 +3,7 @@ import os
 import random
 from PIL import Image
 import json
+import re
 
 Question_template = [
     "What abnormalities can be observed in this panoramic dental image?",
@@ -72,13 +73,24 @@ def process_coco_json(input_file):
         image_width = image_info.get('width', 0)
         image_height = image_info.get('height', 0)
         
+        # 过滤掉 1.jpg-199.jpg 因为他们的标注包含很大 noise
+        if re.fullmatch(r"(?:[1-9]|[1-9]\d|1\d\d)\.jpg", image_name):
+            continue
+
         # 构建 Answer 句子
         answers = []
+        first_round_answers = []
+        second_round_answers = []
+        category = []
         for box in boxes:
             # tooth_id = f"{categories_1.get(box['category_id_1'], '')}{categories_2.get(box['category_id_2'], '')}"
+            
             tooth_id = box['tooth_id']
             bbox = box['bbox']
             disease_name = categories.get(box['category_id'], '')
+            category.append(disease_name)
+            if disease_name == 'Obturation':
+                continue
             x1, y1, x2, y2 = bbox[0], bbox[1], bbox[0]+bbox[2], bbox[1]+bbox[3]
             # import pdb; pdb.set_trace()
             # answers.append(f"Tooth #{tooth_id} has {disease_name.lower()}.")
@@ -87,11 +99,19 @@ def process_coco_json(input_file):
             
             # 构建 answer_sentence 和 precise_grounding_positions
             if disease_name in ['Prosthetic restoration', 'Orthodontic device', 'Surgical device']:
-                answers.append(f"The area <box>[{box}]</box> has {disease_name.lower()}.")
+                answers.append(f"The region <box>[{box}]</box> has {disease_name.lower()}.")
+                first_round_answers.append(f"The region <box>[{box}]</box> has {disease_name.lower()}.")
             elif disease_name == 'Impacted tooth':
-                answers.append(f"Tooth #{tooth_id} is impacted.")
+                answers.append(f"Tooth {tooth_id} is impacted.")
+                first_round_answers.append(f"Tooth {tooth_id} is impacted.")
+            elif disease_name in ['Implant']:
+                first_round_answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
+            elif disease_name in ['Bone resorbtion']:
+                answers.append(f"A {disease_name.lower()} near tooth {tooth_id}.")
+                second_round_answers.append(f"A {disease_name.lower()} near tooth {tooth_id}.")
             else:
-                answers.append(f"Tooth #{tooth_id} has {disease_name.lower()}.")
+                answers.append(f"A {disease_name.lower()} at tooth {tooth_id}.")
+                second_round_answers.append(f"A {disease_name.lower()} at tooth {tooth_id}.")
 
             # if disease_name == "Prosthetic restoration" or disease_name == "Caries":
             #     disease_name = "caries"
@@ -105,6 +125,8 @@ def process_coco_json(input_file):
         
         # 将所有 box 的信息拼接成一个句子
         answer_sentence = " ".join(answers)
+        first_answer_sentence = " ".join(first_round_answers)
+        second_answer_sentence = " ".join(second_round_answers)
 
         # 获取每张图片的精准定位信息
         precise_grounding_positions = [
@@ -127,9 +149,12 @@ def process_coco_json(input_file):
             "Dentition Type": "Permanent",
             "Age Classification": "Adult",
             "Question": random.choice(Question_template),
-            "Answer": answer_sentence,
+            "Full Answer": answer_sentence,
+            "First Round Answer": first_answer_sentence, 
+            "Second Round Answer": second_answer_sentence,
             "Precise Grounding Position": precise_grounding_positions,
-            "Contextual Grounding Position": Contextual_bounding_boxes
+            "Contextual Grounding Position": Contextual_bounding_boxes,
+            "Category": list(category),
         }
 
         # 添加到结果列表
@@ -140,7 +165,7 @@ def process_coco_json(input_file):
 
 def main():
     # 调用函数处理数据
-    input_file = 'Dental_Conditions_Detection_2025_Romania_all_with_ToothID.json'  # 输入 JSON 文件路径
+    input_file = '/home/jinghao/projects/x-ray-VLM/R1/Dental_Conditions_Detection_2025_Romania_all_with_ToothID.json'  # 输入 JSON 文件路径
     results = process_coco_json(input_file)
 
     # Save the processed data to a JSON file
