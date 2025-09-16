@@ -9,7 +9,7 @@ from openai import OpenAI
 from tqdm import tqdm
 
 client = OpenAI(
-    api_key="sk-N1hsISExwkdoyisZg9gTd8CxzNAwK8r2ESRSbFsp2M2859Q6",  # 替换成你的 DMXapi 令牌key
+    api_key="sk-xx",  # 替换成你的 DMXapi 令牌key
     base_url="https://www.dmxapi.cn/v1",  # 需要改成DMXAPI的中转 https://www.dmxapi.cn/v1 ，这是已经改好的。
 )
 
