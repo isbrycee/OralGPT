@@ -40,7 +40,7 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 ---
 
 ## 🔔 News 
-
+- **[2025-09-19]** 🎉 Our paper of **OralGPT** has been accepted by **NeurIPS 2025**. 
 - **[2025-09-11]** 🎉 Our paper of **OralGPT** has been released on [arXiv](https://arxiv.org/abs/2509.09254).  
 - 🔜 We are actively developing **MMOral-Bench v2**, which will include:  
   - ✅ More dental imaging modalities  
