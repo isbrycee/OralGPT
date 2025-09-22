@@ -100,11 +100,12 @@ def process_coco_json(input_file):
             # 构建 answer_sentence 和 precise_grounding_positions
             if disease_name in ['Prosthetic restoration', 'Orthodontic device', 'Surgical device']:
                 answers.append(f"The region <box>[{box}]</box> has {disease_name.lower()}.")
-                first_round_answers.append(f"The region <box>[{box}]</box> has {disease_name.lower()}.")
+                first_round_answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
             elif disease_name == 'Impacted tooth':
                 answers.append(f"Tooth {tooth_id} is impacted.")
                 first_round_answers.append(f"Tooth {tooth_id} is impacted.")
             elif disease_name in ['Implant']:
+                answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
                 first_round_answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
             elif disease_name in ['Bone resorbtion']:
                 answers.append(f"A {disease_name.lower()} near tooth {tooth_id}.")
@@ -149,7 +150,7 @@ def process_coco_json(input_file):
             "Dentition Type": "Permanent",
             "Age Classification": "Adult",
             "Question": random.choice(Question_template),
-            "Full Answer": answer_sentence,
+            "Full Answer": first_answer_sentence + ' ' + second_answer_sentence if second_answer_sentence else first_answer_sentence,
             "First Round Answer": first_answer_sentence, 
             "Second Round Answer": second_answer_sentence,
             "Precise Grounding Position": precise_grounding_positions,
