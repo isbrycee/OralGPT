@@ -15,7 +15,8 @@
 ## 📖 Table of Contents  
 - [Introduction](#-introduction)  
 - [News](#-News)
-- [Upcoming Updates](#-upcoming-updates)  
+- [Upcoming Updates](#-upcoming-updates)
+- [Released Materials](#-released-materials)
 - [MMOral-Bench](#-mmoral-bench)  
 - [Citation](#-citation)  
 
@@ -57,6 +58,14 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 - 🧪 Release of **OralGPT-o3**
 
 ---
+
+## 🚀 Released Materials
+
+- Multiple **Dental Visual Expert Models** released on Hugging Face, covering detection, segmentation, and classification tasks in dental X-ray images.
+👉 Model Hub: [Bryceee/Teeth_Visual_Experts_Models](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models)
+
+---
+
 
 ## 📏 MMOral-Bench  
 
