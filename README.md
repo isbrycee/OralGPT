@@ -62,9 +62,8 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 
 ## 🚀 Released Materials
 
-1. Multiple **Dental Visual Expert Models** released on Hugging Face🤗, covering detection, segmentation, and classification tasks in panoramic/periapical X-ray images.
-
-👉 [Bryceee/Teeth_Visual_Experts_Models](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models)
+1. Multiple **Dental Visual Expert Models** released on 🤗 [Hugging Face](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models)
+, covering detection, segmentation, and classification tasks in panoramic/periapical X-ray images.
 
 ---
 
