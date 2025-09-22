@@ -41,7 +41,7 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 ---
 
 ## 🔔 News 
-- **[2025-09-22]** 🎉 Our paper of **OralGPT** has been accepted by **NeurIPS 2025**. 
+- **[2025-09-22]** 🚀 Multiple **Dental Visual Expert Models** have been released on 🤗 [Hugging Face](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models). 
 - **[2025-09-19]** 🎉 Our paper of **OralGPT** has been accepted by **NeurIPS 2025**. 
 - **[2025-09-11]** 🎉 Our paper of **OralGPT** has been released on [arXiv](https://arxiv.org/abs/2509.09254).  
 - 🔜 We are actively developing **MMOral-Bench v2**, which will include:  
@@ -64,7 +64,7 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 
 1. Multiple **Dental Visual Expert Models** released on 🤗 [Hugging Face](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models)
 , covering detection, segmentation, and classification tasks in panoramic/periapical X-ray images.
-
+2. 👉 Coming soon ...
 ---
 
 
