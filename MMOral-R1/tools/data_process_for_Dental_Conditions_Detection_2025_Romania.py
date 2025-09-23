@@ -111,8 +111,15 @@ def process_coco_json(input_file):
                 answers.append(f"A {disease_name.lower()} near tooth {tooth_id}.")
                 second_round_answers.append(f"A {disease_name.lower()} near tooth {tooth_id}.")
             else:
-                answers.append(f"A {disease_name.lower()} at tooth {tooth_id}.")
-                second_round_answers.append(f"A {disease_name.lower()} at tooth {tooth_id}.")
+                if tooth_id != None:
+                    answers.append(f"A {disease_name.lower()} at tooth {tooth_id}.")
+                    second_round_answers.append(f"A {disease_name.lower()} at tooth {tooth_id}.")
+                else:
+                    answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
+                    second_round_answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
+
+                # if disease_name =="Root fragment":
+                #     print(second_round_answers[-1])
 
             # if disease_name == "Prosthetic restoration" or disease_name == "Caries":
             #     disease_name = "caries"
