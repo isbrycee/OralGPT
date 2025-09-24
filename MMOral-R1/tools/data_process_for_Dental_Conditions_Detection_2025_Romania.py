@@ -82,21 +82,24 @@ def process_coco_json(input_file):
         first_round_answers = []
         second_round_answers = []
         category = []
+        precise_grounding_positions = []
         for box in boxes:
             # tooth_id = f"{categories_1.get(box['category_id_1'], '')}{categories_2.get(box['category_id_2'], '')}"
             
             tooth_id = box['tooth_id']
             bbox = box['bbox']
             disease_name = categories.get(box['category_id'], '')
-            category.append(disease_name)
             if disease_name == 'Obturation':
                 continue
+            
+            
             x1, y1, x2, y2 = bbox[0], bbox[1], bbox[0]+bbox[2], bbox[1]+bbox[3]
             # import pdb; pdb.set_trace()
             # answers.append(f"Tooth #{tooth_id} has {disease_name.lower()}.")
 
             box = f"{int(x1)}, {int(y1)}, {int(x2)}, {int(y2)}"
             
+            answer_add_flag = False
             # 构建 answer_sentence 和 precise_grounding_positions
             if disease_name in ['Prosthetic restoration', 'Orthodontic device', 'Surgical device']:
                 sentence = f"The region <box>[{box}]</box> has {disease_name.lower()}."
@@ -104,12 +107,14 @@ def process_coco_json(input_file):
                     answers.append(sentence)
                 if sentence not in first_round_answers:
                     first_round_answers.append(sentence)
+                    answer_add_flag = True
             elif disease_name == 'Impacted tooth':
                 sentence = f"Tooth {tooth_id} is impacted."
                 if sentence not in answers:
                     answers.append(sentence)
                 if sentence not in first_round_answers:
                     first_round_answers.append(sentence)
+                    answer_add_flag = True
 
             elif disease_name in ['Implant']:
                 sentence = f"The region <box>[{box}]</box> has a {disease_name.lower()}."
@@ -117,12 +122,14 @@ def process_coco_json(input_file):
                     answers.append(sentence)
                 if sentence not in first_round_answers:
                     first_round_answers.append(sentence)
+                    answer_add_flag = True
             elif disease_name in ['Bone resorbtion']:
                 sentence = f"A {disease_name.lower()} near tooth {tooth_id}."
                 if sentence not in answers:
                     answers.append(sentence)
                 if sentence not in second_round_answers:
                     second_round_answers.append(sentence)
+                    answer_add_flag = True
             else:
                 if tooth_id != None:
                     sentence = f"A {disease_name.lower()} at tooth {tooth_id}."
@@ -130,13 +137,18 @@ def process_coco_json(input_file):
                         answers.append(sentence)
                     if sentence not in second_round_answers:
                         second_round_answers.append(sentence)
+                        answer_add_flag = True
                 else:
                     sentence = f"The region <box>[{box}]</box> has a {disease_name.lower()}."
                     if sentence not in answers:
                         answers.append(sentence)
                     if sentence not in second_round_answers:
                         second_round_answers.append(sentence)
+                        answer_add_flag = True
 
+            if answer_add_flag:
+                precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
+                category.append(disease_name)
 
                 # if disease_name =="Root fragment":
                 #     print(second_round_answers[-1])
@@ -157,13 +169,13 @@ def process_coco_json(input_file):
         second_answer_sentence = " ".join(second_round_answers)
 
         # 获取每张图片的精准定位信息
-        precise_grounding_positions = [
-            [int(box['bbox'][0]),  # x1
-            int(box['bbox'][1]),  # y1
-            int(box['bbox'][0] + box['bbox'][2]),  # x2 = x1 + w
-            int(box['bbox'][1] + box['bbox'][3])]  # y2 = y1 + h
-            for box in boxes if 'bbox' in box and len(box['bbox']) == 4
-        ]
+        # precise_grounding_positions = [
+        #     [int(box['bbox'][0]),  # x1
+        #     int(box['bbox'][1]),  # y1
+        #     int(box['bbox'][0] + box['bbox'][2]),  # x2 = x1 + w
+        #     int(box['bbox'][1] + box['bbox'][3])]  # y2 = y1 + h
+        #     for box in boxes if 'bbox' in box and len(box['bbox']) == 4 and box['category_id'] != 'Obturation'
+        # ]
         
         Contextual_bounding_boxes = process_boxes(precise_grounding_positions, image_width, image_height)
         
