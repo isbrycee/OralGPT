@@ -99,24 +99,44 @@ def process_coco_json(input_file):
             
             # 构建 answer_sentence 和 precise_grounding_positions
             if disease_name in ['Prosthetic restoration', 'Orthodontic device', 'Surgical device']:
-                answers.append(f"The region <box>[{box}]</box> has {disease_name.lower()}.")
-                first_round_answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
+                sentence = f"The region <box>[{box}]</box> has {disease_name.lower()}."
+                if sentence not in answers:
+                    answers.append(sentence)
+                if sentence not in first_round_answers:
+                    first_round_answers.append(sentence)
             elif disease_name == 'Impacted tooth':
-                answers.append(f"Tooth {tooth_id} is impacted.")
-                first_round_answers.append(f"Tooth {tooth_id} is impacted.")
+                sentence = f"Tooth {tooth_id} is impacted."
+                if sentence not in answers:
+                    answers.append(sentence)
+                if sentence not in first_round_answers:
+                    first_round_answers.append(sentence)
+
             elif disease_name in ['Implant']:
-                answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
-                first_round_answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
+                sentence = f"The region <box>[{box}]</box> has a {disease_name.lower()}."
+                if sentence not in answers:
+                    answers.append(sentence)
+                if sentence not in first_round_answers:
+                    first_round_answers.append(sentence)
             elif disease_name in ['Bone resorbtion']:
-                answers.append(f"A {disease_name.lower()} near tooth {tooth_id}.")
-                second_round_answers.append(f"A {disease_name.lower()} near tooth {tooth_id}.")
+                sentence = f"A {disease_name.lower()} near tooth {tooth_id}."
+                if sentence not in answers:
+                    answers.append(sentence)
+                if sentence not in second_round_answers:
+                    second_round_answers.append(sentence)
             else:
                 if tooth_id != None:
-                    answers.append(f"A {disease_name.lower()} at tooth {tooth_id}.")
-                    second_round_answers.append(f"A {disease_name.lower()} at tooth {tooth_id}.")
+                    sentence = f"A {disease_name.lower()} at tooth {tooth_id}."
+                    if sentence not in answers:
+                        answers.append(sentence)
+                    if sentence not in second_round_answers:
+                        second_round_answers.append(sentence)
                 else:
-                    answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
-                    second_round_answers.append(f"The region <box>[{box}]</box> has a {disease_name.lower()}.")
+                    sentence = f"The region <box>[{box}]</box> has a {disease_name.lower()}."
+                    if sentence not in answers:
+                        answers.append(sentence)
+                    if sentence not in second_round_answers:
+                        second_round_answers.append(sentence)
+
 
                 # if disease_name =="Root fragment":
                 #     print(second_round_answers[-1])
