@@ -81,7 +81,7 @@ def process_coco_json(input_file):
         answers = []
         first_round_answers = []
         second_round_answers = []
-        category = []
+        # category = []
         precise_grounding_positions = []
         for box in boxes:
             # tooth_id = f"{categories_1.get(box['category_id_1'], '')}{categories_2.get(box['category_id_2'], '')}"
@@ -148,37 +148,23 @@ def process_coco_json(input_file):
 
             if answer_add_flag:
                 precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
-                category.append(disease_name)
-
-                # if disease_name =="Root fragment":
-                #     print(second_round_answers[-1])
-
-            # if disease_name == "Prosthetic restoration" or disease_name == "Caries":
-            #     disease_name = "caries"
-            #     answers.append(f"Tooth #{tooth_id} has {disease_name}.")
-            # elif disease_name == "Impacted":
-            #     disease_name = "impacted"
-            #     answers.append(f"Tooth #{tooth_id} is {disease_name}.")
-            # elif disease_name == "Periapical Lesion":
-            #     disease_name = "periapical lesion"
-            #     answers.append(f"Tooth #{tooth_id} has {disease_name}.")
         
         # 将所有 box 的信息拼接成一个句子
-        answer_sentence = " ".join(answers)
+        # answer_sentence = " ".join(answers)
         first_answer_sentence = " ".join(first_round_answers)
         second_answer_sentence = " ".join(second_round_answers)
-
-        # 获取每张图片的精准定位信息
-        # precise_grounding_positions = [
-        #     [int(box['bbox'][0]),  # x1
-        #     int(box['bbox'][1]),  # y1
-        #     int(box['bbox'][0] + box['bbox'][2]),  # x2 = x1 + w
-        #     int(box['bbox'][1] + box['bbox'][3])]  # y2 = y1 + h
-        #     for box in boxes if 'bbox' in box and len(box['bbox']) == 4 and box['category_id'] != 'Obturation'
-        # ]
+        answer_sentence = first_answer_sentence + ' ' + second_answer_sentence if second_answer_sentence else first_answer_sentence
         
         Contextual_bounding_boxes = process_boxes(precise_grounding_positions, image_width, image_height)
-        
+        # 分割句子并去除空白字符，得到有序的 category
+        sentences = [s.strip() for s in answer_sentence.split('.')]
+        found_categories = []
+        for sentence in sentences:
+            for cate_name, cate_value in categories.items():
+                if cate_value.lower() in sentence:
+                    found_categories.append(cate_value)
+
+
         # 构建结果字典
         result = {
             "image_name": "Dental_Conditions_Detection_2025_Romania/all/images/" + image_name,
@@ -189,12 +175,12 @@ def process_coco_json(input_file):
             "Dentition Type": "Permanent",
             "Age Classification": "Adult",
             "Question": random.choice(Question_template),
-            "Full Answer": first_answer_sentence + ' ' + second_answer_sentence if second_answer_sentence else first_answer_sentence,
+            "Full Answer": answer_sentence,
             "First Round Answer": first_answer_sentence, 
             "Second Round Answer": second_answer_sentence,
             "Precise Grounding Position": precise_grounding_positions,
             "Contextual Grounding Position": Contextual_bounding_boxes,
-            "Category": list(category),
+            "Category": found_categories,
         }
 
         # 添加到结果列表
