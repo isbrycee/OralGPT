@@ -158,6 +158,9 @@ def process_coco_json(input_file):
         Contextual_bounding_boxes = process_boxes(precise_grounding_positions, image_width, image_height)
         # 分割句子并去除空白字符，得到有序的 category
         sentences = [s.strip() for s in answer_sentence.split('.')]
+
+        categories[6] = "Impacted"
+
         found_categories = []
         for sentence in sentences:
             for cate_name, cate_value in categories.items():
