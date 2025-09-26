@@ -50,7 +50,7 @@ def process_coco_json(input_file):
     
     # 获取类别信息
     categories = {cat['id']: cat['name'] for cat in data['categories']}
-
+    categories[6] = "Impacted"
     # 用于存储结果的列表
     results = []
 
@@ -108,7 +108,7 @@ def process_coco_json(input_file):
                 if sentence not in first_round_answers:
                     first_round_answers.append(sentence)
                     answer_add_flag = True
-            elif disease_name == 'Impacted tooth':
+            elif disease_name == 'Impacted':
                 sentence = f"Tooth {tooth_id} is impacted."
                 if sentence not in answers:
                     answers.append(sentence)
@@ -158,8 +158,6 @@ def process_coco_json(input_file):
         Contextual_bounding_boxes = process_boxes(precise_grounding_positions, image_width, image_height)
         # 分割句子并去除空白字符，得到有序的 category
         sentences = [s.strip() for s in answer_sentence.split('.')]
-
-        categories[6] = "Impacted"
 
         found_categories = []
         for sentence in sentences:
