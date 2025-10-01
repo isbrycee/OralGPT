@@ -77,12 +77,15 @@ def process_coco_json(input_file):
         if re.fullmatch(r"(?:[1-9]|[1-9]\d|1\d\d)\.jpg", image_name):
             continue
 
+        # if "1009" not in image_name:
+        #     continue
+
         # 构建 Answer 句子
-        answers = []
         first_round_answers = []
         second_round_answers = []
         # category = []
-        precise_grounding_positions = []
+        first_round_precise_grounding_positions = []
+        second_round_precise_grounding_positions = []
         for box in boxes:
             # tooth_id = f"{categories_1.get(box['category_id_1'], '')}{categories_2.get(box['category_id_2'], '')}"
             
@@ -91,7 +94,6 @@ def process_coco_json(input_file):
             disease_name = categories.get(box['category_id'], '')
             if disease_name == 'Obturation':
                 continue
-            
             
             x1, y1, x2, y2 = bbox[0], bbox[1], bbox[0]+bbox[2], bbox[1]+bbox[3]
             # import pdb; pdb.set_trace()
@@ -102,53 +104,50 @@ def process_coco_json(input_file):
             answer_add_flag = False
             # 构建 answer_sentence 和 precise_grounding_positions
             if disease_name in ['Prosthetic restoration', 'Orthodontic device', 'Surgical device']:
-                sentence = f"The region <box>[{box}]</box> has {disease_name.lower()}."
-                if sentence not in answers:
-                    answers.append(sentence)
+                sentence = f"The region <box>[{box}]</box> has a {disease_name.lower()}."
                 if sentence not in first_round_answers:
                     first_round_answers.append(sentence)
+                    first_round_precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
                     answer_add_flag = True
             elif disease_name == 'Impacted':
                 sentence = f"Tooth {tooth_id} is impacted."
-                if sentence not in answers:
-                    answers.append(sentence)
                 if sentence not in first_round_answers:
                     first_round_answers.append(sentence)
+                    first_round_precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
                     answer_add_flag = True
-
             elif disease_name in ['Implant']:
                 sentence = f"The region <box>[{box}]</box> has a {disease_name.lower()}."
-                if sentence not in answers:
-                    answers.append(sentence)
                 if sentence not in first_round_answers:
                     first_round_answers.append(sentence)
+                    first_round_precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
                     answer_add_flag = True
+                
+
             elif disease_name in ['Bone resorbtion']:
                 sentence = f"A {disease_name.lower()} near tooth {tooth_id}."
-                if sentence not in answers:
-                    answers.append(sentence)
                 if sentence not in second_round_answers:
                     second_round_answers.append(sentence)
+                    second_round_precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
                     answer_add_flag = True
             else:
                 if tooth_id != None:
                     sentence = f"A {disease_name.lower()} at tooth {tooth_id}."
-                    if sentence not in answers:
-                        answers.append(sentence)
                     if sentence not in second_round_answers:
                         second_round_answers.append(sentence)
+                        second_round_precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
                         answer_add_flag = True
                 else:
                     sentence = f"The region <box>[{box}]</box> has a {disease_name.lower()}."
-                    if sentence not in answers:
-                        answers.append(sentence)
                     if sentence not in second_round_answers:
                         second_round_answers.append(sentence)
+                        second_round_precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
                         answer_add_flag = True
 
-            if answer_add_flag:
-                precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
+            # if answer_add_flag:
+            #     precise_grounding_positions.append([int(x1), int(y1), int(x2), int(y2)])
         
+        precise_grounding_positions = first_round_precise_grounding_positions + second_round_precise_grounding_positions
+
         # 将所有 box 的信息拼接成一个句子
         # answer_sentence = " ".join(answers)
         first_answer_sentence = " ".join(first_round_answers)

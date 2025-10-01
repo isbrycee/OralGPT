@@ -5,7 +5,7 @@ from openai import OpenAI
 from tqdm import tqdm
 
 client = OpenAI(
-    api_key="sk-1",  # 替换成你的 DMXapi 令牌key
+    api_key="sk-N1hsISExwkdoyisZg9gTd8CxzNAwK8r2ESRSbFsp2M2859Q6",  # 替换成你的 DMXapi 令牌key
     base_url="https://www.dmxapi.cn/v1",  # 需要改成DMXAPI的中转 https://www.dmxapi.cn/v1 ，这是已经改好的。
 )
 
@@ -25,16 +25,19 @@ def translate_question(text, client, max_retries=10):
                 messages=[
                     {
                         "role": "system",
-                        "content": (
-                            "You are a professional medical exam question writer and translator.\n"
-                            "Translate the following Chinese text into fluent, natural English.\n"
-                            "Always reframe the text into a clear exam-style question, even if the original is just a topic, phrase, or statement.\n"
-                            "Ensure the output is precisely in the form of a question, written in an academic and professional medical examination style."
-                        ),
+                        "content": """
+                            You are a professional medical exam question writer and translator.  
+                            Translate the following Chinese text into fluent and natural English.  
+                            Convert it into a single, clear exam-style question.  
+                            Do not add, remove, or explain anything beyond what is in the original text.  
+                            Do not provide additional background, definitions, or extensive aspects.
+                            For questions asking to define or explain a term, use the style "Define the term [term] in dentistry."
+                            Output only the translated exam-style question.  
+                            """
                     },
                     {"role": "user", "content": text},
                 ],
-                temperature=0
+                temperature=1
             )
 
             # 确保 response 内容合法
@@ -78,7 +81,7 @@ def translate_answer(text, client, max_retries=10):
                     },
                     {"role": "user", "content": text},
                 ],
-                temperature=0
+                temperature=1
             )
 
             # 确保 response 和必要字段存在
@@ -137,6 +140,6 @@ def process_excel(file_path, output_json):
 
 if __name__ == "__main__":
     input_file = "/home/jinghao/projects/x-ray-VLM/RGB/pure_text_conv_data/benchmark_examination-k-2025.9.23.xlsx"   # 输入 excel 文件
-    output_file = "/home/jinghao/projects/x-ray-VLM/RGB/pure_text_conv_data/benchmark_examination-k-2025.9.23.json" # 输出 json 文件
+    output_file = "/home/jinghao/projects/x-ray-VLM/RGB/pure_text_conv_data/benchmark_examination-k-2025.9.23-translate-J-2025.9.25.json" # 输出 json 文件
     process_excel(input_file, output_file)
     print(f"✅ 已经翻译完成并保存到 {output_file}")
