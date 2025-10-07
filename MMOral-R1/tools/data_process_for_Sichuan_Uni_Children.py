@@ -73,6 +73,7 @@ def process_json_file(json_file, label_set):
     shapes = data.get("shapes", [])
     answers = []
     precise_grounding_position = []
+    category_list = []
     for shape in shapes:
         if shape["shape_type"] == "rectangle":
             label = shape["label"]
@@ -91,22 +92,26 @@ def process_json_file(json_file, label_set):
             # 构建 answer_sentence 和 precise_grounding_positions
             if label == '根尖周炎':
                 label = "periapical periodontitis"
-                answer_sentence = f"The area <box>[{box}]</box> has {label}."
+                # answer_sentence = f"The area <box>[{box}]</box> has {label}."
+                answer_sentence = f"The {label} is found in the area <box>[{box}]</box>."
             elif label == '深窝沟':
                 label = "deep pits and fissures"
-                answer_sentence = f"The area <box>[{box}]</box> has {label}."
+                # answer_sentence = f"The area <box>[{box}]</box> has {label}."
+                answer_sentence = f"The {label} is detected in the area <box>[{box}]</box>."
             elif label == '牙髓炎':
                 label = "pulpitis"
-                answer_sentence = f"The area <box>[{box}]</box> has {label}."
+                # answer_sentence = f"The area <box>[{box}]</box> has {label}."
+                answer_sentence = f"The {label} is found in the area <box>[{box}]</box>."
             elif label == '牙齿发育异常':
                 label = "Abnormal tooth development"
                 answer_sentence = f"{label} is found in the area <box>[{box}]</box>."
             elif label == '龋病':
                 label = "caries"
-                answer_sentence = f"The area <box>[{box}]</box> has {label}."
+                # answer_sentence = f"The area <box>[{box}]</box> has {label}."
+                answer_sentence = f"The {label} is observed in the area <box>[{box}]</box>."
 
             answers.append(answer_sentence)
-
+            category_list.append(label)
     # 将所有 box 的信息拼接成一个句子
     answer_sentence = " ".join(answers)
 
@@ -125,7 +130,8 @@ def process_json_file(json_file, label_set):
         "Question": random.choice(Question_template),
         "Annotations": answer_sentence,  # 一张图片的所有box信息都在这里
         "Precise Grounding Position": precise_grounding_position,
-        "Contextual Grounding Position": Contextual_bounding_boxes
+        "Contextual Grounding Position": Contextual_bounding_boxes,
+        "Category": category_list
     }
 
     return result

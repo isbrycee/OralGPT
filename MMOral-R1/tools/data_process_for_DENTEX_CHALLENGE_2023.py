@@ -76,19 +76,24 @@ def process_coco_json(input_file):
         
         # 构建 Answer 句子
         answers = []
+        category_list = []
         for box in boxes:
             tooth_id = f"{categories_1.get(box['category_id_1'], '')}{categories_2.get(box['category_id_2'], '')}"
             disease_name = categories_3.get(box['category_id_3'], '')
             if disease_name == "Deep Caries" or disease_name == "Caries":
                 disease_name = "caries"
-                answers.append(f"Tooth #{tooth_id} has {disease_name}.")
+                answer_sentence = f"The {disease_name} is found in tooth {tooth_id}."
+                # answers.append(f"Tooth #{tooth_id} has {disease_name}.")
             elif disease_name == "Impacted":
                 disease_name = "impacted"
-                answers.append(f"Tooth #{tooth_id} is {disease_name}.")
+                # answers.append(f"Tooth {tooth_id} is {disease_name}.")
+                answer_sentence = f"Tooth {tooth_id} is {disease_name}."
             elif disease_name == "Periapical Lesion":
                 disease_name = "periapical lesion"
-                answers.append(f"Tooth #{tooth_id} has {disease_name}.")
-        
+                # answers.append(f"Tooth #{tooth_id} has {disease_name}.")
+                answer_sentence = f"The {disease_name} is found in tooth {tooth_id}."
+            answers.append(answer_sentence)
+            category_list.append(disease_name)
         # 将所有 box 的信息拼接成一个句子
         answer_sentence = " ".join(answers)
 
@@ -115,7 +120,8 @@ def process_coco_json(input_file):
             "Question": random.choice(Question_template),
             "Answer": answer_sentence,
             "Precise Grounding Position": precise_grounding_positions,
-            "Contextual Grounding Position": Contextual_bounding_boxes
+            "Contextual Grounding Position": Contextual_bounding_boxes,
+            "Category": category_list
         }
 
         # 添加到结果列表
@@ -126,7 +132,7 @@ def process_coco_json(input_file):
 
 def main():
     # 调用函数处理数据
-    input_file = '/home/jinghao/projects/x-ray-VLM/R1/DENTEX_CHALLENGE_2023/training_data/training_data/quadrant-enumeration-disease/train_quadrant_enumeration_disease.json'  # 输入 JSON 文件路径
+    input_file = '/home/jinghao/projects/x-ray-VLM/R1/DENTEX_CHALLENGE_2023/train_quadrant_enumeration_disease.json'  # 输入 JSON 文件路径
     results = process_coco_json(input_file)
 
     # Save the processed data to a JSON file
