@@ -9,10 +9,9 @@
 
 ### 🧩 创建 `.env` 文件
 
-在 `$VLMEvalKit/.env` 处创建并填写以下内容：
+在 `$VLMEvalKit/.env` 处创建并填写 OpenAI API：
 
 ```bash
-OpenAI API
 OPENAI_API_KEY=
 OPENAI_API_BASE=
 ```
@@ -70,11 +69,35 @@ vlmutil check gpt-4.1-nano
 
 ```json
 {
-  "models": ["gpt-4.1-nano"],
-  "datasets": ["MMOral-Omni-Bench"],
-  "judger": "gpt-4o-mini",
-  "other_args": {}
+    "model": {
+        "gpt-4.1-nano": {
+            "class": "GPT4V",
+            "model": "gpt-4.1-nano",
+            "temperature": 1.0,
+            "img_detail": "high",
+            "api_base": "https://www.dmxapi.cn/v1/chat/completions",
+            "retry": 10,
+            "verbose": true
+        }
+    },
+    "data": {
+        "MMOral": {
+            "class": "MMOral",
+            "dataset": "MMOral"
+        }
+    },
+    "judger": {
+        "gpt-4.1-nano": {
+            "class": "GPT4V",
+            "model": "gpt-4.1-nano",
+            "api_base": "https://www.dmxapi.cn/v1/chat/completions",
+            "temperature": 1.0,
+            "retry": 10,
+            "verbose": true
+        }
+    }
 }
+
 ```
 ---
 
@@ -82,9 +105,10 @@ vlmutil check gpt-4.1-nano
 ```bash
 python run.py --config run_config.json \
   --mode all \
-  --api-nproc 4 \
+  --api-nproc 8 \
   --work-dir '.' \
-  --verbose
+  --verbose \
+  # --reuse
 ```
 > 📌 如果想重复使用已有结果，可加上: `--reuse`
 
