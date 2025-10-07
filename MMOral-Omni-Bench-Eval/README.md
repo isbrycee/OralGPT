@@ -10,10 +10,13 @@
 ### 🧩 创建 `.env` 文件
 
 在 `$VLMEvalKit/.env` 处创建并填写以下内容：
-bash
+
+```bash
 OpenAI API
 OPENAI_API_KEY=
 OPENAI_API_BASE=
+```
+
 > 💡 `.env` 文件用于保存私密的 API 配置，请 **不要上传到公共仓库**！
 
 ---
@@ -21,30 +24,36 @@ OPENAI_API_BASE=
 ## ⚙️ 2. 配置模型信息
 
 打开并编辑 `vlmeval/config.py` 文件，示例如下：
-python
+```python
 注意：VLMEvalKit 使用的是 requests.post 方式，
 因此需要使用 post 版本的 api_base
+
 from functools import partial
 from vlmeval.vlm import GPT4V
+
 test_models = {
-"gpt-4.1-nano": partial(
-GPT4V,
-model="gpt-4.1-nano",
-api_base="https://www.dmxapi.cn/v1/chat/completions",
-temperature=1,
-img_size=-1,
-img_detail="high",
-retry=10,
-verbose=True,
-),
+    "gpt-4.1-nano": partial(
+        GPT4V,
+        model="gpt-4.1-nano",
+        api_base="https://www.dmxapi.cn/v1/chat/completions",
+        temperature=1,
+        img_size=-1,
+        img_detail="high",
+        retry=10,
+        verbose=True,
+    ),
 }
+```
 ---
 
 ## 🔍 3. 检查模型配置是否成功
 
 使用以下命令验证模型加载是否成功：
-bash
+
+```bash
 vlmutil check gpt-4.1-nano
+```
+
 > ✅ 若返回模型可用或正常响应结果，即代表配置成功。
 
 ---
@@ -58,22 +67,25 @@ vlmutil check gpt-4.1-nano
 - 评估方式及 Judger（如需）
 
 示例结构：
-json
+
+```json
 {
-"models": ["gpt-4.1-nano"],
-"datasets": ["MMOral-Omni-Bench"],
-"judger": "gpt-4o-mini",
-"other_args": {}
+  "models": ["gpt-4.1-nano"],
+  "datasets": ["MMOral-Omni-Bench"],
+  "judger": "gpt-4o-mini",
+  "other_args": {}
 }
+```
 ---
 
 ## 🧭 5. 启动评估脚本
-bash
+```bash
 python run.py --config run_config.json \
---mode all \
---api-nproc 4 \
---work-dir '.' \
---verbose
+  --mode all \
+  --api-nproc 4 \
+  --work-dir '.' \
+  --verbose
+```
 > 📌 如果想重复使用已有结果，可加上: `--reuse`
 
 ### 💬 参数说明：
@@ -99,8 +111,9 @@ python run.py --config run_config.json \
   第 **1690** 行 与 第 **1694** 行
 
 #### MD5 获取方式：
-bash
+```bash
 md5sum file_path
+```
 ---
 
 ### 🧹 可选：模型输出后处理
