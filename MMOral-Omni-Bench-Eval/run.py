@@ -315,7 +315,7 @@ def main():
 
                 if model is None:
                     model = model_name  # which is only a name
-
+                
                 if args.model != "eval" and args.mode != 'eval': # changed by Bryce
                     # Perform the Inference
                     if dataset.MODALITY == 'VIDEO':
@@ -357,6 +357,8 @@ def main():
                 #     'retry': args.retry if args.retry is not None else 3,
                 #     **(json.loads(args.judge_args) if args.judge_args else {}),
                 # }
+                
+
                 judge_kwargs = {
                     'nproc': args.api_nproc,
                     'verbose': args.verbose,
@@ -423,7 +425,7 @@ def main():
 
                 if WORLD_SIZE > 1:
                     dist.barrier()
-
+                
                 # Only RANK 0 handles the evaluation part
                 if RANK == 0:
                     # Prepare Submission Files for MMMU_TEST AND MMT-Bench_ALL

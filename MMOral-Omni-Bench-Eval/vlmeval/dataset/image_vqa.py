@@ -1719,15 +1719,17 @@ class MMOral(ImageBaseDataset):
     @classmethod
     def evaluate(self, eval_file, **judge_kwargs):
         from .utils.mmoral import MMOral_auxeval, MMOral_acc, extract_box_content
+        
         model = judge_kwargs['model']
         storage = get_intermediate_file_path(eval_file, f'_{model}')
         tmp_file = get_intermediate_file_path(eval_file, f'_{model}', 'pkl')
         nproc = judge_kwargs.pop('nproc', 4)
         if not osp.exists(storage):
             data = load(eval_file)
-            model = build_judge(max_tokens=3, **judge_kwargs)
-            assert model.working(), 'MMVet evaluation requires a working OPENAI API\n' + DEBUG_MESSAGE
-
+            model = build_judge(max_tokens=32768, **judge_kwargs)
+            # model = build_judge(max_tokens=3, **judge_kwargs) ; !!! invalid for [max_tokens=3] !!!
+            assert model.working(), 'MMOral evaluation requires a working OPENAI API\n' + DEBUG_MESSAGE
+            
             lt = len(data)
             # lines = [data.iloc[i] for i in range(lt)] # changed by Bryce; for extract final answer without think parts
             lines = [data.iloc[i] for i in range(lt)]

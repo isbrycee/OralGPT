@@ -66,7 +66,6 @@ class BaseAPI:
         if hasattr(self, 'timeout'):
             self.old_timeout = self.timeout
             self.timeout = 120
-
         retry = 5
         while retry > 0:
             ret = self.generate('hello')

@@ -9,6 +9,6 @@ python run.py --config run_config.json \
               --api-nproc 8 \
               --work-dir '.' \
               --verbose \
-              --mode all \
+              --mode eval \
               --reuse
 
