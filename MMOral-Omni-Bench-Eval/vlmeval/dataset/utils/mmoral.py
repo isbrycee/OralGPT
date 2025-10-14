@@ -90,7 +90,7 @@ def MMOral_acc(result_file):
                      'TP', 'Endodontics', 'Implant Dentistry', 'Periodontics',
                      'II_Loc',
                      'II_Dx-I', 'Orthodontics', 'Cancer', 'Gingivitis', 'Defective Dentition', 'Normality', 'Tooth Discoloration', 'Ulcer', 'Caries', 'Calculus',
-                     'II_Dx-R', 'Fenestration and Dehiscence', 'Malocclusion Issues Assessment' # "Caries", 
+                     'II_Dx-R', 'Fenestration and Dehiscence', 'Malocclusion Issues Assessment', # "Caries", 
                      'PA', 'Impacted Tooth', 'Pulpitis', 'Periodontitis', 'Apical Periodontitis', 'Mixed Dentition', 'Bone Loss', 'Root Canal Treatment', 'Crown', 'Restoration', 
                      'CE',
                      'PI', 'Leukoplakia with Dysplasia', 'Leukoplakia without Dysplasia', 'Oral Squamous Cell Carcinoma', 'Oral Submucous Fibrosis', # "Normal", 
