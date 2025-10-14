@@ -86,15 +86,15 @@ def MMOral_acc(result_file):
         grade = float(item['score'])
         # cate_list = ['teeth', 'patho', 'his', 'jaw', 'summ', 'report']
         # cate_list = ['rec', 'ocr', 'know', 'gen', 'spat', 'math', 'teeth', 'patho', 'his', 'jaw', 'summ', 'report']
-        cate_list = ['Pure-text Examination', 'Oral Histopathology', 'Oral Mucosal Disease', 'Oral & Maxillofacial Radiology', 
-                     'Treatment Planning', 'Endodontics', 'Implant Dentistry', 'Periodontics',
-                     'II_loc',
-                     "II_I_diag", "Orthodontics", "Cancer", "Gingivitis", "Defective Dentition", "Normality", "Tooth Discoloration", "Ulcer", "Caries", "Calculus",
+        cate_list = ['TE', 'Oral Histopathology', 'Oral Mucosal Disease', 'Oral & Maxillofacial Radiology', 
+                     'TP', 'Endodontics', 'Implant Dentistry', 'Periodontics',
+                     'II_Loc',
+                     'II_Dx-I', 'Orthodontics', 'Cancer', 'Gingivitis', 'Defective Dentition', 'Normality', 'Tooth Discoloration', 'Ulcer', 'Caries', 'Calculus',
+                     'II_Dx-R', 'Fenestration and Dehiscence', 'Malocclusion Issues Assessment' # "Caries", 
                      'PA', 'Impacted Tooth', 'Pulpitis', 'Periodontitis', 'Apical Periodontitis', 'Mixed Dentition', 'Bone Loss', 'Root Canal Treatment', 'Crown', 'Restoration', 
-                     'Cepha',
-                     "Histo", "Leukoplakia with Dysplasia", "Leukoplakia without Dysplasia", "Oral Squamous Cell Carcinoma", "Oral Submucous Fibrosis", # "Normal", 
-                     "Intraoral Video",
-                     "II_R_diag", "Fenestration and Dehiscence", "Malocclusion Issues Assessment" # "Caries", 
+                     'CE',
+                     'PI', 'Leukoplakia with Dysplasia', 'Leukoplakia without Dysplasia', 'Oral Squamous Cell Carcinoma', 'Oral Submucous Fibrosis', # "Normal", 
+                     'IV'
                      ]
 
         for capa in cate_list:
