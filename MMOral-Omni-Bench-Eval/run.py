@@ -48,6 +48,36 @@ from vlmeval.inference_mt import infer_data_job_mt
 from vlmeval.smp import *
 from vlmeval.utils.result_transfer import MMMU_result_transfer, MMTBench_result_transfer
 
+# add by bryce
+def df_to_latex_from_key_value(df: pd.DataFrame) -> str:
+    # 指定要提取的 key 顺序
+    keys = ["II_Loc", "II_Dx-I", "II_Dx-R", "PA", "CE", "PI", "TP", "TE", "IV", "Overall"]
+    
+    # 检查列数量
+    if df.shape[1] < 3:
+        raise ValueError("表格至少需要 3 列，第1列为key，第3列为value。")
+    
+    # 取第2列作为key，第4列作为value
+    key_col = df.columns[0]
+    value_col = df.columns[2]
+    
+    # 筛选出需要的 key
+    df_filtered = df[df[key_col].isin(keys)].copy()
+    
+    # 建立 key->value 映射
+    mapping = dict(zip(df_filtered[key_col], df_filtered[value_col]))
+    
+    # 按固定顺序提取对应的 value
+    values = []
+    for key in keys:
+        val = mapping.get(key, float("nan"))  # 如果某个 key 缺失，用 NaN 占位
+        values.append(val)
+        
+    # 格式化为 LaTeX 表格字符串，保留两位小数
+    latex_line = "& " + " & ".join([f"{v:.2f}" for v in values]) + r" \\"
+    
+    return latex_line
+
 
 # Make WORLD_SIZE invisible when build models
 def build_model_from_config(cfg, model_name, use_vllm=False):
@@ -478,12 +508,15 @@ def main():
                         assert isinstance(eval_results, dict) or isinstance(eval_results, pd.DataFrame)
                         logger.info(f'The evaluation of model {model_name} x dataset {dataset_name} has finished! ')
                         logger.info('Evaluation Results:')
+                        
                         if isinstance(eval_results, dict):
                             logger.info('\n' + json.dumps(eval_results, indent=4))
                         elif isinstance(eval_results, pd.DataFrame):
                             if len(eval_results) < len(eval_results.columns):
                                 eval_results = eval_results.T
                             logger.info('\n' + tabulate(eval_results))
+                            latex_row = df_to_latex_from_key_value(eval_results)
+                            logger.info(latex_row)
 
                     # Restore the proxy
                     if eval_proxy is not None:
