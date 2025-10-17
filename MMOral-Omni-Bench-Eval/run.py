@@ -515,8 +515,9 @@ def main():
                             if len(eval_results) < len(eval_results.columns):
                                 eval_results = eval_results.T
                             logger.info('\n' + tabulate(eval_results))
-                            latex_row = df_to_latex_from_key_value(eval_results)
-                            logger.info(latex_row)
+                            if dataset_name == "MMOral_OMNI":
+                                latex_row = df_to_latex_from_key_value(eval_results)
+                                logger.info(latex_row)
 
                     # Restore the proxy
                     if eval_proxy is not None:
