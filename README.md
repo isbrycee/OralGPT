@@ -11,9 +11,7 @@
   <a href="https://huggingface.co/OralGPT" target="_blank">
     🤗 <b>Benchmark</b>
   </a>
-
   <br><br>
-  📣 If you like our work, please give us a ⭐ on GitHub!  
 </div>
 
 ---
