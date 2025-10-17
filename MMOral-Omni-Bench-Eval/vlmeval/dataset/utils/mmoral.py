@@ -1,7 +1,7 @@
 from ...smp import *
 
 
-def build_mmoral_gpt4_prompt(line):
+def build_mmoral_omni_gpt5_prompt(line):
     question = line['question']
     gt = str(line['answer'])
     prediction = str(line['prediction'])
@@ -41,20 +41,15 @@ def build_mmoral_gpt4_prompt(line):
         [question, gt.replace('<AND>', ' <AND> ').replace('<OR>', ' <OR> '), prediction, ''])
     return gpt4_prompt
 
-def extract_box_content(text):
-    # 使用非贪婪模式匹配 <|begin_of_box|> 与 <|end_of_box|> 之间的内容
-    pattern = r"<\|begin_of_box\|>(.*?)<\|end_of_box\|>"
-    matches = re.findall(pattern, text, re.DOTALL)  # DOTALL 允许匹配跨多行内容
-    return [m.strip() for m in matches][0]
 
-def MMOral_auxeval(model, line):
+def MMOral_Omni_auxeval(model, line):
     def float_cvt(s):
         try:
             return float(s)
         except ValueError:
             return None
 
-    prompt = build_mmoral_gpt4_prompt(line)
+    prompt = build_mmoral_omni_gpt5_prompt(line)
     log = ''
     retry = 5
     for i in range(retry):
@@ -71,7 +66,7 @@ def MMOral_auxeval(model, line):
     return dict(log=log, score=0.0)
 
 
-def MMOral_acc(result_file):
+def MMOral_Omni_acc(result_file):
     data = load(result_file)
     tot = defaultdict(lambda: 0)
     score = defaultdict(lambda: 0)
@@ -84,8 +79,6 @@ def MMOral_acc(result_file):
         if cate2 not in cate2_list:
             cate2_list.append(cate2)
         grade = float(item['score'])
-        # cate_list = ['teeth', 'patho', 'his', 'jaw', 'summ', 'report']
-        # cate_list = ['rec', 'ocr', 'know', 'gen', 'spat', 'math', 'teeth', 'patho', 'his', 'jaw', 'summ', 'report']
         cate_list = ['TE', 'Oral Histopathology', 'Oral Mucosal Disease', 'Oral & Maxillofacial Radiology', 
                      'TP', 'Endodontics', 'Implant Dentistry', 'Periodontics',
                      'II_Loc',

@@ -57,7 +57,7 @@ class ImageBaseDataset:
             data['image'] = [str(x) for x in data['image']]
             image_map = {x: y for x, y in zip(data['index'], data['image'])}
             for k in image_map:
-                if len(image_map[k]) <= 64:
+                if len(image_map[k]) <= 64 and image_map[k] != 'nan': ##### Add by bryce to avoid 'nan' string #####
                     idx = image_map[k]
                     assert idx in image_map and len(image_map[idx]) > 64
                     image_map[k] = image_map[idx]

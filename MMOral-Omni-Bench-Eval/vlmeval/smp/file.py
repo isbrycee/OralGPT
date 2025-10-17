@@ -253,7 +253,7 @@ def load(f, fmt=None):
     # changed by bryce; for fill blank cells of image column to save file memory; avoid saving base64 image repeatedly.
     def load_tsv(f):
         df = pd.read_csv(f, sep='\t')
-        df.fillna(method='ffill', inplace=True)
+        # df.fillna(method='ffill', inplace=True)
         return df
 
     import validators

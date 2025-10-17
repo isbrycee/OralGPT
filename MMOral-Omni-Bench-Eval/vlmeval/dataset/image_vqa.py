@@ -1687,11 +1687,11 @@ class MMOral(ImageBaseDataset):
         'MMVet_demo':
         '/home/jinghao/projects/x-ray-VLM/VLMEvalKit/dataset/MMVet_demo.tsv',
         'MMOral':
-        '/home/jinghao/projects/x-ray-VLM/VLMEvalKit/dataset/MMOral_new_II_loc_cepha_intraoral_image-level_diagnosis_PA_Histo_Video_RegionLevelDiagnosis_valid.tsv',
+        '/home/jinghao/projects/x-ray-VLM/VLMEvalKit/dataset/MMOral_new_II_loc_cepha_intraoral_image-level_diagnosis_PA_Histo_Video_RegionLevelDiagnosis_valid_cleaned_finalize_category.tsv',
     }
     DATASET_MD5 = {
         'MMVet_demo': 'e390df2fc405b569f6cd18f7503dbd37',
-        'MMOral': '73d6604da3baa849166a1bd6e6159e3b',
+        'MMOral': 'a48fe17d1e97257173ebe836fd563a1b',
     }
 
     # Given one data record, return the built prompt (a multi-modal message), can override
@@ -1718,7 +1718,7 @@ class MMOral(ImageBaseDataset):
     # It returns a DataFrame
     @classmethod
     def evaluate(self, eval_file, **judge_kwargs):
-        from .utils.mmoral import MMOral_auxeval, MMOral_acc, extract_box_content
+        from .utils.mmoral import MMOral_Omni_auxeval, MMOral_Omni_acc
         
         model = judge_kwargs['model']
         storage = get_intermediate_file_path(eval_file, f'_{model}')
@@ -1742,7 +1742,7 @@ class MMOral(ImageBaseDataset):
 
             if len(indices):
                 new_results = track_progress_rich(
-                    MMOral_auxeval,
+                    MMOral_Omni_auxeval,
                     tups,
                     nproc=nproc,
                     chunksize=nproc,
@@ -1758,12 +1758,15 @@ class MMOral(ImageBaseDataset):
             data['log'] = [ans[idx]['log'] for idx in data['index']]
             dump(data, storage)
 
-        score, score_fine = MMOral_acc(storage)
+        score, score_fine = MMOral_Omni_acc(storage)
         score_pth = get_intermediate_file_path(storage, '_score', 'csv')
         score_fine_pth = get_intermediate_file_path(storage, '_score_fine', 'csv')
         dump(score, score_pth)
         dump(score_fine, score_fine_pth)
         return score
+
+#################### END #################
+
 
 class MTVQADataset(ImageBaseDataset):
     TYPE = 'VQA'
