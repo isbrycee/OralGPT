@@ -7,8 +7,9 @@
 </div>
 
 <div align="center">
-  [paper](https://arxiv.org/pdf/2509.09254)   |   [<img src="https://huggingface.co/front/assets/huggingface_logo.svg" alt="Huggingface" width="20px"> Huggingface](https://huggingface.co/OralGPT)
+  [[paper](https://arxiv.org/pdf/2509.09254)]   |   [<img src="https://huggingface.co/front/assets/huggingface_logo.svg" alt="Huggingface" width="20px"> Huggingface](https://huggingface.co/OralGPT)
 </div>
+
 ---
 
 ## 📖 Table of Contents  
