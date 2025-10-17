@@ -7,7 +7,17 @@
 </div>
 
 <div align="center">
-  [[paper](https://arxiv.org/pdf/2509.09254)]   |   [<img src="https://huggingface.co/front/assets/huggingface_logo.svg" alt="Huggingface" width="20px"> Huggingface](https://huggingface.co/OralGPT)
+  <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/mmoral-logo.png" width="150px">
+  <br><br>
+
+  <!-- 链接部分 -->
+  <a href="https://arxiv.org/pdf/2509.09254" target="_blank">📄 <b>Paper</b></a> &nbsp;|&nbsp;
+  <a href="https://huggingface.co/OralGPT" target="_blank">
+    🤗 <b>Dataset on Hugging Face</b>
+  </a>
+
+  <br><br>
+  📣 If you like our work, please give us a ⭐ on GitHub!  
 </div>
 
 ---
