@@ -7,6 +7,9 @@
   <a href="https://huggingface.co/OralGPT" target="_blank">
     🤗 <b>MMOral-OPG-Bench</b>
   </a>
+  <a href="https://huggingface.co/OralGPT" target="_blank">
+    🤗 <b>MMOral-OMNI-Bench (Coming soon)</b>
+  </a>
 </div>
 
 # OralGPT 🦷🦷  
