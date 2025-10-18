@@ -1,7 +1,3 @@
-# OralGPT 🦷🦷  
-
-***OralGPT**: An Omni Multimodal Large Language Model for Digital Dentistry*
-
 <div align="center">
   <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/mmoral-logo.png" width="150px">
   <br><br>
@@ -13,10 +9,14 @@
   </a>
 </div>
 
+# OralGPT 🦷🦷  
+
+***OralGPT**: An Omni Multimodal Large Language Model for Digital Dentistry*
+
 ---
 
 ## 📖 Table of Contents  
-- [Introduction](#-introduction)  
+- [Overview](#-Overview)  
 - [News](#-News)
 - [Upcoming Updates](#-upcoming-updates)
 - [Released Materials](#-released-materials)
@@ -27,7 +27,7 @@
 
 ![图片描述](assets/1_overview.png)
 
-## ✨ Introduction
+## ✨ Overview
 
 **OralGPT** is a **series multimodal large language model (MLLM) specialized in digital dentistry**. It supports diverse dental imaging modalities, including:  
 
