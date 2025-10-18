@@ -80,7 +80,8 @@ def MMOral_Omni_acc(result_file):
         if cate2 not in cate2_list:
             cate2_list.append(cate2)
         grade = float(item['score'])
-        cate_list = ['TE', 'Oral Histopathology', 'Oral Mucosal Disease', 'Oral & Maxillofacial Radiology', 
+        cate_list = [
+                    # 'TE', 'Oral Histopathology', 'Oral Mucosal Disease', 'Oral & Maxillofacial Radiology', 
                      'TP', 'Endodontics', 'Implant Dentistry', 'Periodontics',
                      'II_Loc',
                      'II_Dx-I', 'Orthodontics', 'Cancer', 'Gingivitis', 'Defective Dentition', 'Normality', 'Tooth Discoloration', 'Ulcer', 'Caries', 'Calculus',
