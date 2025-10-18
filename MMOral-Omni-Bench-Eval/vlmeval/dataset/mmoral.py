@@ -226,7 +226,7 @@ class MMOral_OMNI(ImageBaseDataset):
         'https://huggingface.co/datasets/OralGPT/MMOral-Omni-Bench/resolve/main/MMOral-Omni-Bench.tsv',
     }
     DATASET_MD5 = {
-        'MMOral_OMNI': 'cc1ca28d5fb13b7a7adae0fb2974016f',
+        'MMOral_OMNI': '0b1baf7fafa5a32dd5fb841369a1feb8',
     }
 
     def __init__(self, dataset='MMOral_OMNI', skip_noimg=False):
