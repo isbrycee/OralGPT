@@ -1,39 +1,47 @@
-# 🧠 VLMEvalKit 使用指南
+# 🧠 MMOral Benchmark Evaluation
 
-> 本项目用于多模态大语言模型 (VLM) 的自动化评估与测试。  
-> 请按照以下步骤完成环境配置与运行。
+> Supports benchmarking and standardized evaluation for MMOral-OPG-Bench ([paper link]) and MMOral-Omni-Bench ([paper link]).
+
+> You will need access to the gpt-4-turbo or gpt-5-mini as the judge model in the evaluation process.
 
 ---
 
-## 🚀 1. 环境配置
+Benchmarks supported:
 
-### 🧩 创建 `.env` 文件
+1. 🦷 MMOral-OPG-Bench
+2. ⚕️ MMOral-Omni-Bench
 
-在 `$VLMEvalKit/.env` 处创建并填写 OpenAI API：
+
+## 🚀 1. Environment Setup
+
+### 🧩 Create a `.env` file
+
+Inside your `$VLMEvalKit` directory, create a `.env` file and fill in your OpenAI API credentials:
 
 ```bash
 OPENAI_API_KEY=
 OPENAI_API_BASE=
 ```
 
-> 💡 `.env` 文件用于保存私密的 API 配置，请 **不要上传到公共仓库**！
+> 💡 **Important:** The `.env` file stores private API configurations. **Do not upload it** to any public repository!
 
 ---
 
-## ⚙️ 2. 配置模型信息
+## ⚙️ 2. Judge Model Configuration
 
-打开并编辑 `vlmeval/config.py` 文件，示例如下：
+Edit the model configuration in `vlmeval/config.py`.
+Example configuration:
+
 ```python
-注意：VLMEvalKit 使用的是 requests.post 方式，
-因此需要使用 post 版本的 api_base
+# VLMEvalKit uses requests.post, so ensure the API base supports POST requests
 
 from functools import partial
 from vlmeval.vlm import GPT4V
 
 test_models = {
-    "gpt-4.1-nano": partial(
+    "gpt-5-mini": partial(
         GPT4V,
-        model="gpt-4.1-nano",
+        model="gpt-5-mini",
         api_base="https://www.dmxapi.cn/v1/chat/completions",
         temperature=1,
         img_size=-1,
@@ -45,35 +53,35 @@ test_models = {
 ```
 ---
 
-## 🔍 3. 检查模型配置是否成功
+## 🔍 3. Verify Judge Model Configuration
 
-使用以下命令验证模型加载是否成功：
+To confirm your judge model is properly configured, run:
 
 ```bash
-vlmutil check gpt-4.1-nano
+vlmutil check gpt-5-mini
 ```
 
-> ✅ 若返回模型可用或正常响应结果，即代表配置成功。
+> ✅ If the model passes the check and returns a valid response, setup is successful.
 
 ---
 
-## ⚒️ 4. 配置运行参数
+## ⚒️ 4. Prepare the Evaluation Configuration
 
-编辑或新建 `run_config.json` 文件，配置内容包括：
+Create or edit the file `config_mmoral_opg.json`. This file defines:
 
-- 测试模型（例如上面的 `gpt-4.1-nano`）
-- 测试数据集路径
-- 评估方式及 Judger（如需）
+- The VLM models to be evaluated
+- The benchmark name (e.g., '**MMOral_OPG_CLOSED**', '**MMOral_OPG_OPEN**', '**MMOral_OMNI**', etc.)
+- The Judge model (e.g., 'gpt-5-mini' or 'gpt-4-turbo')
 
-示例结构：
+Config Example:
 
 ```json
 {
     "model": {
-        "gpt-4.1-nano": {
+        "GLM-4.1V-9B-Thinking": {
             "class": "GPT4V",
-            "model": "gpt-4.1-nano",
-            "temperature": 1.0,
+            "model": "GLM-4.1V-9B-Thinking",
+            "temperature": 0.8,
             "img_detail": "high",
             "api_base": "https://www.dmxapi.cn/v1/chat/completions",
             "retry": 10,
@@ -81,15 +89,15 @@ vlmutil check gpt-4.1-nano
         }
     },
     "data": {
-        "MMOral": {
-            "class": "MMOral",
-            "dataset": "MMOral"
+        "MMOral_OPG_CLOSED": {
+            "class": "MMOral_OPG_CLOSED",
+            "dataset": "MMOral_OPG_CLOSED"
         }
     },
     "judger": {
-        "gpt-4.1-nano": {
+        "gpt-4-turbo": {
             "class": "GPT4V",
-            "model": "gpt-4.1-nano",
+            "model": "gpt-4-turbo",
             "api_base": "https://www.dmxapi.cn/v1/chat/completions",
             "temperature": 1.0,
             "retry": 10,
@@ -101,29 +109,22 @@ vlmutil check gpt-4.1-nano
 ```
 ---
 
-## 🧭 5. 启动评估脚本
+## 🧭 5. Start Evaluation
+Run the following script to start the evaluation:
+
 ```bash
-python run.py --config run_config.json \
+python run.py --config config_mmoral_opg.json \
   --mode all \
   --api-nproc 8 \
   --work-dir '.' \
-  --verbose \
+  --verbose
   # --reuse
 ```
-> 📌 如果想重复使用已有结果，可加上: `--reuse`
-
-### 💬 参数说明：
-
-| 参数 | 说明 |
-|------|------|
-| `--mode all` | 执行完整的评估流程 |
-| `--api-nproc` | 设置并行请求数 |
-| `--work-dir` | 指定工作目录 |
-| `--verbose` | 显示详细日志 |
+> 💡 Add `--reuse` if you want to resume the existing evaluation results.
 
 ---
 
-## ⚠️ 6. 使用注意事项
+## ⚠️ 6. Notes & Advanced Settings
 
 ### 🗂️ 修改数据集文件
 
@@ -140,23 +141,21 @@ md5sum file_path
 ```
 ---
 
-### 🧹 可选：模型输出后处理
+### 🧹 Optional: Post-processing Model Outputs
 
-如需对模型输出结果进行后处理（例如去除 Think 部分，仅保留最终答案），请编辑文件：
-
-`$VLMEvalKit/vlmeval/inference.py`
-
-定位到第 **244** 行并修改相应逻辑即可。
+If you wish to clean model responses (e.g., remove “thinking” reasoning parts and keep only final answers), edit the post-processing logic in: `$VLMEvalKit/vlmeval/inference.py` at Line 244.
 
 ---
 
-## 💬 7. 反馈与贡献
+## 💬 7.  Feedback & Contributions
 
-若你在使用过程中遇到问题或有优化建议，欢迎通过以下方式反馈：
+Contributions and feedback are highly welcome!
 
-- 🐛 **提交 Issue**
-- 💡 **提交 Pull Request**
-- ⭐ **给仓库点个 Star 支持一下！**
+- 🐛 Report Issues via GitHub Issues
+- 💡 Submit Pull Requests for improvements
+- ⭐ Pls feel free to 📮 isjinghao@gmail.com
+
+
 
 ## 🖊️ Citation
 
