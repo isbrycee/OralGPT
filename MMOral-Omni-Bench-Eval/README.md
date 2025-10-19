@@ -1,6 +1,6 @@
 # 🧠 MMOral Benchmark Evaluation
 
-Benchmarks supported:
+## ☀️ 0. Benchmarks supported:
 
 1. 🦷 MMOral-OPG-Bench <a href="https://arxiv.org/pdf/2509.09254" target="_blank"><b>[Paper]</b></a>
 2. ⚕️ MMOral-Omni-Bench <a href="" target="_blank"><b>[Coming soom]</b></a>
