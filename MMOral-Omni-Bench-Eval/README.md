@@ -2,14 +2,15 @@
 
 > Supports benchmarking and standardized evaluation for MMOral-OPG-Bench ([paper link]) and MMOral-Omni-Bench ([paper link]).
 
-> You will need access to the gpt-4-turbo or gpt-5-mini as the judge model in the evaluation process.
-
----
 
 Benchmarks supported:
 
-1. 🦷 MMOral-OPG-Bench
-2. ⚕️ MMOral-Omni-Bench
+1. 🦷 MMOral-OPG-Bench <a href="https://arxiv.org/pdf/2509.09254" target="_blank"><b>[Paper]</b></a>
+2. ⚕️ MMOral-Omni-Bench <a href="" target="_blank"><b>[Coming soom]</b></a>
+
+> You will need access to the gpt-4-turbo or gpt-5-mini as the judge model in the evaluation process.
+
+---
 
 
 ## 🚀 1. Environment Setup
