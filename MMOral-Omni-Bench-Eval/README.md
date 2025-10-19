@@ -1,8 +1,5 @@
 # 🧠 MMOral Benchmark Evaluation
 
-> Supports benchmarking and standardized evaluation for MMOral-OPG-Bench ([paper link]) and MMOral-Omni-Bench ([paper link]).
-
-
 Benchmarks supported:
 
 1. 🦷 MMOral-OPG-Bench <a href="https://arxiv.org/pdf/2509.09254" target="_blank"><b>[Paper]</b></a>
