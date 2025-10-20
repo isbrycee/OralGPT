@@ -28,8 +28,6 @@
 
 ---
 
-![图片描述](assets/1_overview.png)
-
 ## ✨ Overview
 
 **OralGPT** is a **series multimodal large language model (MLLM) specialized in digital dentistry**. It supports diverse dental imaging modalities, including:  
@@ -39,7 +37,7 @@
 - Panoramic X-rays 
 - Periapical radiographs  
 - Cephalometric radiographs  
-- Histopathological slides  
+- Histopathological images  
 - Textual Question & Conversation  
 
 OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridging multimodal reasoning with clinical expertise. With **Chain-of-Thought (CoT) reasoning**, OralGPT simulates the diagnostic process of radiologists, ensuring outputs that are **interpretable, trustworthy, and clinically reliable**.  
@@ -86,19 +84,16 @@ All benchmark data are **reviewed and validated by professional clinical dentist
 
 ### Evaluation of MMOral-Bench
 
-Our benchmark consists of both Open-Ended and Closed-Ended evaluation formats, with corresponding TSV files available at [https://huggingface.co/datasets/EasonFan/MMOral-Bench](https://huggingface.co/datasets/EasonFan/MMOral-Bench).
+Our benchmark consists of both Open-Ended and Closed-Ended evaluation formats, with corresponding TSV files available at 🤗 [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench).
 
 For benchmark evaluation, we provide two approaches:
 
-1. Using [**VLMEvalkit**](https://github.com/open-compass/VLMEvalKit) (supporting multiple pre-configured VLMs)
+1. Using [**VLMEvalkit**](https://github.com/isbrycee/OralGPT/tree/main/MMOral-Omni-Bench-Eval) (supporting multiple pre-configured VLMs)
 2. For VLMs not available in VLMEvalkit or new VLMs, we provide generic evaluation scripts: `eval_MMOral_VQA_Closed.py` and `eval_MMOral_VQA_Open.py`
 
 #### Using VLMEvalkit
 
-We offer a zip file which includes the version we use to evaluate the VLMs on the MMOral-Bench. We have included an `mmoral.py` file in the `vlmeval/dataset` directory. To evaluate any model supported by VLMEvalkit:
-
-1. Modify the `mmoral_config.json` file with your desired settings
-2. Run `bash run_eval.sh` to start the evaluation
+Please refer to [**Evaluation Suite**](./MMOral-Omni-Bench-Eval/).
 
 #### Using Generic Evaluation Scripts
 
@@ -106,7 +101,7 @@ For models not supported by VLMEvalkit, you can use our generic evaluation templ
 
 ```python
 #For Open-Ended Evaluation
-python MMOral-Bench-Eval/eval_MMOral_VQA_Open.py \
+python MMOral-Omni-Bench-Eval/eval_MMOral_VQA_Open.py \
   --benchmark_path '/path/to/your/MM-Oral-VQA-Open-Ended_processed.tsv' \
   --output_dir '/path/to/save/evaluation_results_open-4o' \
   --gpt_api_key 'your_api_key_here' \
@@ -115,7 +110,7 @@ python MMOral-Bench-Eval/eval_MMOral_VQA_Open.py \
   --model_name 'gpt4o'
 
 #For Closed-Ended Evaluation
-python MMOral-Bench-Eval/eval_MMOral_VQA_Closed.py \
+python MMOral-Omni-Bench-Eval/eval_MMOral_VQA_Closed.py \
   --benchmark_path '/path/to/your/MM-Oral-VQA-Closed-Ended.tsv' \
   --output_dir '/path/to/save/evaluation_results' \
   --api_url 'https://your-gpt-api-endpoint.com/v1/chat/completions' \
@@ -124,7 +119,7 @@ python MMOral-Bench-Eval/eval_MMOral_VQA_Closed.py \
   --model_name 'gpt4o'
 ```
 
-This streamlined process allows you to easily benchmark any VLM against our MMOral-Bench dataset.
+This streamlined process allows you to easily benchmark any VLM against our MMOral-OPG-Bench.
 
 ## 📌 Citation  
 
