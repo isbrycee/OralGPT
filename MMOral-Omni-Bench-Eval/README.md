@@ -120,26 +120,7 @@ python run.py --config config_mmoral_opg.json \
 ```
 > 💡 Add `--reuse` if you want to resume the existing evaluation results.
 
----
-
-## ⚠️ 6. Notes & Advanced Settings
-
-### 🗂️ 修改数据集文件
-
-如需修改数据集文件，需同步更新以下内容：
-
-- 文件：`MMOral-Omni-Bench.tsv`
-- 对应的 MD5 值配置位于：  
-  `$VLMEvalKit/vlmeval/dataset/image_vqa.py`  
-  第 **1690** 行 与 第 **1694** 行
-
-#### MD5 获取方式：
-```bash
-md5sum file_path
-```
----
-
-### 🧹 Optional: Post-processing Model Outputs
+#### 🧹 Optional: Post-processing Model Outputs
 
 If you wish to clean model responses (e.g., remove “thinking” reasoning parts and keep only final answers), edit the post-processing logic in: `$VLMEvalKit/vlmeval/inference.py` at Line 244.
 
