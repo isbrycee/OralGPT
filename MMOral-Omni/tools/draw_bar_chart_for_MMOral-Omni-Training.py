@@ -1,95 +1,7 @@
-# import matplotlib.pyplot as plt
-# import numpy as np
-
-# def plot_modality_bar_chart(modality_dict, output_path='modality_distribution.png'):
-#     """
-#     绘制模态数量分布的横向柱状图
-    
-#     Parameters:
-#     modality_dict: dict, 键为模态名称，值为数量
-#     output_path: str, 输出图片路径
-#     """
-#     # 设置学术论文风格的参数
-#     plt.rcParams.update({
-#         'font.size': 12,
-#         'font.family': 'serif',
-#         'font.serif': ['Times New Roman'],
-#         'figure.dpi': 300,
-#         'savefig.dpi': 300,
-#         'savefig.bbox': 'tight',
-#         'savefig.pad_inches': 0.1
-#     })
-    
-#     # 按数量排序（从大到小）
-#     sorted_items = sorted(modality_dict.items(), key=lambda x: x[1], reverse=True)
-#     modalities = [item[0] for item in sorted_items]
-#     counts = [item[1] for item in sorted_items]
-    
-#     # 创建图形
-#     fig, ax = plt.subplots(figsize=(10, 6))
-    
-#     # 选择适合学术论文的颜色方案
-#     colors = plt.cm.Blues(np.linspace(0.6, 0.9, len(modalities)))
-    
-#     # 绘制横向柱状图
-#     bars = ax.barh(modalities, counts, color=colors, height=0.7, edgecolor='black', linewidth=0.5)
-    
-#     # 在每个柱子上显示数值
-#     for i, (bar, count) in enumerate(zip(bars, counts)):
-#         width = bar.get_width()
-#         ax.text(width + max(counts) * 0.01, bar.get_y() + bar.get_height()/2, 
-#                 f'{count}', ha='left', va='center', fontsize=11)
-    
-#     # 设置坐标轴标签
-#     ax.set_xlabel('数量', fontsize=14, fontweight='bold')
-#     ax.set_ylabel('图像模态', fontsize=14, fontweight='bold')
-    
-#     # 设置标题
-#     ax.set_title('图像模态数量分布', fontsize=16, fontweight='bold', pad=20)
-    
-#     # 美化图形
-#     ax.spines['top'].set_visible(False)
-#     ax.spines['right'].set_visible(False)
-#     ax.spines['left'].set_linewidth(0.5)
-#     ax.spines['bottom'].set_linewidth(0.5)
-    
-#     # 网格线
-#     ax.grid(axis='x', alpha=0.3, linestyle='--', linewidth=0.5)
-#     ax.set_axisbelow(True)
-    
-#     # 调整布局
-#     plt.tight_layout()
-    
-#     # 保存图片
-#     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-#     print(f"图片已保存至: {output_path}")
-    
-#     # 显示图片
-#     plt.show()
-
-# # 使用示例
-# if __name__ == "__main__":
-#     # 示例数据 - 请替换为您的实际数据
-#     modality_number_dict = {
-#         "Plain-Text Data": 6678,
-#         "Figures from Textbooks": 6318,
-#         "Intraoral Image": 14994,
-#         "Periapical Radiograph": 16396,
-#         "Panoramic Radiograph": 20563,
-#         "Cephalometric Radiograph": 802,
-#         "Histopathological Image": 7768,
-#         "Intraoral Video": 90,
-#         "Interleaved Image-Text Data": 327,
-#         "3D Model Scan": 136
-#     }
-    
-#     # 调用函数绘制并保存图片
-#     plot_modality_bar_chart(modality_number_dict, 'modality_distribution.png')
-
-
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib
+import seaborn as sns
 
 matplotlib.rcParams['font.family'] = 'Times New Roman'
 
@@ -112,12 +24,18 @@ def plot_horizontal_bar(data: dict, output_path: str = "modality_distribution.pn
     # plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Arial"]  # 学术通用无衬线字体
     plt.rcParams["axes.unicode_minus"] = False  # 解决负号显示异常
     
+    sns.set(style="whitegrid", font="Times New Roman")
+    ax = plt.gca()
+    ax.set_facecolor("#f9f9f9")
+    colors = plt.cm.Blues(np.linspace(0.3, 1, len(sorted_modalities)))
+
     # ---------------------- 3. 绘制横向柱状图：Viridis渐变颜色（学术友好）
     bars = plt.barh(
         y=sorted_modalities,  # Y轴使用降序后的模态（A在最下，C在最上）
         width=sorted_counts,  # X轴为数量
-        color=plt.cm.viridis(np.linspace(1, 0, len(sorted_modalities))),  # Viridis渐变（色盲友好）
-        edgecolor="black",    # 柱子白色边框，增强区分度
+        # color=plt.cm.viridis(np.linspace(1, 0, len(sorted_modalities))),  # Viridis渐变（色盲友好）
+        color=colors,
+        edgecolor="none",    # 柱子白色边框，增强区分度
         linewidth=0.8         # 边框粗细
     )
     
@@ -131,7 +49,8 @@ def plot_horizontal_bar(data: dict, output_path: str = "modality_distribution.pn
             va="center",                 # 垂直居中
             ha="left",                   # 水平左对齐
             fontsize=9,                  # 字体大小
-            fontweight="bold"            # 粗体增强可读性
+            fontweight="bold",           # 粗体增强可读性
+            color="#333333"              # 深灰文本颜色
         )
     
     # ---------------------- 5. 美化细节：学术图表标准配置
@@ -139,9 +58,19 @@ def plot_horizontal_bar(data: dict, output_path: str = "modality_distribution.pn
     # plt.ylabel("图像模态", fontsize=12, fontweight="bold")   # Y轴标签（粗体）
     # plt.title("图像模态数量分布", fontsize=14, fontweight="bold", pad=15)  # 标题（pad避免重叠）
     plt.xlim(0, max_count * 1.1)                              # X轴留10%空白（避免标签贴边）
-    plt.grid(axis="x", alpha=0.3, linestyle="--")             # X轴浅灰虚线网格（辅助数值定位）
+    plt.grid(axis="x", alpha=0.5, linestyle="--")             # X轴浅灰虚线网格（辅助数值定位）
+    ax.grid(False, axis="y")
     plt.gca().invert_yaxis()                                  # 关键！反转Y轴，让最多的模态到顶部
-    
+    plt.yticks(rotation=12)
+
+     # 去除图框四条边，仅保留底线和左线（学术风格）
+    # for spine in ["top", "right"]:
+    #     ax.spines[spine].set_visible(False)
+    # ax.spines["left"].set_color("#888888")
+    # ax.spines["bottom"].set_color("#888888")
+    # ax.spines["left"].set_linewidth(0.5)
+    # ax.spines["bottom"].set_linewidth(0.5)
+
     # ---------------------- 6. 保存图表：高分辨率+去白边
     plt.tight_layout()  # 自动调整布局，避免标签被裁剪
     plt.savefig(output_path, dpi=300, bbox_inches="tight")  # 保存为PNG（300DPI，去白边）
@@ -152,17 +81,17 @@ def plot_horizontal_bar(data: dict, output_path: str = "modality_distribution.pn
 if __name__ == "__main__":
     # 替换为您的图像模态数据（key=模态名称，value=数量）
     modality_number_dict = {
-        "Plain-Text Data": 6678,
-        "Figures from Textbooks": 6318,
+        "Text-Only Instruction Data": 4295, # 6678 indicates len(pt) + len(sft)
+        # "Figures from Textbooks": 6318,
         "Intraoral Image": 14994,
         "Periapical Radiograph": 16396,
-        "Panoramic Radiograph": 20563,
+        "Panoramic Radiograph": 13000,
         "Cephalometric Radiograph": 802,
-        "Histopathological Image": 7768,
+        "Pathological Image": 7767,
         "Intraoral Video": 90,
         "Interleaved Image-Text Data": 327,
         "3D Model Scan": 136
     }
     
     # 调用函数绘图（输出路径可自定义）
-    plot_horizontal_bar(modality_number_dict, output_path="image_modality_distribution.png")
+    plot_horizontal_bar(modality_number_dict, output_path="MMoral-Omni-Training-SFT-Dist.png")
