@@ -88,12 +88,12 @@ Our benchmark consists of both Open-Ended and Closed-Ended evaluation formats, w
 
 For benchmark evaluation, we provide two approaches:
 
-1. Using [**VLMEvalkit**](https://github.com/isbrycee/OralGPT/tree/main/MMOral-Bench-Eval) (supporting multiple pre-configured VLMs)
+1. Using [**VLMEvalkit**](https://github.com/isbrycee/OralGPT/tree/main/MMOral-Bench-EvalKit) (supporting multiple pre-configured VLMs)
 2. For VLMs not available in VLMEvalkit or new VLMs, we provide generic evaluation scripts: `eval_MMOral_VQA_Closed.py` and `eval_MMOral_VQA_Open.py`
 
 #### Using VLMEvalkit
 
-Please refer to [**Evaluation Suite**](./MMOral-Bench-Eval/).
+Please refer to [**Evaluation Suite**](./MMOral-Bench-EvalKit/).
 
 #### Using Generic Evaluation Scripts
 
@@ -101,7 +101,7 @@ For models not supported by VLMEvalkit, you can use our generic evaluation templ
 
 ```python
 #For Open-Ended Evaluation
-python MMOral-Bench-Eval/eval_MMOral_VQA_Open.py \
+python MMOral-Bench-EvalKit/eval_MMOral_VQA_Open.py \
   --benchmark_path '/path/to/your/MM-Oral-VQA-Open-Ended_processed.tsv' \
   --output_dir '/path/to/save/evaluation_results_open-4o' \
   --gpt_api_key 'your_api_key_here' \
@@ -110,7 +110,7 @@ python MMOral-Bench-Eval/eval_MMOral_VQA_Open.py \
   --model_name 'gpt4o'
 
 #For Closed-Ended Evaluation
-python MMOral-Bench-Eval/eval_MMOral_VQA_Closed.py \
+python MMOral-Bench-EvalKit/eval_MMOral_VQA_Closed.py \
   --benchmark_path '/path/to/your/MM-Oral-VQA-Closed-Ended.tsv' \
   --output_dir '/path/to/save/evaluation_results' \
   --api_url 'https://your-gpt-api-endpoint.com/v1/chat/completions' \
