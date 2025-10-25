@@ -49,6 +49,6 @@ def save_images_from_tsv(filepath, output_folder):
                 print(f"Failed to save image at index {index_str} image {i}: {e}")
 
 # 示例调用
-save_images_from_tsv('/home/jinghao/projects/x-ray-VLM/VLMEvalKit/dataset/MMOral_new_II_loc_cepha_intraoral_image-level_diagnosis_PA_Histo_Video_RegionLevelDiagnosis_valid_cleaned_finalize_category_cleaned_woTE_resizeFDTooth_resizeGingivitis_resizePINormality.tsv',
+save_images_from_tsv("/home/jinghao/projects/x-ray-VLM/VLMEvalKit/dataset/MMOral_new_II_loc_cepha_intraoral_image-level_diagnosis_PA_Histo_Video_RegionLevelDiagnosis_valid_cleaned_finalize_category_cleaned_woTE_resizeFDTooth_resizeGingivitis_resizeAlphaDent_resizePINormality_480_490.tsv",
                       '/home/jinghao/projects/x-ray-VLM/VLMEvalKit/dataset/MMOral-OMNI-Bench-Images')
 
