@@ -65,7 +65,7 @@ class MMOral_OPG_OPEN(MMOralBase):
         
         if not osp.exists(storage):
             data = load(eval_file)
-            model = build_judge(max_tokens=3, **judge_kwargs)
+            model = build_judge(max_tokens=16384, **judge_kwargs)
             assert model.working(), ('MMOral-Open-ended evaluation requires a working OPENAI API\n' + DEBUG_MESSAGE)
 
             lt = len(data)
