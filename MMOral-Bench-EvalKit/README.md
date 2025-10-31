@@ -126,7 +126,7 @@ If you wish to clean model responses (e.g., remove “thinking” reasoning part
 
 ---
 
-## 💬 7.  Feedback & Contributions
+## 💬 6.  Feedback & Contributions
 
 Contributions and feedback are highly welcome!
 
