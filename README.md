@@ -19,12 +19,26 @@
 ---
 
 ## 📖 Table of Contents  
-- [Overview](#-Overview)  
 - [News](#-News)
+- [Overview](#-Overview)  
 - [Upcoming Updates](#-upcoming-updates)
 - [Released Materials](#-released-materials)
 - [MMOral-Bench](#-mmoral-bench)  
 - [Citation](#-citation)  
+
+---
+
+
+## 🔔 News 
+- **[2025-10-31]** 🔥 **[NeurIPS 2025] MMOral-Bench** (MMOral-OPG-Bench) has been released on 🤗 [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench). 👏 Welcome to evaluate your LVLMs.
+- **[2025-09-22]** 🚀 Multiple **Dental Visual Expert Models** have been released on 🤗 [Hugging Face](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models). 
+- **[2025-09-19]** 🎉 Our paper of **OralGPT** has been accepted by **NeurIPS 2025**. 
+- **[2025-09-11]** 🎉 Our paper of **OralGPT** has been released on [arXiv](https://arxiv.org/abs/2509.09254).  
+- 🔜 We are actively developing **MMOral-Bench v2**, which will include:  
+  - ✅ More dental imaging modalities  
+  - ✅ Professional dentistry exam questions  
+  - ✅ Comprehensive evaluation of multiple MLLM performance in digital dentistry
+- 🤝 For collaboration inquiries, please contact us at: 📮 isjinghao@gmail.com
 
 ---
 
@@ -41,19 +55,6 @@
 - Textual Question & Conversation  
 
 OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridging multimodal reasoning with clinical expertise. With **Chain-of-Thought (CoT) reasoning**, OralGPT simulates the diagnostic process of radiologists, ensuring outputs that are **interpretable, trustworthy, and clinically reliable**.  
-
----
-
-## 🔔 News 
-- **[2025-10-31]** 🔥 **[NeurIPS 2025] MMOral-Bench** (MMOral-OPG-Bench) has been released on 🤗 [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench). 👏 Welcome to evaluate your LVLMs.
-- **[2025-09-22]** 🚀 Multiple **Dental Visual Expert Models** have been released on 🤗 [Hugging Face](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models). 
-- **[2025-09-19]** 🎉 Our paper of **OralGPT** has been accepted by **NeurIPS 2025**. 
-- **[2025-09-11]** 🎉 Our paper of **OralGPT** has been released on [arXiv](https://arxiv.org/abs/2509.09254).  
-- 🔜 We are actively developing **MMOral-Bench v2**, which will include:  
-  - ✅ More dental imaging modalities  
-  - ✅ Professional dentistry exam questions  
-  - ✅ Comprehensive evaluation of multiple MLLM performance in digital dentistry
-- 🤝 For collaboration inquiries, please contact us at: 📮 isjinghao@gmail.com
 
 ---
 
