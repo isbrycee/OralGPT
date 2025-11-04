@@ -1,0 +1,54 @@
+### model
+model_name_or_path:  /home/jinghao/projects/llm/LLaMA-Factory/output/OralGPT-Omni_qwen2_5vl-7b_pt_merged_lora_checkpoint-3000
+image_max_pixels: 2621440 # 262144
+video_max_pixels: 163840 # 16384
+trust_remote_code: true
+
+
+### method
+stage: sft # sft
+do_train: true
+finetuning_type: lora
+freeze_vision_tower: false
+freeze_multi_modal_projector: false
+freeze_language_model: true
+lora_rank: 64
+lora_target: all
+# packing: false # add by bryce; used in pt stage
+
+
+### dataset
+dataset: 2.0_ita_textbookFigures_Caption_2sources_shareGPT # 6.1_sft_intraoralVideo_Comprehension_Vident_shareGPT # pure_text_16_textbooks_mainland_CN_shareGPT_for_pt # image_pair_formated_shareGPT_for_image_caption_alignment # pure_text_hku_six_textbooks_QA_pairs_wo_images_shareGPT_for_sft # pure_text_hku_six_textbooks_case_studies_conv_w_images_shareGPT_for_sft # , OPG_Positioning_Error, pure_text_dental_QA_from_dental_forum_shareGPT_for_sft, pure_text_Oral_Disease_QA_shareGPT_for_sft, pure_text_Web_manually_collected_dental_QA_shareGPT_for_sft
+template: qwen2_vl
+cutoff_len: 32768 # 8192
+max_samples: 50000
+overwrite_cache: true
+preprocessing_num_workers: 16 # 16
+dataloader_num_workers: 4 # 4
+
+
+### output
+output_dir: saves/OralGPT-Omni_qwen2_5vl-7b/lora/ita_pt_checkpoint-3000
+logging_steps: 50
+save_steps: 1000
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 4
+learning_rate: 1.0e-5
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+# val_size: 0.1
+# per_device_eval_batch_size: 1
+# eval_strategy: steps
+# eval_steps: 500

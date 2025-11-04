@@ -1,0 +1,47 @@
+### model
+model_name_or_path: /data/OralGPT/OralGPT-OMNI-ckps/OralGPT-Omni_qwen2_5vl-7b_ITA_merged_lora_1epoch_lr5e-6_checkpoint-final
+image_max_pixels: 1048576 # 262144
+video_max_pixels: 49152 # 16384
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 8
+lora_target: all
+
+### dataset
+dataset: 6.1_sft_intraoralVideo_Comprehension_Vident_shareGPT, 0.0_sft_Text-only_ALL_shareGPT, 0.1_sft_multimodal_ALL_shareGPT, 9.1_sft_panoramicImage_ReportVQAChat_MMOralOPG_shareGPT # mllm_demo,identity,alpaca_en_demo  # video: mllm_video_demo
+template: qwen2_vl
+cutoff_len: 16384 # 8192
+max_samples: 1000000
+overwrite_cache: true
+preprocessing_num_workers: 16
+dataloader_num_workers: 4
+
+### output
+output_dir: saves/OralGPT-Omni_qwen2_5vl-7b/lora/sft_v0.3_wThink/
+logging_steps: 10
+save_steps: 1000
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 4
+learning_rate: 1.0e-4
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+# val_size: 0.1
+# per_device_eval_batch_size: 1
+# eval_strategy: steps
+# eval_steps: 500

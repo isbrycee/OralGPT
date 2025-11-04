@@ -1,0 +1,4 @@
+model_name_or_path: /data/OralGPT/OralGPT-OMNI-ckps/OralGPT-Omni_qwen2_5vl-7b_sft_v0.2_wThink_merged_lora_checkpoint-28908
+template: qwen2_vl
+infer_backend: huggingface  # choices: [huggingface, vllm, sglang]
+trust_remote_code: true

@@ -1,0 +1,51 @@
+### model
+model_name_or_path:  internlm/Intern-S1-mini
+trust_remote_code: true
+
+### method
+stage: sft # sft
+do_train: true
+finetuning_type: lora
+freeze_vision_tower: true
+freeze_multi_modal_projector: true
+freeze_language_model: false
+lora_rank: 8
+lora_target: all
+# packing: false # add by bryce; used in pt stage
+
+
+### dataset
+dataset: 5.1_sft_histopathologicalImage_Diagnosis_4datasets_shareGPT # 6.1_sft_intraoralVideo_Comprehension_Vident_shareGPT # pure_text_16_textbooks_mainland_CN_shareGPT_for_pt # image_pair_formated_shareGPT_for_image_caption_alignment # pure_text_hku_six_textbooks_QA_pairs_wo_images_shareGPT_for_sft # pure_text_hku_six_textbooks_case_studies_conv_w_images_shareGPT_for_sft # , OPG_Positioning_Error, pure_text_dental_QA_from_dental_forum_shareGPT_for_sft, pure_text_Oral_Disease_QA_shareGPT_for_sft, pure_text_Web_manually_collected_dental_QA_shareGPT_for_sft
+template: intern_s1
+cutoff_len: 16384 # 8192
+max_samples: 50000
+overwrite_cache: true
+preprocessing_num_workers: 16 # 16
+dataloader_num_workers: 4 # 4
+
+
+### output
+output_dir: saves/interns1_mini_test_data/lora/sft
+logging_steps: 10
+save_steps: 2500
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+
+### train
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 1
+learning_rate: 1.0e-5
+num_train_epochs: 1.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+# val_size: 0.1
+# per_device_eval_batch_size: 1
+# eval_strategy: steps
+# eval_steps: 500

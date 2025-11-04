@@ -1,0 +1,5 @@
+model_name_or_path: internlm/Intern-S1-mini
+adapter_name_or_path: saves/interns1_mini_10e/lora/sft
+template: intern_s1
+infer_backend: huggingface  # choices: [huggingface, vllm, sglang]
+trust_remote_code: true
