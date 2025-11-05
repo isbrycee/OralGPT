@@ -76,7 +76,7 @@ class OpenAIWrapper(BaseAPI):
             if key is None:
                 key = env_key
         elif 'grok' in model:
-            env_key = os.environ.get('XAI_API_KEY', '')
+            env_key = os.environ.get('OPENAI_API_KEY', '')
             if key is None:
                 key = env_key
         elif 'gemini' in model and 'preview' in model:
