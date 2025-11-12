@@ -1,185 +1,3 @@
-# import matplotlib.pyplot as plt
-# import matplotlib
-# import numpy as np
-
-# # -----------------------------
-# # 设置字体为 Times New Roman
-# # -----------------------------
-# matplotlib.rcParams['font.family'] = 'Times New Roman'
-
-# # -----------------------------
-# # 数据定义
-# # -----------------------------
-
-# First_modality_number_dict = {
-#     "Interleaved Image-Text data": 15, # Treatment planning
-#     "Plain text data": 362,
-#     "Intraoral Image": 1565, #  (Location and Counting) 
-#     # "Intraoral Image (Image-level Analysis)": 723,
-#     # "Intraoral Image (Region-level Analysis)": 742,
-#     "Periapical Radiograph": 539,
-#     "Histopathological Image": 383,
-#     "Cephalometric Radiograph": 300,
-#     "Intraoral Video": 10,
-# }
-
-# Second_task_number_dict = {
-#     "Dental treatment video comprehension": 10,
-#     "Treatment Planning": 15,
-#     "Cervical vertebral maturation (CVM) stage Prediction": 300,
-#     "Examination Question": 362,
-#     "Abnormality Diagnosis": 2387,
-#     "Tooth Location and Counting": 100,
-# }
-
-# # subject; abnormalities;
-# Third_abnormality_number_dict = {
-#     # Interleaved Image-Text data; Treatment planning
-#     # 'Endodontics': 5, 
-#     # 'Implant Dentistry': 5, 
-#     # 'Periodontics': 5, 
-
-#     # Examination Question; Plain text
-#     # 'Oral Histopathology': 110, 
-#     # 'Oral Mucosal Disease': 142, 
-#     # 'Oral & Maxillofacial Radiology': 110, 
-
-#     # II_I_diag
-#     'Orthodontics': 70, 
-#     'Cancer': 273, 
-#     'Gingivitis': 135, # 68 + 67 
-#     'Defective Dentition': 20, 
-#     'Normality': 348, # 100 + 248
-#     'Tooth Discoloration': 27, 
-#     'Ulcer': 39, 
-#     'Caries': 543, # 74 + 353 + 116
-#     'Calculus': 52, 
-
-#     # II_R_diag
-#     # 'Caries': 353, 
-#     'Fenestration and Dehiscence': 22, 
-#     # 'Gingivitis': 67, 
-#     'Malocclusion Issues Assessment': 300,
-
-#     # PA
-#     'Impacted Tooth': 101, 
-#     'Pulpitis': 44, 
-#     # 'Caries': 116, 
-#     'Periodontitis': 68, 
-#     'Apical Periodontitis': 62, 
-#     'Mixed Dentition': 50, 
-#     'Bone Loss': 40, 
-#     'Root Canal Treatment': 11,
-#     'Crown': 25, 
-#     'Restoration': 22,
-
-#     # Histo
-#     # 'Normality': 248,
-#     'Leukoplakia with Dysplasia': 15, 
-#     'Oral Squamous Cell Carcinoma': 76, 
-#     'Leukoplakia without Dysplasia': 9, 
-#     'Oral Submucous Fibrosis': 35, 
-
-#     # "Cephalometric Radiograph": 300,
-#     # "Intraoral Image (Location and Counting)": 100,
-#     # 'Intraoral Video': 10, 
-# }
-
-# # {'Endodontics,Treatment Planning': 5, 'Implant Dentistry,Treatment Planning': 5, 'Periodontics,Treatment Planning': 5, 'Oral Histopathology,Pure-text Examination': 110, 'Oral Mucosal Disease,Pure-text Examination': 142, 'Oral & Maxillofacial Radiology,Pure-text Examination': 110, 'II_loc': 100, 'Cepha': 300, 'II_I_diag,Orthodontics': 70, 'II_I_diag,Cancer': 273, 'II_I_diag,Gingivitis': 68, 'II_I_diag,Defective Dentition': 20, 'II_I_diag,Normality': 100, 'II_I_diag,Tooth Discoloration': 27, 'II_I_diag,Ulcer': 39, 'II_I_diag,Caries': 74, 'II_I_diag,Calculus': 52, 'PA,Impacted Tooth': 101, 'PA,Pulpitis': 44, 'PA,Caries': 116, 'PA,Periodontitis': 68, 'PA,Apical Periodontitis': 62, 'PA,Mixed Dentition': 50, 'PA,Bone Loss': 40, 'PA,Root Canal Treatment': 11, 'PA,Crown': 25, 'PA,Restoration': 22, 'Histo,Normality': 248, 'Histo,Leukoplakia with Dysplasia': 15, 'Histo,Oral Squamous Cell Carcinoma': 76, 'Histo,Leukoplakia without Dysplasia': 9, 'Histo,Oral Submucous Fibrosis': 35, 'Intraoral Video': 10, 'II_R_diag,Caries': 353, 'II_R_diag,Fenestration and Dehiscence': 22, 'II_R_diag,Gingivitis': 67, 'II_R_diag,Malocclusion Issues Assessment': 300}
-
-# # -----------------------------
-# # 配色方案
-# # -----------------------------
-# # 优化的配色方案 - 融入蓝色主题
-# # -----------------------------
-# # color_map = {
-# #     "Plain text data": "#687EFF",        # 您的深蓝色
-# #     "Figures from Textbooks": "#80B3FF",    # 您的中蓝色
-# #     "Intraoral Image": "#98E4FF",   # 您的浅蓝色 - 三个子任务用相同颜色
-# #     "Periapical Radiograph": "#FF6B6B",     # 暖红色，与蓝色形成对比
-# #     "Panoramic Radiograph": "#FFD166",      # 暖黄色
-# #     "Cephalometric Radiograph": "#06D6A0",  # 青绿色
-# #     "Histopathological Image": "#B6FFFA",   # 您的极浅蓝色
-# #     "Intraoral Video": "#C8B6FF",           # 淡紫色
-# #     "Interleaved Image-Text data": "#FFA69E", # 珊瑚粉色
-# #     "3D Model Scan": "#A0C4FF",             # 另一种蓝色调
-# # }
-
-# color_map_First_modality_blue = {
-#     "Plain text data": "#A5B4FC",          # 主蓝色 (清晰主色)
-#     "Intraoral Image": "#98E4FF",         # 浅蓝色
-#     "Periapical Radiograph": "#93C5FD",   # 更浅一点的蓝，用于缓和区域
-#     "Cephalometric Radiograph": "#22D3EE",# 青蓝色，带点绿调用于亮点区分
-#     "Histopathological Image": "#38BDF8", # 极浅蓝，适合作为柔和色块
-#     "Intraoral Video": "#3B82F6",          # 带一点紫调的浅蓝，形成微妙变化
-#     "Interleaved Image-Text data": "#BAE6FD", # 海蓝色中间调，用于强调
-# }
-
-color_map_Second_task_red = {
-    "Abnormality Diagnosis": "#FCA5A5",          # 主浅红色（主色调，柔和不刺眼）
-    "Treatment Planning": "#FEC6C6", # FDB4B4         # 稍浅一点的粉红，明亮柔和
-    "Examination Question": "#FECACA",    # 更淡的粉调，增强层次
-    "Cervical vertebral maturation (CVM) stage Prediction": "#F87171", # 略偏珊瑚红，带亮度差异
-    "Dental treatment video comprehension": "#FB7185",  # 偏玫瑰粉色，微调到更饱和一点
-    "Tooth Location and Counting": "#EF4444",          # 饱和度更高的红，充当视觉重点
-    "Interleaved Image-Text data": "#FEC6C6" # 介于主色与最浅色之间的过渡色
-}
-
-# # -----------------------------
-# # 数据准备
-# # -----------------------------
-# labels = []
-# values = []
-# colors = []
-
-# for key, val in Second_task_number_dict.items():
-#     labels.append(key)
-#     values.append(val)
-#     colors.append(color_map_Second_task_red.get(key, "#aaaaaa"))
-
-# # -----------------------------
-# # 绘制饼图
-# # -----------------------------
-# fig, ax = plt.subplots(figsize=(8, 8))
-
-# wedges, _ = ax.pie(
-#     values,
-#     colors=colors,
-#     startangle=90,
-#     wedgeprops=dict(width=0.6, edgecolor='white')  # 中心空白形成环形
-# )
-
-# # 计算比例并在 >1% 的部分添加文字
-# total = sum(values)
-# # for i, wedge in enumerate(wedges):
-# #     ratio = 100 * values[i] / total
-# #     if ratio > 0.99:
-# #         # 计算角度和中心点
-# #         theta = (wedge.theta2 + wedge.theta1) / 2.0
-# #         x = 0.7 * np.cos(np.deg2rad(theta))
-# #         y = 0.7 * np.sin(np.deg2rad(theta))
-# #         ax.text(x, y, f"{ratio:.1f}%", ha='center', va='center',
-# #                 fontsize=18, fontweight='bold', fontfamily='Times New Roman', color='black')
-
-# ax.axis('equal')
-# # plt.title("Modality Distribution (Ring Chart)", fontsize=14, fontfamily='Times New Roman')
-
-# # -----------------------------
-# # 打印每个模态数量占比
-# # -----------------------------
-# print("各模态数量占比：")
-# for label, value in zip(labels, values):
-#     ratio = value / total * 100
-#     print(f"{label:45s}: {value:6d} ({ratio:6.2f}%)")
-
-# plt.tight_layout()
-# plt.savefig('output_benchmark.png', bbox_inches='tight', pad_inches=0.02, dpi=300)  # 保存图像到当前目录下的 output.png 文件
-
-# # plt.show()
-
-
-
-######
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
@@ -195,7 +13,7 @@ matplotlib.rcParams['font.family'] = 'Times New Roman'
 
 First_modality_number_dict = {
     "Interleaved Image-Text data": 15, # Treatment planning
-    "Plain text data": 362,
+    # "Plain text data": 362,
     "Intraoral Image": 1565, #  (Location and Counting) 
     "Periapical Radiograph": 539,
     "Histopathological Image": 383,
@@ -207,7 +25,7 @@ Second_task_number_dict = {
     "Dental treatment video comprehension": 10,
     "Treatment Planning": 15,
     "Cervical vertebral maturation (CVM) stage Prediction": 300,
-    "Examination Question": 362,
+    # "Examination Question": 362,
     "Abnormality Diagnosis": 2387,
     "Tooth Location and Counting": 100,
 }
@@ -234,6 +52,16 @@ Second_task_number_dict = {
 #     "Dental treatment video comprehension": "#FB7185",  
 #     "Tooth Location and Counting": "#EF4444",          
 # }
+# color_map_Second_task_red = {
+#     "Abnormality Diagnosis": "#FCA5A5",          # 主浅红色（主色调，柔和不刺眼）
+#     "Treatment Planning": "#FEC6C6", # FDB4B4         # 稍浅一点的粉红，明亮柔和
+#     "Examination Question": "#FECACA",    # 更淡的粉调，增强层次
+#     "Cervical vertebral maturation (CVM) stage Prediction": "#F87171", # 略偏珊瑚红，带亮度差异
+#     "Dental treatment video comprehension": "#FB7185",  # 偏玫瑰粉色，微调到更饱和一点
+#     "Tooth Location and Counting": "#EF4444",          # 饱和度更高的红，充当视觉重点
+#     "Interleaved Image-Text data": "#FEC6C6" # 介于主色与最浅色之间的过渡色
+# }
+
 
 color_map_First_modality_red = {
     "Plain text data": "#FCA5A5",          
@@ -245,14 +73,46 @@ color_map_First_modality_red = {
     "Interleaved Image-Text data": "#FCA5A5", 
 }
 
+color_map_First_modality_fef9f2 = {
+    "Plain text data": "#F2E5D0",          # 中浅暖米色
+    "Intraoral Image": "#F9EEDC",          # 浅奶杏色
+    "Periapical Radiograph": "#E8D1AD",    # 稍深的金米色
+    "Cephalometric Radiograph": "#FEF4E6", # 偏深的暖沙黄
+    "Histopathological Image": "#D7BF8A",  # 🟢 调浅版 深金棕 → 柔和金杏色
+    "Intraoral Video": "#D8BD8B",          # 最浅层，用主色
+    "Interleaved Image-Text data": "#F2E5D0", # 一致性
+}
+
+
+color_map_First_modality_fff5fd = {
+    "Plain text data": "#DA96C8",          # 中浅粉紫（带轻微玫瑰感）
+    "Intraoral Image": "#FBE7F7",          # 浅粉白（接近主色）
+    "Periapical Radiograph": "#ECB9E1",    # 中粉紫（柔和亮丽）
+    "Cephalometric Radiograph": "#FFF5FD", # 偏深、温柔的丁香紫
+    "Histopathological Image": "#F5DAEE",  # 稍深的玫瑰紫粉（最深层）
+    "Intraoral Video": "#C47DB0",          # 最浅主色（奶粉白）
+    "Interleaved Image-Text data": "#F5DAEE", # 保持一致层次
+}
+
+color_map_First_modality_new = {
+    "Plain text data": "#D1E7F7",      # 柔和浅蓝
+    "Intraoral Image": "#E3F2FD",      # 极浅蓝
+    "Periapical Radiograph": "#CCE2DC",# 淡青色
+    "Cephalometric Radiograph": "#D0EBEB", # 浅蓝绿
+    "Histopathological Image": "#B2C9D9",  # 蓝灰色
+    "Intraoral Video": "#A8D8EA",      # 薄荷蓝
+    "Interleaved Image-Text data": "#E6F3F5", # 雾感极浅蓝
+}
+
 color_map_Second_task_blue = {
-    "Abnormality Diagnosis": "#93C5FD",          
+    "Abnormality Diagnosis": "#93C5FD",
     "Treatment Planning": "#38BDF8", 
     "Examination Question": "#98E4FF",    
-    "Cervical vertebral maturation (CVM) stage Prediction": "#22D3EE", 
+    "Cervical vertebral maturation (CVM) stage Prediction": "#98E4FF",
     "Dental treatment video comprehension": "#A5B4FC",  
-    "Tooth Location and Counting": "#3B82F6", 
+    "Tooth Location and Counting": "#22D3EE", 
 }
+
 color_map_Second_task_yellow_soft = {
     "Abnormality Diagnosis": "#F6BE4F",     # 柔和亮金黄（主色，温柔不刺眼）
     "Treatment Planning": "#FFDB6E",        # 温润的柠檬黄（略亮，用于重点）
@@ -260,6 +120,16 @@ color_map_Second_task_yellow_soft = {
     "Cervical vertebral maturation (CVM) stage Prediction": "#D9A441",  # 稍偏橙调，平衡过渡
     "Dental treatment video comprehension": "#E9B44C",  # 稍深但温暖
     "Tooth Location and Counting": "#FFD35C",           # 压轴暖黄，保持协调
+}
+
+color_map_First_modality_fefbc7 = {
+    "Plain text data": "#F3EBA8",          # 中浅暖黄（柔和金杏）
+    "Intraoral Image": "#FBF4B8",          # 浅奶黄色（接近主色）
+    "Periapical Radiograph": "#E9D97E",    # 偏深金黄
+    "Cephalometric Radiograph": "#DCC25C", # 深一层的暖金黄
+    "Histopathological Image": "#C9AC48",  # 最深层 → 柔和金棕黄（不过饱和）
+    "Intraoral Video": "#FEFBC7",          # 主色本身（奶黄）
+    "Interleaved Image-Text data": "#F3EBA8", # 同层次保持一致
 }
 
 def pie_stretch(
@@ -367,7 +237,7 @@ def create_matched_data(inner_dict, outer_dict):
             if val == value:
                 inner_sorted.append(value)
                 inner_labels.append(key)
-                inner_colors.append(color_map_First_modality_red.get(key, "#aaaaaa"))
+                inner_colors.append(color_map_First_modality_fff5fd.get(key, "#aaaaaa"))
         
         # 处理外环数据
         for key, val in outer_dict.items():
@@ -476,4 +346,4 @@ for label, value in zip(outer_labels, outer_values):
 #           fontsize=14, pad=20)
 
 plt.tight_layout()
-plt.savefig('dual_layer_donut_chart.png', bbox_inches='tight', pad_inches=0.01, dpi=300)
+plt.savefig('dual_layer_donut_chart_v1.png', bbox_inches='tight', pad_inches=0.01, dpi=300)
