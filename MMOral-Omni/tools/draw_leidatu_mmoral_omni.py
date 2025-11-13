@@ -56,7 +56,7 @@ results = [
     {"II": 28.81, "Loc": 36.30, "Dx-I": 38.85, "Dx-R": 11.28, "PA": 38.03, "CE": 33.33, "PI": 34.52, "TP": 79.33, "IV": 29.00, "Overall": 30.32},  # Claude-Sonnet-4-5-20250929
     {"II": 23.74, "Loc": 18.70, "Dx-I": 40.00, "Dx-R": 12.53, "PA": 33.62, "CE": 26.70, "PI": 28.75, "TP": 56.00, "IV": 23.00, "Overall": 27.83},  # Qwen3-VL-235B-A22B
     {"II": 17.32, "Loc": 10.10, "Dx-I": 30.85, "Dx-R": 11.02, "PA": 32.95, "CE": 14.80, "PI": 28.67, "TP": 64.67, "IV": 14.00, "Overall": 23.39},  # InternVL3.5-8B
-    {"II": 55.69, "Loc": 65.30, "Dx-I": 54.69, "Dx-R": 41.09, "PA": 46.70, "CE": 65.73, "PI": 55.67, "TP": 48.00, "IV": 60.00, "Overall": 51.24},  # OralGPT-Omni (Ours)
+    {"II": 54.46, "Loc": 66.80, "Dx-I": 56.60, "Dx-R": 39.99, "PA": 48.11, "CE": 65.90, "PI": 56.01, "TP": 47.33, "IV": 66.00, "Overall": 51.84},  # OralGPT-Omni (Ours)
 ]
 
 for item in results:
@@ -88,31 +88,31 @@ angles += angles[:1]  # Complete the loop
 
 # Initialize the radar chart
 fig, ax = plt.subplots(figsize=(10, 10), subplot_kw={"polar": True})
-colors = plt.cm.get_cmap("Dark2", len(models))
-
+colors = plt.cm.get_cmap("Set1", len(models))
+colors = colors(np.arange(len(models)))[::-1]
 # Plot each model
 for idx, result in enumerate(results):
     values = list(result.values())
     values += values[:1]  # Complete the loop
-    ax.plot(angles, values, label=models[idx], linewidth=2, linestyle='solid', color=colors(idx))
-    ax.fill(angles, values, alpha=0.25, color=colors(idx))
+    ax.plot(angles, values, label=models[idx], linewidth=2, linestyle='solid', color=colors[idx])
+    ax.fill(angles, values, alpha=0.25, color=colors[idx])
 
 # Add labels for each axis
 ax.set_xticks(angles[:-1])
-ax.set_xticklabels(labels, fontsize=25)
+ax.set_xticklabels(labels, fontsize=35)
 
 # Set the range for the radial axis
 ax.set_rscale("linear")
 ax.set_rlabel_position(120)
 ax.set_yticks([20, 40, 60, 80])  # Customize tick positions
-ax.set_yticklabels(["20", "40", "60", "80"], fontsize=20, color="gray")
+ax.set_yticklabels(["20", "40", "60", "80"], fontsize=30, color="gray")
 ax.set_ylim(0, 70)
 
 # Add title
 # plt.title("Radar Chart of Model Performance", size=16, fontweight='bold', pad=20)
 
 # Add legend
-ax.legend(loc="best",  fontsize=16,)
+ax.legend(loc="best",  fontsize=20,)
 
 # Save the figure (for use in papers)
 plt.tight_layout()
