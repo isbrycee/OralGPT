@@ -8,7 +8,7 @@
     🤗 <b>MMOral-OPG-Bench</b>
   </a> &nbsp;|&nbsp;
   <a href="https://huggingface.co/OralGPT" target="_blank">
-    🤗 <b>MMOral-OMNI-Bench (Coming soon)</b>
+    🤗 <b>MMOral-Uni-Bench (Coming soon)</b>
   </a>
 </div>
 
@@ -62,7 +62,7 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 
 - 📦 Release of **MMOral-Bench v2**  
 - 📑 Expanded **instruction dataset** with more diverse dental imaging modalities
-- 🧪 Release of **OralGPT-o3**
+- 🧪 Release of **OralGPT-Plus**
 
 ---
 
