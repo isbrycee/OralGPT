@@ -112,7 +112,7 @@ ax.set_ylim(0, 70)
 # plt.title("Radar Chart of Model Performance", size=16, fontweight='bold', pad=20)
 
 # Add legend
-ax.legend(loc="best",  fontsize=20,)
+ax.legend(loc="best",  fontsize=23,)
 
 # Save the figure (for use in papers)
 plt.tight_layout()
