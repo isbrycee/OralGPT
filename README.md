@@ -60,7 +60,7 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 
 ## 🔮 Upcoming Updates  
 
-- 📦 Release of **MMOral-Bench v2**  
+- 📦 Release of **MMOral-Uni Benchmark**  
 - 📑 Expanded **instruction dataset** with more diverse dental imaging modalities
 - 🧪 Release of **OralGPT-Plus**
 
