@@ -34,7 +34,7 @@ def clean_tsv(file_path, output_path=None):
         output_path = base + "_cleaned.tsv"
 
     # 保存为新的 TSV
-    df_cleaned.to_csv(output_path, sep='\t', index=False)
+    # df_cleaned.to_csv(output_path, sep='\t', index=False)
 
     # 打印统计信息
     print(f"\n已删除 {len(drop_indices)} 行含中文的记录")
@@ -49,5 +49,5 @@ def clean_tsv(file_path, output_path=None):
         print("\n未找到 'category' 列。")
 
 if __name__ == "__main__":
-    file_path = '/home/jinghao/projects/x-ray-VLM/VLMEvalKit/dataset/MMOral_new_II_loc_cepha_intraoral_image-level_diagnosis_PA_Histo_Video_RegionLevelDiagnosis_valid_cleaned_finalize_category_cleaned_woTE_resizeFDTooth_resizeGingivitis.tsv'
+    file_path = '/home/jinghao/projects/x-ray-VLM/VLMEvalKit/dataset/MMOral_new_II_loc_cepha_intraoral_image-level_diagnosis_PA_Histo_Video_RegionLevelDiagnosis_valid_cleaned_finalize_category_cleaned_woTE_resizeFDTooth_resizeGingivitis_resizeAlphaDent_resizePINormality_filterUnableToAnalysis.tsv'
     clean_tsv(file_path)
