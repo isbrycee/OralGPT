@@ -22,14 +22,14 @@ bars2 = ax.bar(x + bar_width/2, scores_person2, bar_width, label='Dentist 2',
 
 # 添加一些美观的元素
 # ax.set_xlabel('Categories', fontsize=14)
-ax.set_ylabel('Scores', fontsize=13, fontweight='bold')
+ax.set_ylabel('Scores', fontsize=18, fontweight='bold')
 # ax.set_title('Scores Comparison', fontsize=16)
 ax.set_xticks(x)
 # ax.set_xticklabels(categories)
-ax.set_xticklabels(categories, rotation=12, fontsize=11, ha='center', fontweight='bold')  # 旋转标签
-ax.set_yticklabels(range(0,5), fontsize=11, fontweight='bold')  # 旋转标签
+ax.set_xticklabels(categories, rotation=12, fontsize=14, ha='center', fontweight='bold')  # 旋转标签
+ax.set_yticklabels(range(0,5), fontsize=15, fontweight='bold')  # 旋转标签
 
-ax.legend()
+ax.legend(fontsize=14)
 
 # 加粗坐标轴线条
 ax.spines['top'].set_linewidth(2)
@@ -42,7 +42,7 @@ def add_value_labels(bars):
     for bar in bars:
         yval = bar.get_height()
         ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), 
-                ha='center', va='bottom')
+                ha='center', va='bottom', fontsize=14)
 
 add_value_labels(bars1)
 add_value_labels(bars2)
