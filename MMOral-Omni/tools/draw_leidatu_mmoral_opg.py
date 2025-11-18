@@ -58,7 +58,7 @@ results = [
     {"Teeth": 30.64, "Patho": 25.83, "His": 27.98, "Jaw": 51.12, "SumRec": 17.02, "Report": 8.00, "average": 27.80},  # HealthGPT-XL32
     {"Teeth": 22.42, "Patho": 13.71, "His": 24.42, "Jaw": 43.88, "SumRec": 13.57, "Report": 25.80, "average": 24.70},  # MedVLM-R1
     # {"Teeth": 22.99, "Patho": 32.58, "His": 29.57, "Jaw": 52.44, "SumRec": 20.95, "Report": 8.70, "average": 26.20},   # MedDr
-    {"Teeth": 37.76, "Patho": 30.91, "His": 40.31, "Jaw": 54.69, "SumRec": 43.93, "Report": 29.90, "average": 38.86},  # OralGPT-Omni (Ours)
+    {"Teeth": 37.26, "Patho": 43.94, "His": 55.34, "Jaw": 70.50, "SumRec": 38.57, "Report": 37.90, "average": 45.31},  # OralGPT-Omni (Ours)
 ]
 
 labels = ["Teeth", "Patho", "HisT", "Jaw", "SumRec", "Report", "Overall"]
@@ -104,20 +104,20 @@ for idx, result in enumerate(results):
 
 # Add labels for each axis
 ax.set_xticks(angles[:-1])
-ax.set_xticklabels(labels, fontsize=25)
+ax.set_xticklabels(labels, fontsize=35)
 
 # Set the range for the radial axis
 ax.set_rscale("linear")
 ax.set_rlabel_position(120)
 ax.set_yticks([20, 40, 60, 80])  # Customize tick positions
-ax.set_yticklabels(["20", "40", "60", "80"], fontsize=20, color="gray")
-ax.set_ylim(0, 70)
+ax.set_yticklabels(["20", "40", "60", "80"], fontsize=30, color="gray")
+ax.set_ylim(0, 75)
 
 # Add title
 # plt.title("Radar Chart of Model Performance", size=16, fontweight='bold', pad=20)
 
 # Add legend
-ax.legend(loc="lower right",  fontsize=17,)
+ax.legend(loc="lower right",  fontsize=22,)
 
 # Save the figure (for use in papers)
 plt.tight_layout()
