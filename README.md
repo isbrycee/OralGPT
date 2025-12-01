@@ -23,8 +23,7 @@
 - OralGPT-Plus
 - OralGPT-Patho
 - OralGPT-3D
-
-...
+- ...
   
 ---
 
