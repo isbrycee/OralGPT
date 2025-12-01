@@ -4,7 +4,8 @@
 
   <!-- 链接部分 -->
   <a href="https://arxiv.org/pdf/2509.09254" target="_blank">📄 <b>OralGPT</b></a> &nbsp;|&nbsp;
-  <a href="https://arxiv.org/abs/2511.22055" target="_blank">📄 <b>OralGPT-Omni</b></a> &nbsp;|&nbsp;
+  <a href="https://arxiv.org/abs/2511.22055" target="_blank">📄 <b>OralGPT-Omni</b></a> 
+  
   <a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench" target="_blank">
     🤗 <b>MMOral-OPG-Bench</b>
   </a> &nbsp;|&nbsp;
