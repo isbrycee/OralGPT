@@ -3,7 +3,8 @@
   <br><br>
 
   <!-- 链接部分 -->
-  <a href="https://arxiv.org/pdf/2509.09254" target="_blank">📄 <b>Paper</b></a> &nbsp;|&nbsp;
+  <a href="https://arxiv.org/pdf/2509.09254" target="_blank">📄 <b>OralGPT</b></a> &nbsp;|&nbsp;
+  <a href="https://arxiv.org/abs/2511.22055" target="_blank">📄 <b>OralGPT-Omni</b></a> &nbsp;|&nbsp;
   <a href="https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench" target="_blank">
     🤗 <b>MMOral-OPG-Bench</b>
   </a> &nbsp;|&nbsp;
@@ -14,8 +15,15 @@
 
 # OralGPT 🦷🦷  
 
-***OralGPT**: An Omni Multimodal Large Language Model for Digital Dentistry*
+***OralGPT**: A Series Versatile Dental Multimodal Large Language Models*
 
+- [OralGPT](https://arxiv.org/abs/2509.09254)
+- [OralGPT-Omni](https://arxiv.org/abs/2511.22055)
+- OralGPT-Plus
+- OralGPT-Patho
+- OralGPT-3D
+...
+  
 ---
 
 ## 📖 Table of Contents  
@@ -30,6 +38,7 @@
 
 
 ## 🔔 News 
+- **[2025-11-27]** 🔥🔥🔥 Our paper of **OralGPT-Omni** has been released on [arXiv](https://arxiv.org/abs/2511.22055).  
 - **[2025-10-31]** 🔥 **[NeurIPS 2025] MMOral-Bench** (MMOral-OPG-Bench) has been released on 🤗 [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench). 👏 Welcome to evaluate your LVLMs.
 - **[2025-09-22]** 🚀 Multiple **Dental Visual Expert Models** have been released on 🤗 [Hugging Face](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models). 
 - **[2025-09-19]** 🎉 Our paper of **OralGPT** has been accepted by **NeurIPS 2025**. 
