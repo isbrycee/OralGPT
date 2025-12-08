@@ -145,3 +145,9 @@ If you find our work helpful, please cite us:
   journal={arXiv preprint arXiv:2509.09254},
   year={2025}
 }
+@article{hao2025oralgpt,
+  title={OralGPT-Omni: A Versatile Dental Multimodal Large Language Model},
+  author={Hao, Jing and Liang, Yuci and Lin, Lizhuo and Fan, Yuxuan and Zhou, Wenkai and Guo, Kaixin and Ye, Zanting and Sun, Yanpeng and Zhang, Xinyu and Yang, Yanqi and others},
+  journal={arXiv preprint arXiv:2511.22055},
+  year={2025}
+}
