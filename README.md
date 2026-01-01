@@ -142,7 +142,7 @@ This streamlined process allows you to easily benchmark any VLM against our MMOr
 If you find our work helpful, please cite us:  
 
 ```bibtex
-@article{oralgpt2025,
+@article{hao2025mmoral,
   title={Towards Better Dental AI: A Multimodal Benchmark and Instruction Dataset for Panoramic X-ray Analysis},
   author={Hao, Jing and Fan, Yuxuan and Sun, Yanpeng and Guo, Kaixin and Lin, Lizhuo and Yang, Jinrong and Ai, Qi Yong H and Wong, Lun M and Tang, Hao and Hung, Kuo Feng},
   journal={arXiv preprint arXiv:2509.09254},
@@ -154,3 +154,14 @@ If you find our work helpful, please cite us:
   journal={arXiv preprint arXiv:2511.22055},
   year={2025}
 }
+@article{hao2025oraldataset,
+  title={Characteristics, licensing, and ethical considerations of openly accessible oral-maxillofacial imaging datasets: a systematic review},
+  author={Hao, Jing and Nalley, Andrew and Yeung, Andy Wai Kan and Tanaka, Ray and Ai, Qi Yong H and Lam, Walter Yu Hang and Shan, Zhiyi and Leung, Yiu Yan and AlHadidi, Abeer and Bornstein, Michael M and others},
+  journal={npj Digital Medicine},
+  volume={8},
+  number={1},
+  pages={412},
+  year={2025},
+  publisher={Nature Publishing Group UK London}
+}
+```
