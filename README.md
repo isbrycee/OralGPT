@@ -25,6 +25,7 @@
 - OralGPT-3D
 - OralGPT-Agent
 - OralGPT-U
+- OralGPT-Edu
 - ...
   
 ---
