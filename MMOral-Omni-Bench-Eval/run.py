@@ -51,7 +51,7 @@ from vlmeval.utils.result_transfer import MMMU_result_transfer, MMTBench_result_
 # add by bryce
 def df_to_latex_from_key_value(df: pd.DataFrame) -> str:
     # 指定要提取的 key 顺序
-    keys = ["II_Loc", "II_Dx-I", "II_Dx-R", "PA", "CE", "PI", "TP", "TE", "IV", "Overall"]
+    keys = ["II_Loc", "II_Dx-I", "II_Dx-R", "PA", "CE", "PI", "TP", "IV", "Overall"]
     
     # 检查列数量
     if df.shape[1] < 3:

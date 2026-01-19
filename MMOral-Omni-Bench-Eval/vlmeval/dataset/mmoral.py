@@ -230,7 +230,7 @@ class MMOral_OMNI(ImageBaseDataset):
     }
 
     def __init__(self, dataset='MMOral_OMNI', skip_noimg=False):
-        if dataset != 'MMOral_OMNI':
+        if dataset != 'MMOral_OMNI' or dataset != 'MMOral_OMNI_Mini':
             import warnings
             warnings.warn(
                 'To evaluate on MMOral-OMNI, we would suggest `MMOral_OMNI` for the default setting.'
@@ -313,3 +313,15 @@ class MMOral_OMNI(ImageBaseDataset):
         dump(score, score_pth)
         dump(score_fine, score_fine_pth)
         return score
+
+class MMOral_OMNI_Mini(MMOral_OMNI):
+    DATASET_URL = {
+        'MMOral_OMNI_Mini':
+        'https://huggingface.co/datasets/OralGPT/MMOral-Omni-Bench-Mini/resolve/main/MMOral-Omni-Bench-Mini.tsv',
+    }
+    DATASET_MD5 = {
+        'MMOral_OMNI_Mini': '59dde61ef6186e6b6705860c913d7fe2',
+    }
+
+    def __init__(self, dataset='MMOral_OMNI_Mini', skip_noimg=False):
+        super().__init__(dataset=dataset, skip_noimg=skip_noimg)
