@@ -42,6 +42,7 @@
 
 
 ## 🔔 News 
+- **[2026-03-02]** 🔥🔥🔥 **Dental Image Captioning MLLM** across 7 modalities has been released on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralGPT-Captioning-4B-Base). 👏 Welcome to generate visual description of dental images. 
 - **[2026-02-22]** 🎉 Our paper of **[OralGPT-Omni](https://arxiv.org/abs/2511.22055)** and **OralGPT-Plus** have been accepted by **CVPR 2026**.
 - **[2025-12-17]** 🔥🔥🔥 **OralGPT-Omni-7B-Instruct** has been released on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralGPT-Omni-7B-Instruct). 👏 Welcome to try it.
 - **[2025-11-27]** 🔥🔥🔥 Our paper of **OralGPT-Omni** has been released on [arXiv](https://arxiv.org/abs/2511.22055).  
@@ -85,8 +86,9 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 
 1. Multiple **Dental Visual Expert Models** released on 🤗 [Hugging Face](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models)
 , covering detection, segmentation, and classification tasks in panoramic/periapical X-ray images.
-2. **[NeurIPS 2025] MMOral-Bench** (MMOral-OPG-Bench) has been released on 🤗 [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench). 
-3. 👉 Coming soon ...
+2. **[NeurIPS 2025] MMOral-Bench** (MMOral-OPG-Bench) has been released on 🤗 [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench).
+3. **Dental Image Captioning MLLM** across 7 modalities has been released on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralGPT-Captioning-4B-Base).  
+4. 👉 Coming soon ...
 ---
 
 
