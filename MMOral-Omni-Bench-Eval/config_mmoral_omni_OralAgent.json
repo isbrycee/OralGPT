@@ -1,6 +1,6 @@
 {
     "model": {
-        "OralAgent": {
+        "OralAgent_20260304": {
             "class": "GPT4V",
             "model": "OralAgent",
             "temperature": 0.0,
@@ -8,14 +8,14 @@
             "api_base": "http://0.0.0.0:8124/v1/chat/completions",
             "retry": 10,
             "timeout": 600,
-            "max_tokens": 8192,
+            "max_tokens": 32768,
             "verbose": true
         }
     },
     "data": {
-        "MMOral_OMNI_Mini": {
-            "class": "MMOral_OMNI_Mini",
-            "dataset": "MMOral_OMNI_Mini"
+        "MMOral_OMNI": {
+            "class": "MMOral_OMNI",
+            "dataset": "MMOral_OMNI"
         }
     },
     "judger": {

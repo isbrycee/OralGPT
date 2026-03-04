@@ -78,7 +78,7 @@ from .GUI.screenspot_pro import ScreenSpot_Pro
 from .mmifeval import MMIFEval
 from .chartmimic import ChartMimic
 from .m4bench import M4Bench
-from .mmoral import MMOral_OMNI, MMOral_OPG_CLOSED, MMOral_OPG_OPEN
+from .mmoral import MMOral_OMNI, MMOral_OMNI_Mini, MMOral_OPG_CLOSED, MMOral_OPG_OPEN
 
 
 class ConcatDataset(ImageBaseDataset):

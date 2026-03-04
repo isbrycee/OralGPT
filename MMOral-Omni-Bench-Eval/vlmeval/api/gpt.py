@@ -173,7 +173,11 @@ class OpenAIWrapper(BaseAPI):
                     from PIL import Image
                     img = Image.open(msg['value'])
                     b64 = encode_image_to_base64(img, target_size=self.img_size)
-                    img_struct = dict(url=f'data:image/jpeg;base64,{b64}', detail=self.img_detail)
+                    img_struct = dict(
+                        url=f'data:image/jpeg;base64,{b64}',
+                        detail=self.img_detail,
+                        image_path=os.path.abspath(msg['value']),  # 本地图像绝对路径，供服务端使用
+                    )
                     content_list.append(dict(type='image_url', image_url=img_struct))
         else:
             assert all([x['type'] == 'text' for x in inputs])
