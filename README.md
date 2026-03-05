@@ -1,6 +1,7 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/mmoral-logo.png" width="150px">
   <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/logo_OralGPT-Plus.png" width="150px">
+  <img src="https://raw.githubusercontent.com/isbrycee/OralGPT/main/assets/logo_OralAgent.png" width="150px">
   <br><br>
 
   <!-- 链接部分 -->
