@@ -28,6 +28,8 @@
 - OralGPT-Agent
 - OralGPT-X
 - OralGPT-Edu
+- OralCLIP
+- OralDINO
 - ...
   
 ---
