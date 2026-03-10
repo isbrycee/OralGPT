@@ -1,8 +1,8 @@
 {
     "model": {
-        "OralAgent": {
+        "OralAgent_test": {
             "class": "GPT4V",
-            "model": "OralAgent_20260304",
+            "model": "OralAgent",
             "temperature": 0.0,
             "img_detail": "high",
             "api_base": "http://0.0.0.0:8124/v1/chat/completions",

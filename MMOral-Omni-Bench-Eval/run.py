@@ -192,6 +192,8 @@ You can launch the evaluation by setting either --data and --model or --config.
     - `dataset`: The name of the dataset, which should be a string that is accepted by the `dataset` argument of the \
         corresponding class.
     - Other keys are specific to the dataset, please refer to the corresponding class.
+    - For MMOral_OMNI, optional `categories`: list of category keywords (e.g. ["PA", "CE", "PI"]) to evaluate only \
+        those categories; omit or leave empty to use all. Supported keys include: II_Loc, II_Dx-I, II_Dx-R, PA, CE, PI, TP, IV.
     - Tip: The defined dataset in the `supported_video_datasets` of `vlmeval/dataset/video_dataset_config.py` \
         can be used as a shortcut.
 

@@ -68,7 +68,7 @@ def infer_data_api(model, work_dir, model_name, dataset, index_set=None, api_npr
     indices = [i for i in indices if i not in res]
 
     gen_func = model.generate
-    structs = [dict(message=struct, dataset=dataset_name) for struct in structs]
+    structs = [dict(message=struct, dataset=dataset_name, index=idx) for struct, idx in zip(structs, indices)]
 
     if len(structs):
         track_progress_rich(gen_func, structs, nproc=api_nproc, chunksize=api_nproc, save=out_file, keys=indices)

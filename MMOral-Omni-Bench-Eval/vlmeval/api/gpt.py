@@ -161,11 +161,13 @@ class OpenAIWrapper(BaseAPI):
 
     # inputs can be a lvl-2 nested list: [content1, content2, content3, ...]
     # content can be a string or a list of image & text
-    def prepare_itlist(self, inputs):
+    # index: optional benchmark case index, passed to server when present (e.g. for eval)
+    def prepare_itlist(self, inputs, index=None):
         assert np.all([isinstance(x, dict) for x in inputs])
         has_images = np.sum([x['type'] == 'image' for x in inputs])
         if has_images:
             content_list = []
+            first_image_done = False
             for msg in inputs:
                 if msg['type'] == 'text':
                     content_list.append(dict(type='text', text=msg['value']))
@@ -178,6 +180,9 @@ class OpenAIWrapper(BaseAPI):
                         detail=self.img_detail,
                         image_path=os.path.abspath(msg['value']),  # 本地图像绝对路径，供服务端使用
                     )
+                    if index is not None and not first_image_done:
+                        img_struct['index'] = index
+                        first_image_done = True
                     content_list.append(dict(type='image_url', image_url=img_struct))
         else:
             assert all([x['type'] == 'text' for x in inputs])
@@ -185,7 +190,7 @@ class OpenAIWrapper(BaseAPI):
             content_list = [dict(type='text', text=text)]
         return content_list
 
-    def prepare_inputs(self, inputs):
+    def prepare_inputs(self, inputs, index=None):
         input_msgs = []
         if self.system_prompt is not None:
             input_msgs.append(dict(role='system', content=self.system_prompt))
@@ -194,13 +199,16 @@ class OpenAIWrapper(BaseAPI):
         if 'role' in inputs[0]:
             assert inputs[-1]['role'] == 'user', inputs[-1]
             for item in inputs:
-                input_msgs.append(dict(role=item['role'], content=self.prepare_itlist(item['content'])))
+                # pass index only for the last user message (benchmark case index)
+                idx = index if (item.get('role') == 'user' and item is inputs[-1]) else None
+                input_msgs.append(dict(role=item['role'], content=self.prepare_itlist(item['content'], index=idx)))
         else:
-            input_msgs.append(dict(role='user', content=self.prepare_itlist(inputs)))
+            input_msgs.append(dict(role='user', content=self.prepare_itlist(inputs, index=index)))
         return input_msgs
 
     def generate_inner(self, inputs, **kwargs) -> str:
-        input_msgs = self.prepare_inputs(inputs)
+        index = kwargs.pop('index', None)
+        input_msgs = self.prepare_inputs(inputs, index=index)
         temperature = kwargs.pop('temperature', self.temperature)
         max_tokens = kwargs.pop('max_tokens', self.max_tokens)
 
@@ -292,5 +300,5 @@ class OpenAIWrapper(BaseAPI):
 
 class GPT4V(OpenAIWrapper):
 
-    def generate(self, message, dataset=None):
-        return super(GPT4V, self).generate(message)
+    def generate(self, message, dataset=None, **kwargs):
+        return super(GPT4V, self).generate(message, **kwargs)

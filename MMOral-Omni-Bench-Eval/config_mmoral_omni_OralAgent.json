@@ -1,6 +1,6 @@
 {
     "model": {
-        "OralAgent_20260304": {
+        "OralAgent_20260310": {
             "class": "GPT4V",
             "model": "OralAgent",
             "temperature": 0.0,
@@ -15,7 +15,8 @@
     "data": {
         "MMOral_OMNI": {
             "class": "MMOral_OMNI",
-            "dataset": "MMOral_OMNI"
+            "dataset": "MMOral_OMNI",
+            "categories": ["CE"]
         }
     },
     "judger": {

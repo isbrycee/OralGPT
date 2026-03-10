@@ -229,13 +229,32 @@ class MMOral_OMNI(ImageBaseDataset):
         'MMOral_OMNI': '139e90f132f02e2a87d60eff1c24254a',
     }
 
-    def __init__(self, dataset='MMOral_OMNI', skip_noimg=False):
+    def __init__(self, dataset='MMOral_OMNI', skip_noimg=False, categories=None):
+        """
+        Args:
+            dataset: Dataset name.
+            skip_noimg: Whether to skip samples without image.
+            categories: Optional list of category keywords (e.g. ["PA", "CE", "PI"]).
+                If provided, only samples whose `category` field contains any of these
+                keywords are used. Main category keys include: II_Loc, II_Dx-I, II_Dx-R,
+                PA, CE, PI, TP, IV, etc. None or empty list = use all categories.
+        """
         if dataset != 'MMOral_OMNI' or dataset != 'MMOral_OMNI_Mini':
             import warnings
             warnings.warn(
                 'To evaluate on MMOral-OMNI, we would suggest `MMOral_OMNI` for the default setting.'
             )
+        self._categories_filter = categories if categories else None
         super().__init__(dataset=dataset, skip_noimg=skip_noimg)
+
+    def post_build(self, dataset):
+        """Filter by categories if self._categories_filter was set."""
+        if getattr(self, '_categories_filter', None) and len(self._categories_filter) > 0:
+            keywords = [str(kw) for kw in self._categories_filter]
+            mask = self.data['category'].apply(
+                lambda c: any(kw in str(c) for kw in keywords)
+            )
+            self.data = self.data[mask].reset_index(drop=True)
 
 
     # Given one data record, return the built prompt (a multi-modal message), can override
