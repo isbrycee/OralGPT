@@ -105,6 +105,43 @@ Config Example:
 }
 
 ```
+
+```json
+{
+    "model": {
+        "OralGPT-Omni": {
+            "class": "GPT4V",
+            "model": "OralAgent",
+            "temperature": 0.0,
+            "img_detail": "high",
+            "api_base": "http://0.0.0.0:8124/v1/chat/completions",
+            "retry": 10,
+            "timeout": 600,
+            "max_tokens": 32768,
+            "verbose": true
+        }
+    },
+    "data": {
+        "MMOral_OMNI": {
+            "class": "MMOral_OMNI",
+            "dataset": "MMOral_OMNI",
+            // "categories": ["IV", "CE", "PA", "PI"]
+        }
+    },
+    "judger": {
+        "gpt-5-mini": {
+            "class": "GPT4V",
+            "model": "gpt-5-mini",
+            "img_detail": "high",
+            "api_base": "https://www.dmxapi.cn/v1/chat/completions",
+            "temperature": 0.0,
+            "retry": 10,
+            "verbose": true
+        }
+    }
+}
+
+
 ---
 
 ## 🧭 5. Start Evaluation
