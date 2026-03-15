@@ -22,7 +22,7 @@
 
 - [OralGPT](https://arxiv.org/abs/2509.09254)
 - [OralGPT-Omni](https://arxiv.org/abs/2511.22055)
-- OralGPT-Plus
+- [OralGPT-Plus](https://arxiv.org/abs/2603.06366)
 - OralGPT-Patho
 - OralGPT-3D
 - OralGPT-Agent
