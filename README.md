@@ -156,11 +156,17 @@ If you find our work helpful, please cite us:
   journal={NeurIPS 2025},
   year={2025}
 }
-@article{hao2025oralgpt,
+@article{hao2025oralgpt-omni,
   title={OralGPT-Omni: A Versatile Dental Multimodal Large Language Model},
   author={Hao, Jing and Liang, Yuci and Lin, Lizhuo and Fan, Yuxuan and Zhou, Wenkai and Guo, Kaixin and Ye, Zanting and Sun, Yanpeng and Zhang, Xinyu and Yang, Yanqi and others},
   journal={CVPR 2026},
   year={2025}
+}
+@article{fan2026oralgpt-plus,
+  title={OralGPT-Plus: Learning to Use Visual Tools via Reinforcement Learning for Panoramic X-ray Analysis},
+  author={Fan, Yuxuan and Hao, Jing and Chen, Hong and Bao, Jiahao and Shao, Yihua and Liang, Yuci and Hung, Kuo Feng and Tang, Hao},
+  journal={CVPR 2026},
+  year={2026}
 }
 @article{hao2025oraldataset,
   title={Characteristics, licensing, and ethical considerations of openly accessible oral-maxillofacial imaging datasets: a systematic review},
