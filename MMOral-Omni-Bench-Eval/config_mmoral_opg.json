@@ -1,12 +1,13 @@
 {
     "model": {
-        "GLM-4.1V-9B-Thinking": {
+        "OralGPT": {
             "class": "GPT4V",
-            "model": "GLM-4.1V-9B-Thinking",
-            "temperature": 1.0,
+            "model": "OralGPT",
+            "temperature": 0,
             "img_detail": "high",
-            "api_base": "https://www.dmxapi.cn/v1/chat/completions",
+            "api_base": "http://0.0.0.0:0000/v1/chat/completions",
             "retry": 10,
+            "max_tokens": 8192,
             "verbose": true
         }
     },
@@ -17,12 +18,12 @@
         }
     },
     "judger": {
-        "Qwen3-8B": {
+        "gpt-5-mini": {
             "class": "GPT4V",
-            "model": "Qwen3-8B",
+            "model": "gpt-5-mini",
             "img_detail": "high",
             "api_base": "https://www.dmxapi.cn/v1/chat/completions",
-            "temperature": 1.0,
+            "temperature": 0.0,
             "retry": 10,
             "verbose": true
         }
