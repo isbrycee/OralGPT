@@ -5,7 +5,7 @@
             "model": "OralGPT",
             "temperature": 0,
             "img_detail": "high",
-            "api_base": "http://0.0.0.0:0000/v1/chat/completions",
+            "api_base": "http://0.0.0.0:8001/v1/chat/completions",
             "retry": 10,
             "max_tokens": 8192,
             "verbose": true
