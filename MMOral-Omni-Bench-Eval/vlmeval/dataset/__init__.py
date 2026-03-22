@@ -20,6 +20,7 @@ from .image_vqa import (
 from .image_ccocr import CCOCRDataset
 from .image_shortqa import ImageShortQADataset, PathVQA_VAL, PathVQA_TEST
 from .text_mcq import CustomTextMCQDataset, TextMCQDataset
+from .oralqa_zh import OralQA_ZH
 
 from .vcr import VCRDataset
 from .mmlongbench import MMLongBench
@@ -223,7 +224,8 @@ VIDEO_DATASET = [
 ]
 
 TEXT_DATASET = [
-    TextMCQDataset
+    TextMCQDataset,
+    OralQA_ZH,
 ]
 
 CUSTOM_DATASET = [

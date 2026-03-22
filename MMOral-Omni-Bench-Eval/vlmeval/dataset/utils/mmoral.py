@@ -43,7 +43,6 @@ def build_mmoral_omni_gpt5_prompt(line):
         [question, gt.replace('<AND>', ' <AND> ').replace('<OR>', ' <OR> '), prediction, ''])
     return gpt4_prompt
 
-
 def MMOral_Omni_auxeval(model, line):
     def float_cvt(s):
         try:

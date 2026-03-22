@@ -50,14 +50,14 @@ from vlmeval.utils.result_transfer import MMMU_result_transfer, MMTBench_result_
 
 # add by bryce
 def df_to_latex_from_key_value(df: pd.DataFrame) -> str:
-    # 指定要提取的 key 顺序
+    # 指定要提取的 key 顺序 (MMOral_OMNI)
     keys = ["II_Loc", "II_Dx-I", "II_Dx-R", "PA", "CE", "PI", "TP", "IV", "Overall"]
     
     # 检查列数量
     if df.shape[1] < 3:
         raise ValueError("表格至少需要 3 列，第1列为key，第3列为value。")
     
-    # 取第2列作为key，第4列作为value
+    # 取第1列作为key，第3列作为value
     key_col = df.columns[0]
     value_col = df.columns[2]
     
@@ -76,6 +76,28 @@ def df_to_latex_from_key_value(df: pd.DataFrame) -> str:
     # 格式化为 LaTeX 表格字符串，保留两位小数
     latex_line = "& " + " & ".join([f"{v:.2f}" for v in values]) + r" \\"
     
+    return latex_line
+
+
+def df_to_latex_from_key_value_opg(df: pd.DataFrame) -> str:
+    """MMOral_OPG_OPEN 评估结果的 LaTeX 表格行（可直接复制到论文）。"""
+    keys = ["Teeth", "Patho", "HisT", "Jaw", "SumRec", "Report", "Overall"]
+    
+    if df.shape[1] < 3:
+        raise ValueError("表格至少需要 3 列，第1列为 key，第3列为 value。")
+    
+    key_col = df.columns[0]
+    value_col = df.columns[2]
+    
+    df_filtered = df[df[key_col].isin(keys)].copy()
+    mapping = dict(zip(df_filtered[key_col], df_filtered[value_col]))
+    
+    values = []
+    for key in keys:
+        val = mapping.get(key, float("nan"))
+        values.append(val)
+    
+    latex_line = "& " + " & ".join([f"{v:.2f}" for v in values]) + r" \\"
     return latex_line
 
 
@@ -519,7 +541,10 @@ def main():
                             logger.info('\n' + tabulate(eval_results))
                             if dataset_name == "MMOral_OMNI":
                                 latex_row = df_to_latex_from_key_value(eval_results)
-                                logger.info(latex_row)
+                                logger.info("LaTeX (MMOral_OMNI): " + latex_row)
+                            elif dataset_name == "MMOral_OPG_OPEN":
+                                latex_row = df_to_latex_from_key_value_opg(eval_results)
+                                logger.info("LaTeX (MMOral_OPG_OPEN): " + latex_row)
 
                     # Restore the proxy
                     if eval_proxy is not None:
