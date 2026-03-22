@@ -101,6 +101,18 @@ def df_to_latex_from_key_value_opg(df: pd.DataFrame) -> str:
     return latex_line
 
 
+def df_to_latex_oralqa_zh(df: pd.DataFrame) -> str:
+    """OralQA-ZH：按评估结果中的 Category 行顺序输出各准确率（%）的 LaTeX 表格行。"""
+    if "acc" in df.columns:
+        acc_series = df["acc"]
+    elif df.shape[1] >= 3:
+        acc_series = df.iloc[:, 2]
+    else:
+        raise ValueError("无法找到 acc 列（OralQA-ZH 期望列名为 Category, tot, acc）。")
+    values = [float(x) for x in acc_series]
+    return "& " + " & ".join([f"{v:.2f}" for v in values]) + r" \\"
+
+
 # Make WORLD_SIZE invisible when build models
 def build_model_from_config(cfg, model_name, use_vllm=False):
     import vlmeval.api
@@ -545,6 +557,18 @@ def main():
                             elif dataset_name == "MMOral_OPG_OPEN":
                                 latex_row = df_to_latex_from_key_value_opg(eval_results)
                                 logger.info("LaTeX (MMOral_OPG_OPEN): " + latex_row)
+                            elif dataset_name == "OralQA-ZH":
+                                latex_row = df_to_latex_oralqa_zh(eval_results)
+                                logger.info("LaTeX (OralQA-ZH): " + latex_row)
+                                cat_col = (
+                                    eval_results["Category"]
+                                    if "Category" in eval_results.columns
+                                    else eval_results.iloc[:, 0]
+                                )
+                                logger.info(
+                                    "LaTeX (OralQA-ZH) 列顺序（与上行数值一一对应）: "
+                                    + ", ".join(cat_col.astype(str).tolist())
+                                )
 
                     # Restore the proxy
                     if eval_proxy is not None:
