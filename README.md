@@ -16,7 +16,7 @@
   </a>
 </div>
 
-# OralGPT 🦷🦷  
+# OralGPT-Family 🦷🦷  
 
 ***OralGPT**: A Series Versatile Dental Multimodal Large Language Models*
 
