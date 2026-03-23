@@ -102,14 +102,24 @@ def df_to_latex_from_key_value_opg(df: pd.DataFrame) -> str:
 
 
 def df_to_latex_oralqa_zh(df: pd.DataFrame) -> str:
-    """OralQA-ZH：按评估结果中的 Category 行顺序输出各准确率（%）的 LaTeX 表格行。"""
+    """OralQA-ZH：按固定科目顺序（与 OralQA_ZH.CATEGORY_ORDER 一致）输出各准确率（%）的 LaTeX 表格行。"""
+    from vlmeval.dataset.oralqa_zh import OralQA_ZH
+
+    if "Category" not in df.columns:
+        raise ValueError("OralQA-ZH LaTeX 需要 Category 列以确定科目顺序。")
     if "acc" in df.columns:
-        acc_series = df["acc"]
+        acc_col = "acc"
     elif df.shape[1] >= 3:
-        acc_series = df.iloc[:, 2]
+        acc_col = df.columns[2]
     else:
         raise ValueError("无法找到 acc 列（OralQA-ZH 期望列名为 Category, tot, acc）。")
-    values = [float(x) for x in acc_series]
+
+    cat_to_acc = {}
+    for _, row in df.iterrows():
+        cat_to_acc[str(row["Category"])] = float(row[acc_col])
+
+    categories = OralQA_ZH.latex_ordered_categories(cat_to_acc)
+    values = [cat_to_acc[c] for c in categories]
     return "& " + " & ".join([f"{v:.2f}" for v in values]) + r" \\"
 
 
@@ -558,17 +568,23 @@ def main():
                                 latex_row = df_to_latex_from_key_value_opg(eval_results)
                                 logger.info("LaTeX (MMOral_OPG_OPEN): " + latex_row)
                             elif dataset_name == "OralQA-ZH":
+                                from vlmeval.dataset.oralqa_zh import OralQA_ZH
+
+                                acc_col = (
+                                    "acc"
+                                    if "acc" in eval_results.columns
+                                    else eval_results.columns[2]
+                                )
+                                cat_to_acc = {
+                                    str(r["Category"]): float(r[acc_col])
+                                    for _, r in eval_results.iterrows()
+                                }
+                                logger.info(
+                                    "LaTeX (OralQA-ZH) 列顺序（与下一行数值一一对应，Abbrev）: "
+                                    + OralQA_ZH.abbrev_for_log_line(cat_to_acc)
+                                )
                                 latex_row = df_to_latex_oralqa_zh(eval_results)
                                 logger.info("LaTeX (OralQA-ZH): " + latex_row)
-                                cat_col = (
-                                    eval_results["Category"]
-                                    if "Category" in eval_results.columns
-                                    else eval_results.iloc[:, 0]
-                                )
-                                logger.info(
-                                    "LaTeX (OralQA-ZH) 列顺序（与上行数值一一对应）: "
-                                    + ", ".join(cat_col.astype(str).tolist())
-                                )
 
                     # Restore the proxy
                     if eval_proxy is not None:

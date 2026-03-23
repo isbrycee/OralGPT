@@ -15,13 +15,44 @@ class OralQA_ZH(CustomTextMCQDataset):
     - 继承 CustomTextMCQDataset 以复用通用 MCQ 文本评估逻辑
     """
 
+    # 汇总 / LaTeX 打印时的科目顺序：牙体→牙周→外科→修复→正畸→黏膜→儿童→影像→预防→流行→病理
+    CATEGORY_ORDER = [
+        "牙体牙髓病学",
+        "牙周病学",
+        "口腔颌面外科学",
+        "口腔修复学",
+        "口腔正畸学",
+        "口腔黏膜病学",
+        "儿童口腔医学",
+        "口腔颌面医学影像诊断学",
+        "口腔预防医学",
+        "口腔流行病学",
+        "口腔组织病理学",
+    ]
+
+    # 与 CATEGORY_ORDER 对应科目的英文缩写（日志 / 论文表头）
+    CATEGORY_ABBREV_EN = {
+        "牙体牙髓病学": "Endo",
+        "牙周病学": "Perio",
+        "口腔颌面外科学": "OMFS",
+        "口腔修复学": "Prosth",
+        "口腔正畸学": "Ortho",
+        "口腔黏膜病学": "OMD",
+        "儿童口腔医学": "PedDent",
+        "口腔颌面医学影像诊断学": "OMFR",
+        "口腔预防医学": "PrevDent",
+        "口腔流行病学": "OralEpi",
+        "口腔组织病理学": "OMFP",
+        "Overall": "Overall",
+    }
+
     DATASET_URL = {
         "OralQA-ZH": (
             "https://huggingface.co/datasets/OralGPT/OralQA-ZH/"
             "resolve/main/OralQA-ZH.tsv"
         ),
     }
-    DATASET_MD5 = {"OralQA-ZH": "0fee91c1f532c340a0703fe7b035b7da"}
+    DATASET_MD5 = {"OralQA-ZH": "9d861f09093797d5f23a57a6168fab2b"}
 
     def __init__(self, dataset: str = "OralQA-ZH", **kwargs):
         super().__init__(dataset=dataset, **kwargs)
@@ -129,10 +160,8 @@ class OralQA_ZH(CustomTextMCQDataset):
                 correct["Overall"] += 1
                 correct[cat] += 1
 
-        # 汇总为 DataFrame
-        categories = list({k for k in tot.keys() if k != "Overall"})
-        categories.sort()
-        categories.append("Overall")
+        # 汇总为 DataFrame（科目顺序固定为 CATEGORY_ORDER，其余未见过的 category 按字母排在中间科目之后、Overall 之前）
+        categories = self.latex_ordered_categories(dict(tot))
 
         res = {"Category": [], "tot": [], "acc": []}
         for cat in categories:
@@ -151,6 +180,24 @@ class OralQA_ZH(CustomTextMCQDataset):
         dump(df_res, result_file)
 
         return df_res
+
+    @classmethod
+    def latex_ordered_categories(cls, cat_to_acc: dict) -> list:
+        """
+        与 LaTeX 行、终端「列顺序」一致的科目顺序（中文 category 名）。
+        cat_to_acc: category -> acc（或其它占位），仅使用其键集。
+        """
+        raw_cats = set(cat_to_acc) - {"Overall"}
+        ordered = [c for c in cls.CATEGORY_ORDER if c in raw_cats]
+        unknown = sorted(raw_cats - set(ordered))
+        return ordered + unknown + (["Overall"] if "Overall" in cat_to_acc else [])
+
+    @classmethod
+    def abbrev_for_log_line(cls, cat_to_acc: dict) -> str:
+        """逗号分隔的英文缩写，顺序与 latex_ordered_categories 一致。"""
+        cats = cls.latex_ordered_categories(cat_to_acc)
+        parts = [cls.CATEGORY_ABBREV_EN.get(c, c) for c in cats]
+        return ", ".join(parts)
 
     @classmethod
     def supported_datasets(cls):
