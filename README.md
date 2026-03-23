@@ -27,10 +27,10 @@
 - OralGPT-Patho
 - OralGPT-3D
 - OralGPT-Agent
+- Oral Research
 - OralGPT-X
 - OralGPT-Edu
-- OralCLIP
-- OralDINO
+- OralDetect Family
 - ...
   
 ---
