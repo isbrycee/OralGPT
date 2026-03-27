@@ -47,6 +47,7 @@
 
 
 ## 🔔 News 
+- **[2026-03-27]** 🔥**[NeurIPS 2025] MMOral‑OPG‑Bench** is now supported on [**VLMEvalKit**](https://github.com/open-compass/VLMEvalKit/blob/main/vlmeval/dataset/mmoral_opg_open.py) for evaluation.
 - **[2026-03-02]** 🚀  **OralGPT-Captioning-4B-Base** has been released on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralGPT-Captioning-4B-Base). 👏 Welcome to generate visual description of dental images. 
 - **[2026-02-22]** 🎉 Our paper of **[OralGPT-Omni](https://arxiv.org/abs/2511.22055)** and **OralGPT-Plus** have been accepted by **CVPR 2026**.
 - **[2025-12-17]** 🔥🔥🔥 **OralGPT-Omni-7B-Instruct** has been released on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralGPT-Omni-7B-Instruct). 👏 Welcome to try it.
@@ -118,7 +119,7 @@ For benchmark evaluation, we provide two approaches:
 
 #### Using VLMEvalkit
 
-Please refer to [**Evaluation Suite**](./MMOral-Bench-EvalKit/) or [official VLMEvalKit Suite](https://github.com/open-compass/VLMEvalKit/tree/main).
+Please refer to [**Evaluation Suite**](./MMOral-Bench-EvalKit/) or [**official VLMEvalKit**](https://github.com/open-compass/VLMEvalKit/tree/main).
 
 #### Using Generic Evaluation Scripts
 
