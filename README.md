@@ -17,36 +17,33 @@
   </a>
 </div>
 
-# OralGPT-Family 🦷🦷  
+# OralGPT Family 🦷🦷
 
-***OralGPT**: A Series Versatile Dental Multimodal Large Language Models*
+**OralGPT** is a **family of dental multimodal large language models (MLLMs)** and benchmarks for **AI-driven digital dentistry**.
 
-- [OralGPT](https://arxiv.org/abs/2509.09254)
-- [OralGPT-Omni](https://arxiv.org/abs/2511.22055)
-- [OralGPT-Plus](https://arxiv.org/abs/2603.06366)
-- OralGPT-Patho
-- OralGPT-3D
-- OralGPT-Agent
-- Oral Research
-- OralGPT-X
-- OralGPT-Edu
-- OralDetect Family
-- ...
-  
----
+- **For researchers**: benchmark + evaluation toolkit + papers.
+- **For developers**: ready-to-run evaluation pipeline + configs.
+- **For collaborators**: contact below.
 
-## 📖 Table of Contents  
-- [News](#-News)
-- [Overview](#-Overview)  
-- [Upcoming Updates](#-upcoming-updates)
-- [Released Materials](#-released-materials)
-- [MMOral-Bench](#-mmoral-bench)  
-- [Citation](#-citation)  
+## 📌 Quick Links
+
+- **Papers**: [OralGPT](https://arxiv.org/abs/2509.09254) · [OralGPT-Omni](https://arxiv.org/abs/2511.22055) · [OralGPT-Plus](https://arxiv.org/abs/2603.06366)
+- **Datasets/Models**: [MMOral-OPG-Bench](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench) · [Hugging Face Org](https://huggingface.co/OralGPT)
+- **Evaluation**: [MMOral-OPG-Bench-EvalKit](./MMOral-Bench-EvalKit/) · [MMOral-Uni-Bench-Eval](./MMOral-Omni-Bench-Eval/)
+
+## 📖 Table of Contents
+
+- [News](#news)
+- [Overview](#overview)
+- [Getting Started (MMOral-OPG-Bench)](#getting-started-mmoral-opg-bench)
+- [Repository Structure](#repository-structure)
+- [MMOral-Bench](#mmoral-bench)
+- [Citation](#citation)
+- [Contact](#contact)
 
 ---
 
-
-## 🔔 News 
+## 🔔 News
 - **[2026-03-27]** 🔥 **[NeurIPS 2025] MMOral‑OPG‑Bench** is now supported on [**VLMEvalKit**](https://github.com/open-compass/VLMEvalKit/blob/main/vlmeval/dataset/mmoral_opg_open.py) for evaluation.
 - **[2026-03-02]** 🚀  **OralGPT-Captioning-4B-Base** has been released on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralGPT-Captioning-4B-Base). 👏 Welcome to generate visual description of dental images. 
 - **[2026-02-22]** 🎉 Our paper of **[OralGPT-Omni](https://arxiv.org/abs/2511.22055)** and **OralGPT-Plus** have been accepted by **CVPR 2026**.
@@ -80,23 +77,53 @@ OralGPT aims to be the foundation MLLM for AI-driven digital dentistry — bridg
 
 ---
 
-## 🔮 Upcoming Updates  
+## 🚀 Getting Started (MMOral-OPG-Bench)
 
-- 📦 Release of **MMOral-Uni Benchmark**  
-- 📑 Expanded **instruction dataset** with more diverse dental imaging modalities
-- 🧪 Release of **OralGPT-Plus**
+This is the fastest way to run an evaluation with the provided toolkit.
+
+### 1) Prepare API credentials
+
+Create a `.env` file under `MMOral-Bench-EvalKit/` and fill in your credentials:
+
+```bash
+OPENAI_API_KEY=
+OPENAI_API_BASE=
+```
+
+> **Tip:** `.env` contains private keys. Do **not** commit it to any public repo.
+
+### 2) Configure models & judge
+
+Edit the evaluation config (example file name used by the toolkit: `config_mmoral_opg.json`) to specify:
+
+- models to evaluate
+- benchmark split (e.g., `MMOral_OPG_CLOSED`, `MMOral_OPG_OPEN`)
+- judge model (e.g., `gpt-4-turbo` or `gpt-5-mini`)
+
+See: `MMOral-Bench-EvalKit/README.md` for full examples.
+
+### 3) Run evaluation
+
+From `MMOral-Bench-EvalKit/`, run:
+
+```bash
+python run.py --config config_mmoral_opg.json \
+  --mode all \
+  --api-nproc 8 \
+  --work-dir '.' \
+  --verbose
+  # --reuse
+```
+
+Add `--reuse` to resume existing results.
 
 ---
 
-## 🚀 Released Materials
+## 🧭 Repository Structure
 
-1. Multiple **Dental Visual Expert Models** released on 🤗 [Hugging Face](https://huggingface.co/Bryceee/Teeth_Visual_Experts_Models)
-, covering detection, segmentation, and classification tasks in panoramic/periapical X-ray images.
-2. **[NeurIPS 2025] MMOral-Bench** (MMOral-OPG-Bench) has been released on 🤗 [Hugging Face](https://huggingface.co/datasets/OralGPT/MMOral-OPG-Bench).
-3. **Dental Image Captioning MLLM** across 7 modalities has been released on 🤗 [Hugging Face](https://huggingface.co/OralGPT/OralGPT-Captioning-4B-Base).  
-4. 👉 Coming soon ...
----
-
+- **`MMOral-Bench-EvalKit/`**: evaluation toolkit (recommended entry for benchmarking).
+- **`MMOral-Omni/`**: OralGPT-Omni related materials (in progress).
+- **`LLaMA-Factory/`**: training framework (upstream project included for convenience).
 
 ## 📏 MMOral-Bench  
 
@@ -181,3 +208,7 @@ If you find our work helpful, please cite us:
   publisher={Nature Publishing Group UK London}
 }
 ```
+
+## 🤝 Contact
+
+- 📮 **Email**: isjinghao@gmail.com
