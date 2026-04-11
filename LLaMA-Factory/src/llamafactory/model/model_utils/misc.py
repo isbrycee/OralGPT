@@ -46,7 +46,10 @@ def find_all_linear_modules(model: "PreTrainedModel", freeze_vision_tower: bool)
             continue
 
         if "Linear" in module.__class__.__name__ and "Embedding" not in module.__class__.__name__:
-            module_names.add(name.split(".")[-1])
+            suffix = name.split(".")[-1]
+            if suffix.isdigit():
+                continue
+            module_names.add(suffix)
 
     logger.info_rank0("Found linear modules: {}".format(",".join(module_names)))
     return list(module_names)
