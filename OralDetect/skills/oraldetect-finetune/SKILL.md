@@ -365,23 +365,31 @@ ground truth neither run finds.
 
 ## Final step — The report page
 
-One HTML page, rendered from $SKILL/assets/report_template.html. 
+One HTML page. Pick the language first — `--lang cn` or `--lang en`, matching the language the
+user has been writing to you in — and the script takes both its own copy and its template from it:
 
-$SKILL/assets/example_report.html is a finished one — open it first and match it: section order, how much copy each section carries, how the numbers read.
+| `--lang` | template | worked example |
+|---|---|---|
+| `cn` (default) | `$SKILL/assets/report_template_CN.html` | `$SKILL/assets/example_report_CN.html` |
+| `en` | `$SKILL/assets/report_template_EN.html` | `$SKILL/assets/example_report_EN.html` |
+
+Open the example for your language first and match it: section order, how much copy each section
+carries, how the numbers read. The two examples are the same run, so either one shows the shape.
 
 ```bash
 python $SKILL/scripts/make_report_html.py \
-    --work-dir "$OUT" \
+    --work-dir "$OUT" --lang <cn|en> \
     --train "$DATAS/instances_train.json" --val "$DATAS/instances_val.json" \
-    --title      "在 <dataset folder> 数据集上微调 OralDetect" \
+    --title      "Finetuning OralDetect on <dataset folder>" \
     --subject    "<class name>" --subject-cn "<that class in the reader's language>" \
-    --photo-noun "<what the images are>" \
+    --photo-noun "<what the images are, e.g. intra-oral photos>" \
     --gpu "<1×A100-40G>" --minutes <wall clock> \
     --finding    "<one sentence>" \
     --out "$REPORT/report.html"
 ```
 
-`--title` and `--finding` are the only things it cannot compute. The finding is **one sentence** on what the comparison figure shows that the metrics cannot, from the figure you looked at in step 6, with numbers you can point to.
+`--title` and `--finding` are the only things it cannot compute. Write both in the `--lang`
+language — they go onto the page verbatim. The finding is **one sentence** on what the comparison figure shows that the metrics cannot, from the figure you looked at in step 6, with numbers you can point to.
 
 Add `--standalone --out "$REPORT/report_standalone.html"` for a copy to open or email.
 
